@@ -1,43 +1,52 @@
 import { useCallback, useEffect, useState } from 'react';
-import {
-  OpenVidu,
-  Session as OVSession,
-  Publisher,
-  Subscriber,
-} from 'openvidu-browser';
+import { OpenVidu, Session as OVSession } from 'openvidu-browser';
 import { postCreateSession, postToken } from '@/api/sessionAPI';
 
 const useOpenvidu = () => {
   const [session, setSession] = useState<OVSession | null>(null);
-  /* subscribers, publisher 임시 state => db에 관리 */
-  const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
-  const [publisher, setPublisher] = useState<Publisher | null>(null);
+  const [participants, setParticipants] = useState<Record<string, string>>({});
+  const [user, setUser] = useState<Record<'id' | 'name', null | string>>({
+    id: null,
+    name: null,
+  });
   const [OV, setOV] = useState<OpenVidu | null>(null);
 
-  const joinSession = async (sid: string, isPublisher?: true) => {
+  const joinSession = async (sid: string, name: string) => {
     const token = await postToken(sid);
     const newOV = new OpenVidu();
+    newOV.enableProdMode();
     setOV(newOV);
 
     const newSession = newOV.initSession();
-    await newSession.connect(token);
+    await newSession.connect(token, { clientData: name });
     setSession(newSession);
-
-    if (isPublisher) {
-      const newPublisher = newOV.initPublisher(undefined, {
-        audioSource: true,
-        videoSource: true,
-        publishAudio: true,
-        publishVideo: true,
+    const newPublisher = newOV.initPublisher(undefined, {
+      audioSource: true,
+      videoSource: true,
+      publishAudio: true,
+      publishVideo: true,
+    });
+    await newSession.publish(newPublisher);
+    setParticipants(() => {
+      const totalParticipants = {};
+      newSession.remoteConnections.forEach((entry) => {
+        const { connectionId, data } = entry;
+        Object.assign(totalParticipants, {
+          [connectionId]: JSON.parse(data).clientData,
+        });
       });
-      await newSession.publish(newPublisher);
-      setPublisher(newPublisher);
-    }
+      return totalParticipants;
+    });
+
+    const {
+      connection: { connectionId, data },
+    } = newSession;
+    setUser({ id: connectionId, name: JSON.parse(data).clientData });
   };
 
-  const createSession = async (sid: string) => {
+  const createSession = async (sid: string, name: string) => {
     const id = await postCreateSession(sid);
-    await joinSession(id, true);
+    await joinSession(id, name);
   };
 
   const leaveSession = useCallback(() => {
@@ -46,8 +55,7 @@ const useOpenvidu = () => {
     }
     setOV(null);
     setSession(null);
-    setSubscribers([]);
-    setPublisher(null);
+    setParticipants({});
   }, [session]);
 
   useEffect(() => {
@@ -62,15 +70,28 @@ const useOpenvidu = () => {
       return;
     }
     session.on('streamCreated', (e) => {
-      const subscriber = session.subscribe(e.stream, undefined);
-      setSubscribers((prev) => [...prev, subscriber]);
+      /* const { connectionId, data } = e.stream.connection; */
+      const { connectionId, data } = e.stream.connection;
+      setParticipants((prev) => ({
+        ...prev,
+        [connectionId]: JSON.parse(data).clientData,
+      }));
+    });
+
+    session.on('streamDestroyed', (e) => {
+      const { connectionId } = e.stream.connection;
+      setParticipants((prev) => {
+        const newParticipants = { ...prev };
+        delete newParticipants[connectionId];
+        return newParticipants;
+      });
     });
   }, [session]);
 
   return {
+    user,
     session,
-    subscribers,
-    publisher,
+    participants,
     OV,
     createSession,
     joinSession,

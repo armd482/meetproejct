@@ -34,7 +34,7 @@ export const postToken = async (sessionId: string) => {
         Authorization: `Basic ${btoa(`OPENVIDUAPP:${SERVER_SECRET}`)}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({}),
+      body: JSON.stringify({ name: 'test' }),
     },
   );
 
