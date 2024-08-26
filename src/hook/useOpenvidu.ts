@@ -1,9 +1,16 @@
 import { useCallback, useEffect, useState } from 'react';
-import { OpenVidu, Session as OVSession } from 'openvidu-browser';
+import {
+  OpenVidu,
+  Session as OVSession,
+  Publisher,
+  Subscriber,
+} from 'openvidu-browser';
 import { postCreateSession, postToken } from '@/api/sessionAPI';
 
 const useOpenvidu = () => {
   const [session, setSession] = useState<OVSession | null>(null);
+  const [publisher, setPublisher] = useState<Publisher | null>(null);
+  const [subscribers, setSubscribers] = useState<[string, Subscriber][]>([]);
   const [participants, setParticipants] = useState<Record<string, string>>({});
   const [user, setUser] = useState<Record<'id' | 'name', null | string>>({
     id: null,
@@ -27,6 +34,21 @@ const useOpenvidu = () => {
       publishVideo: true,
     });
     await newSession.publish(newPublisher);
+    setPublisher(newPublisher);
+    setSubscribers(() => {
+      const data: [string, Subscriber][] = [];
+      newSession.remoteConnections.forEach((entry) => {
+        if (!entry.stream) {
+          return;
+        }
+        data.push([
+          entry.connectionId,
+          newSession.subscribe(entry.stream, undefined),
+        ]);
+      });
+      return data;
+    });
+
     setParticipants(() => {
       const totalParticipants = {};
       newSession.remoteConnections.forEach((entry) => {
@@ -56,6 +78,8 @@ const useOpenvidu = () => {
     setOV(null);
     setSession(null);
     setParticipants({});
+    setPublisher(null);
+    setSubscribers([]);
   }, [session]);
 
   useEffect(() => {
@@ -70,12 +94,13 @@ const useOpenvidu = () => {
       return;
     }
     session.on('streamCreated', (e) => {
-      /* const { connectionId, data } = e.stream.connection; */
       const { connectionId, data } = e.stream.connection;
       setParticipants((prev) => ({
         ...prev,
         [connectionId]: JSON.parse(data).clientData,
       }));
+      const newSubscribe = session.subscribe(e.stream, undefined);
+      setSubscribers((prev) => [...prev, [connectionId, newSubscribe]]);
     });
 
     session.on('streamDestroyed', (e) => {
@@ -85,11 +110,16 @@ const useOpenvidu = () => {
         delete newParticipants[connectionId];
         return newParticipants;
       });
+      setSubscribers((prev) =>
+        prev.filter((entity) => entity[0] !== connectionId),
+      );
     });
   }, [session]);
 
   return {
     user,
+    publisher,
+    subscribers,
     session,
     participants,
     OV,
