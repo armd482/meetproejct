@@ -14,27 +14,7 @@ const useOpenvidu = () => {
   const [publisher, setPublisher] = useState<Publisher | null>(null);
   const [OV, setOV] = useState<OpenVidu | null>(null);
 
-  const createSession = async (sid: string) => {
-    const id = await postCreateSession(sid);
-    const token = await postToken(id);
-
-    const newOV = new OpenVidu();
-    const newSession = newOV.initSession();
-    await newSession.connect(token);
-    const newPublisher = newOV.initPublisher(undefined, {
-      audioSource: true,
-      videoSource: true,
-      publishAudio: true,
-      publishVideo: true,
-    });
-    await newSession.publish(newPublisher);
-
-    setOV(newOV);
-    setSession(newSession);
-    setPublisher(newPublisher);
-  };
-
-  const joinSession = async (sid: string, type: 'PUBLISH' | 'SUBSCRIBE') => {
+  const joinSession = async (sid: string, isPublisher?: true) => {
     const token = await postToken(sid);
     const newOV = new OpenVidu();
     setOV(newOV);
@@ -43,7 +23,7 @@ const useOpenvidu = () => {
     await newSession.connect(token);
     setSession(newSession);
 
-    if (type === 'PUBLISH') {
+    if (isPublisher) {
       const newPublisher = newOV.initPublisher(undefined, {
         audioSource: true,
         videoSource: true,
@@ -53,15 +33,11 @@ const useOpenvidu = () => {
       await newSession.publish(newPublisher);
       setPublisher(newPublisher);
     }
+  };
 
-    newSession.on('streamCreated', (e) => {
-      const subscriber = newSession.subscribe(e.stream, undefined);
-      setSubscribers((prev) => [...prev, subscriber]);
-    });
-
-    newSession.on('streamDestroyed', (e) => {
-      setSubscribers((prev) => prev.filter((sub) => sub.stream !== e.stream));
-    });
+  const createSession = async (sid: string) => {
+    const id = await postCreateSession(sid);
+    await joinSession(id, true);
   };
 
   const leaveSession = useCallback(() => {
@@ -80,6 +56,16 @@ const useOpenvidu = () => {
       window.removeEventListener('beforeunload', leaveSession);
     };
   }, [leaveSession]);
+
+  useEffect(() => {
+    if (!session) {
+      return;
+    }
+    session.on('streamCreated', (e) => {
+      const subscriber = session.subscribe(e.stream, undefined);
+      setSubscribers((prev) => [...prev, subscriber]);
+    });
+  }, [session]);
 
   return {
     session,
