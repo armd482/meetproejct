@@ -16,7 +16,7 @@
     },
     "project": "./tsconfig.json"
   },
-  "ignorePatterns": ["build", "dist", "public"],
+  "ignorePatterns": ["build", "dist", "public", "*.mjs"],
   "env": {
     "browser": true,
     "node": true,
