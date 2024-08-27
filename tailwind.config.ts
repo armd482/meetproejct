@@ -11,6 +11,17 @@ const config: Config = {
       xl: ['20px', '28px'],
       '1.5xl': ['22px', '30px'],
       '2xl': ['24px', '32px'],
+      '3xl': ['30px', '36px'],
+      '4xl': ['36px', '40px'],
+      '4.5xl': ['44px', '1'],
+      '5xl': ['48px', '1'],
+      '6xl': ['60px', '1'],
+      '7xl': ['72px', '1'],
+      '8xl': ['96px', '1'],
+      '9xl': ['128px', '1'],
+    },
+    fontFamily: {
+      googleSans: ['Google Sans', 'Roboto', 'Arial', 'sans-serif'],
     },
     extend: {
       backgroundImage: {
