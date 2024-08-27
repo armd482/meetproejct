@@ -5,15 +5,16 @@ export const useCurrentDate = () => {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    const currnetSecond = new Date().getSeconds();
-    const updateToken = () => {
+    const currnetSecond = new Date().getTime();
+    const updateTime = () => {
       setTime(new Date());
+      timerRef.current = setTimeout(updateTime, 60000);
     };
     timerRef.current = setTimeout(
       () => {
-        timerRef.current = setTimeout(updateToken, 60000);
+        updateTime();
       },
-      (60 - currnetSecond) * 1000,
+      60000 - (currnetSecond % 60000),
     );
 
     return () => {
