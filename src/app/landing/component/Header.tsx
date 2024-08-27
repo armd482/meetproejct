@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { LogoIcon, DeclarationIcon, HelpIcon, SettingIcon } from '@/asset';
-import { CurrentDate, IconButton } from './component';
+import { CurrentDate, IconButton } from './part/Header';
 
 export default function Header() {
   return (

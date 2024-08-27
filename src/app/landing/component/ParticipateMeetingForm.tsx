@@ -1,16 +1,31 @@
 'use client';
 
+import { ChangeEvent, FormEvent, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { KeypadIcon } from '@/asset';
-import { ChangeEvent, useState } from 'react';
+import { checkKey } from '@/lib/checkKey';
 
 export default function ParticipateMeetingForm() {
+  const router = useRouter();
   const [value, setValue] = useState('');
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
   };
+
+  const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const result = checkKey(value);
+    if (result) {
+      router.push(`/${result}`);
+    }
+  };
+
   return (
-    <form className='relative flex shrink items-center gap-2'>
+    <form
+      onSubmit={handleFormSubmit}
+      className='relative flex shrink items-center gap-2'
+    >
       <KeypadIcon
         className='absolute left-4 top-1/2 -translate-y-2/4'
         width={22}

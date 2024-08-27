@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { Header } from '@/component';
 
 export const metadata: Metadata = {
   title: 'MeetProject',
@@ -15,7 +14,6 @@ export default function RootLayout({
   return (
     <html lang='ko'>
       <body className='flex h-screen w-screen flex-col'>
-        <Header />
         <div className='flex-1'>{children}</div>
       </body>
     </html>
