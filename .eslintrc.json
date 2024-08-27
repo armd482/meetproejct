@@ -39,6 +39,8 @@
     "@typescript-eslint/lines-between-class-members": "off",
     "@typescript-eslint/no-throw-literal": "off",
     "consistent-return": "off",
-    "jsx-a11y/media-has-caption": "off"
+    "jsx-a11y/media-has-caption": "off",
+    "import/prefer-default-export": "off",
+    "jsx-a11y/control-has-associated-label": "off"
   }
 }
