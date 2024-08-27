@@ -16,7 +16,7 @@
     },
     "project": "./tsconfig.json"
   },
-  "ignorePatterns": ["build", "dist", "public", "*.mjs"],
+  "ignorePatterns": ["build", "dist", "public", "*.mjs", "*.json"],
   "env": {
     "browser": true,
     "node": true,
@@ -37,6 +37,8 @@
   "rules": {
     "react/react-in-jsx-scope": "off",
     "@typescript-eslint/lines-between-class-members": "off",
-    "@typescript-eslint/no-throw-literal": "off"
+    "@typescript-eslint/no-throw-literal": "off",
+    "consistent-return": "off",
+    "jsx-a11y/media-has-caption": "off"
   }
 }
