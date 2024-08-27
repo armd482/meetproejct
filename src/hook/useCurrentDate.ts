@@ -9,9 +9,12 @@ export const useCurrentDate = () => {
     const updateToken = () => {
       setTime(new Date());
     };
-    timerRef.current = setTimeout(() => {
-      timerRef.current = setTimeout(updateToken, 60000);
-    }, 60 - currnetSecond);
+    timerRef.current = setTimeout(
+      () => {
+        timerRef.current = setTimeout(updateToken, 60000);
+      },
+      (60 - currnetSecond) * 1000,
+    );
 
     return () => {
       if (timerRef.current) {
