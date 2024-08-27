@@ -5,7 +5,7 @@ import {
   Publisher,
   Subscriber,
 } from 'openvidu-browser';
-import { postCreateSession, postToken } from '@/api/sessionAPI';
+import { postCreateSession, postToken } from '@/app/api/sessionAPI';
 
 const useOpenvidu = () => {
   const [session, setSession] = useState<OVSession | null>(null);

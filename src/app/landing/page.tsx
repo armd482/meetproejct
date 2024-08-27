@@ -12,7 +12,7 @@ export default function Page() {
           Project Meet로 어디서나 연결하고 공동작업하고 기념일을 축하할 수
           있습니다.
         </div>
-        <div className='flex items-center gap-6'>
+        <div className='flex flex-wrap items-center gap-6'>
           <AddNewMeetingButton />
           <ParticipateMeetingForm />
         </div>

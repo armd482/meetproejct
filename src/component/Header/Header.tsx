@@ -6,13 +6,16 @@ import { CurrentDate, IconButton } from './component';
 
 export default function Header() {
   return (
-    <div className='flex h-16 items-center justify-between px-5 py-2'>
-      <Link href='/' className='flex h-10 items-center gap-2'>
+    <div className='relative h-16'>
+      <Link
+        href='/'
+        className='absolute left-5 top-1/2 flex h-10 -translate-y-1/2 items-center gap-2 whitespace-nowrap'
+      >
         <LogoIcon width={36} height={36} />
         <p className='text-1.5xl font-semibold text-gray-600'>Project</p>
         <p className='text-1.5xl font-medium text-gray-600'>Meet</p>
       </Link>
-      <div className='flex items-center'>
+      <div className='absolute right-5 top-1/2 z-10 flex -translate-y-1/2 items-center whitespace-nowrap bg-white'>
         <CurrentDate />
         <IconButton name='지원'>
           <HelpIcon width={24} height={24} fill='#5f6368' />

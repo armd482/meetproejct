@@ -6,7 +6,7 @@ import { useCurrentDate } from '@/hook/useCurrentDate';
 export default function CurrentDate() {
   const time = useCurrentDate();
   return (
-    <div className='flex items-center gap-2 p-3 text-lg font-medium text-gray-500'>
+    <div className='flex items-center gap-2 p-3 text-lg font-medium text-gray-500 max-[472px]:hidden'>
       <p>{formatTime(time)}</p>
       <span>•</span>
       <p>{formatDate(time)}</p>
