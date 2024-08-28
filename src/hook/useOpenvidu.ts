@@ -68,7 +68,6 @@ const useOpenvidu = () => {
 
   const createSession = async (sid: string, name: string) => {
     const id = await postCreateSession(sid);
-    console.log(id);
     await joinSession(id, name);
   };
 
