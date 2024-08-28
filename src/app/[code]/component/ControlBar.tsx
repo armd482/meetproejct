@@ -14,7 +14,7 @@ import {
   HandOffIcon,
   HandOnIcon,
 } from '@/asset';
-import { ControlButton, OptionButton } from './part/ControlBar';
+import { ControlButton, MenuButton, OptionButton } from './part/ControlBar';
 
 interface ControlBarProps {
   code: string;
@@ -77,6 +77,7 @@ export default function ControlBar({ code }: ControlBarProps) {
     }
     console.log('canceled');
   };
+
   const handleHandButtonClick = (isClicked: boolean) => {
     if (isClicked) {
       console.log('Clicked');
@@ -96,7 +97,7 @@ export default function ControlBar({ code }: ControlBarProps) {
           <div className='h-4 border-r border-solid border-white' />
           <p>{code}</p>
         </div>
-        <div className='flex h-12 items-center gap-2 bg-[#212121]'>
+        <div className='z-10 flex h-12 items-center gap-2 bg-[#212121]'>
           <OptionButton
             onClickButton={handleMicButtonClick}
             onClickChevron={handleMicChevronClick}
@@ -133,6 +134,7 @@ export default function ControlBar({ code }: ControlBarProps) {
             icon={<HandOffIcon width={24} height={24} fill='#06306D' />}
             clickedIcon={<HandOnIcon width={24} height={24} fill='#E3E3E3' />}
           />
+          <MenuButton />
         </div>
         <div className='absolute right-5 top-1/2 -translate-y-1/2'>456</div>
       </div>

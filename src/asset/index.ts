@@ -9,6 +9,7 @@ export { default as HandOnIcon } from './icon/handOn.svg';
 export { default as HelpIcon } from './icon/help.svg';
 export { default as KeypadIcon } from './icon/keypad.svg';
 export { default as LogoIcon } from './icon/logo.svg';
+export { default as MenuIcon } from './icon/menu.svg';
 export { default as MicOnIcon } from './icon/micOn.svg';
 export { default as MicOffIcon } from './icon/micOff.svg';
 export { default as ScreenShareIcon } from './icon/screenShare.svg';
