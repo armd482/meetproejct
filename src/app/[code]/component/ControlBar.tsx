@@ -15,6 +15,7 @@ import {
   HandOnIcon,
 } from '@/asset';
 import { ControlButton, MenuButton, OptionButton } from './part/ControlBar';
+import CallEndButton from './part/ControlBar/CallEndButton';
 
 interface ControlBarProps {
   code: string;
@@ -102,14 +103,14 @@ export default function ControlBar({ code }: ControlBarProps) {
             onClickButton={handleMicButtonClick}
             onClickChevron={handleMicChevronClick}
             isVisibleOption
-            icon={<MicOnIcon width={24} height={24} fill='#E3E3E3' />}
-            clickedIcon={<MicOffIcon width={24} height={24} fill='#5F1312' />}
+            icon={<MicOnIcon width={20} height={20} fill='#E3E3E3' />}
+            clickedIcon={<MicOffIcon width={20} height={20} fill='#5F1312' />}
           />
           <OptionButton
             onClickButton={handleVideoButtonClick}
             onClickChevron={handleVideoChevronClick}
             isVisibleOption
-            icon={<VideoOnIcon width={24} height={24} fill='#E3E3E3' />}
+            icon={<VideoOnIcon width={26} height={26} fill='#E3E3E3' />}
             clickedIcon={<VideoOffIcon width={24} height={24} fill='#5F1312' />}
           />
           <ControlButton
@@ -135,6 +136,7 @@ export default function ControlBar({ code }: ControlBarProps) {
             clickedIcon={<HandOnIcon width={24} height={24} fill='#E3E3E3' />}
           />
           <MenuButton />
+          <CallEndButton />
         </div>
         <div className='absolute right-5 top-1/2 -translate-y-1/2'>456</div>
       </div>

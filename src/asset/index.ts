@@ -1,4 +1,5 @@
 export { default as AddMeetingIcon } from './icon/addMeeting.svg';
+export { default as CallEndIcon } from './icon/callEnd.svg';
 export { default as CcIcon } from './icon/cc.svg';
 export { default as ChevronIcon } from './icon/chevron.svg';
 export { default as DeclarationIcon } from './icon/declaration.svg';
