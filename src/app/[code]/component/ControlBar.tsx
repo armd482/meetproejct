@@ -2,8 +2,19 @@
 
 import { useCurrentDate } from '@/hook/useCurrentDate';
 import { formatTime } from '@/lib/formatDate';
-import { MicOnIcon, MicOffIcon, VideoOnIcon, VideoOffIcon } from '@/asset';
-import { OptionButton } from './part/ControlBar';
+import {
+  MicOnIcon,
+  MicOffIcon,
+  VideoOnIcon,
+  VideoOffIcon,
+  CcIcon,
+  EmojiOffIcon,
+  EmojiOnIcon,
+  ScreenShareIcon,
+  HandOffIcon,
+  HandOnIcon,
+} from '@/asset';
+import { ControlButton, OptionButton } from './part/ControlBar';
 
 interface ControlBarProps {
   code: string;
@@ -42,6 +53,38 @@ export default function ControlBar({ code }: ControlBarProps) {
     }
     console.log('canceled');
   };
+
+  const handleCcButtonClick = (isClicked: boolean) => {
+    if (isClicked) {
+      console.log('Clicked');
+      return;
+    }
+    console.log('canceled');
+  };
+
+  const handleEmojiButtonClick = (isClicked: boolean) => {
+    if (isClicked) {
+      console.log('Clicked');
+      return;
+    }
+    console.log('canceled');
+  };
+
+  const handleScreenShareButtonClick = (isClicked: boolean) => {
+    if (isClicked) {
+      console.log('Clicked');
+      return;
+    }
+    console.log('canceled');
+  };
+  const handleHandButtonClick = (isClicked: boolean) => {
+    if (isClicked) {
+      console.log('Clicked');
+      return;
+    }
+    console.log('canceled');
+  };
+
   return (
     <div className='relative w-full border border-solid border-black bg-black-87 font-googleSans text-base text-white'>
       <div className='flex w-full items-center justify-center'>
@@ -68,8 +111,28 @@ export default function ControlBar({ code }: ControlBarProps) {
             icon={<VideoOnIcon width={24} height={24} fill='#E3E3E3' />}
             clickedIcon={<VideoOffIcon width={24} height={24} fill='#5F1312' />}
           />
-          <div>button</div>
-          <div>button</div>
+          <ControlButton
+            onClickButton={handleCcButtonClick}
+            icon={<CcIcon width={24} height={24} fill='#06306D' />}
+            clickedIcon={<CcIcon width={24} height={24} fill='#E3E3E3' />}
+          />
+          <ControlButton
+            onClickButton={handleEmojiButtonClick}
+            icon={<EmojiOffIcon width={24} height={24} fill='#06306D' />}
+            clickedIcon={<EmojiOnIcon width={24} height={24} fill='#E3E3E3' />}
+          />
+          <ControlButton
+            onClickButton={handleScreenShareButtonClick}
+            icon={<ScreenShareIcon width={24} height={24} fill='#06306D' />}
+            clickedIcon={
+              <ScreenShareIcon width={24} height={24} fill='#E3E3E3' />
+            }
+          />
+          <ControlButton
+            onClickButton={handleHandButtonClick}
+            icon={<HandOffIcon width={24} height={24} fill='#06306D' />}
+            clickedIcon={<HandOnIcon width={24} height={24} fill='#E3E3E3' />}
+          />
         </div>
         <div className='absolute right-5 top-1/2 -translate-y-1/2'>456</div>
       </div>

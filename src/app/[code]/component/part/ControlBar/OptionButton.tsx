@@ -46,12 +46,12 @@ export default function OptionButton({
       {isVisibleOption && (
         <button
           type='button'
-          className='flex size-12 items-center justify-center'
+          className='flex size-12 items-center justify-center pr-2'
           onClick={handleChevronClick}
         >
           <ChevronIcon
-            width={14}
-            height={14}
+            width={10}
+            height={10}
             className={`${!isClickedChevron && 'rotate-180'} duration-75`}
             fill={isClickedButton ? '#F9DEDC' : '#8E918F'}
           />
@@ -67,7 +67,3 @@ export default function OptionButton({
     </div>
   );
 }
-
-OptionButton.defaultProps = {
-  isVisibleOption: true,
-};

@@ -36,6 +36,7 @@
   ],
   "rules": {
     "react/react-in-jsx-scope": "off",
+    "react/require-default-props": "off",
     "@typescript-eslint/lines-between-class-members": "off",
     "@typescript-eslint/no-throw-literal": "off",
     "consistent-return": "off",
