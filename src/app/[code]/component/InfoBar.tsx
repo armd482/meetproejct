@@ -21,6 +21,8 @@ interface ButtonType {
   type: PanelType;
   icon: ReactNode;
   clickedIcon: ReactNode;
+  name: string;
+  align?: 'right';
 }
 const ICON_PROPS = {
   width: 24,
@@ -42,26 +44,32 @@ const BUTTON_LIST: ButtonType[] = [
     type: 'INFO',
     icon: <InfoOffIcon {...ICON_OFF_PROPS} />,
     clickedIcon: <InfoOnIcon {...ICON_ON_PROPS} />,
+    name: '회의 세부정보',
   },
   {
     type: 'USER',
     icon: <UserOffIcon {...ICON_OFF_PROPS} />,
     clickedIcon: <UserOnIcon {...ICON_ON_PROPS} />,
+    name: '사용자',
   },
   {
     type: 'CHAT',
     icon: <ChatOffIcon {...ICON_OFF_PROPS} />,
     clickedIcon: <ChatOnIcon {...ICON_ON_PROPS} />,
+    name: '모든 사용자와 채팅',
   },
   {
     type: 'ACTIVE',
     icon: <ActiveOffIcon {...ICON_OFF_PROPS} />,
     clickedIcon: <ActiveOnIcon {...ICON_ON_PROPS} />,
+    name: '활동',
   },
   {
     type: 'HOST',
     icon: <HostCtrlOffIcon {...ICON_OFF_PROPS} />,
     clickedIcon: <HostCtrlOnIcon {...ICON_ON_PROPS} />,
+    name: '호스트 제어 기능',
+    align: 'right',
   },
 ];
 

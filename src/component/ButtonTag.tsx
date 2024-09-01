@@ -1,34 +1,58 @@
 'use client';
 
-import { ReactNode, useState } from 'react';
+import { CSSProperties, ReactNode, useRef, useState } from 'react';
 
 interface ButtonTagProps {
   children: ReactNode;
   name: string;
+  position?: 'top' | 'bottom';
+  gap?: number;
+  style?: CSSProperties | null;
+  align?: 'left' | 'center' | 'right';
 }
 
-export default function ButtonTag({ children, name }: ButtonTagProps) {
+export default function ButtonTag({
+  children,
+  name,
+  position = 'top',
+  gap = 4,
+  style,
+  align = 'center',
+}: ButtonTagProps) {
   const [isDrag, setIsDrag] = useState(false);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const positionStyle =
+    position === 'top'
+      ? { top: `calc(-50% - ${gap}px)` }
+      : { bottom: `calc(-50% - ${gap}px)` };
 
   const handleButtonMouseEnter = () => {
-    setIsDrag(true);
+    timerRef.current = setTimeout(() => {
+      setIsDrag(true);
+      timerRef.current = null;
+    }, 500);
   };
 
   const handleButtonMouseLeave = () => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
     setIsDrag(false);
   };
   return (
-    <div className='relative'>
-      <button
-        type='button'
-        className='rounded-full p-3 transition duration-200 ease-in-out hover:bg-gray-100'
-        onMouseEnter={handleButtonMouseEnter}
-        onMouseLeave={handleButtonMouseLeave}
-      >
-        {children}
-      </button>
+    <div
+      className='relative size-fit'
+      onMouseEnter={handleButtonMouseEnter}
+      onMouseLeave={handleButtonMouseLeave}
+    >
+      {children}
       {isDrag && (
-        <div className='absolute -bottom-7 left-1/2 flex h-6 w-max -translate-x-2/4 items-center rounded-md bg-black px-2 text-xs text-white opacity-75'>
+        <div
+          className={`absolute flex h-6 w-max ${align === 'left' ? 'left-0' : align === 'right' ? 'right-0' : 'left-1/2 -translate-x-1/2'} items-center rounded-md bg-black-75 px-2 text-xs text-white`}
+          style={{ ...positionStyle, ...style }}
+        >
           {name}
         </div>
       )}
