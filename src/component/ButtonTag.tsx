@@ -1,6 +1,7 @@
 'use client';
 
 import { CSSProperties, ReactNode, useRef, useState } from 'react';
+import { getAlignStyle } from '@/lib/getAlignStyle';
 
 interface ButtonTagProps {
   children: ReactNode;
@@ -50,7 +51,7 @@ export default function ButtonTag({
       {children}
       {isDrag && (
         <div
-          className={`absolute flex h-6 w-max ${align === 'left' ? 'left-0' : align === 'right' ? 'right-0' : 'left-1/2 -translate-x-1/2'} items-center rounded-md bg-black-75 px-2 text-xs text-white`}
+          className={`absolute flex h-6 w-max ${getAlignStyle(align)} items-center rounded-md bg-black-75 px-2 text-xs text-white`}
           style={{ ...positionStyle, ...style }}
         >
           {name}
