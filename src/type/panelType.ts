@@ -1,1 +1,1 @@
-export type PanelType = 'INFO' | 'USER' | 'CAHT' | 'ACTIVE' | 'CONTROL';
+export type PanelType = 'INFO' | 'USER' | 'CHAT' | 'ACTIVE' | 'HOST';

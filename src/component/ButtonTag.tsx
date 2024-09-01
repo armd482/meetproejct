@@ -2,12 +2,12 @@
 
 import { ReactNode, useState } from 'react';
 
-interface IconButtonProps {
+interface ButtonTagProps {
   children: ReactNode;
   name: string;
 }
 
-export default function IconButton({ children, name }: IconButtonProps) {
+export default function ButtonTag({ children, name }: ButtonTagProps) {
   const [isDrag, setIsDrag] = useState(false);
 
   const handleButtonMouseEnter = () => {

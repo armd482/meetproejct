@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { LogoIcon, DeclarationIcon, HelpIcon, SettingIcon } from '@/asset';
-import { CurrentDate, IconButton } from './part/Header';
+import { ButtonTag } from '@/component';
+import { CurrentDate } from './part/Header';
 
 export default function Header() {
   return (
@@ -17,15 +18,15 @@ export default function Header() {
       </Link>
       <div className='absolute right-5 top-1/2 z-10 flex -translate-y-1/2 items-center whitespace-nowrap bg-white'>
         <CurrentDate />
-        <IconButton name='지원'>
+        <ButtonTag name='지원'>
           <HelpIcon width={24} height={24} fill='#5f6368' />
-        </IconButton>
-        <IconButton name='문제 신고'>
+        </ButtonTag>
+        <ButtonTag name='문제 신고'>
           <DeclarationIcon width={24} height={24} fill='#5f6368' />
-        </IconButton>
-        <IconButton name='설정'>
+        </ButtonTag>
+        <ButtonTag name='설정'>
           <SettingIcon width={24} height={24} />
-        </IconButton>
+        </ButtonTag>
       </div>
     </div>
   );
