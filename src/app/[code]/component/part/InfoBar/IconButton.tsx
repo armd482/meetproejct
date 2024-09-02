@@ -20,13 +20,15 @@ export default function IconButton({
   name,
   align = 'center',
 }: IconButtonProps) {
-  const { panelType, handlePanelType } = useContext(PanelContext);
+  const { panelType, handlePanelType, handleOpenStatus } =
+    useContext(PanelContext);
   const handleButtonClick = () => {
     if (panelType === type) {
       handlePanelType(null);
       return;
     }
     handlePanelType(type);
+    handleOpenStatus(true);
   };
   return (
     <ButtonTag name={name} align={align}>

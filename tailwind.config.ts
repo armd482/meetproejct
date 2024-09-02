@@ -22,6 +22,32 @@ const config: Config = {
       backgroundColor: {
         'black-75': 'rgba(0, 0, 0, 0.75)',
       },
+      keyframes: {
+        'slide-in-left': {
+          '0%': {
+            transform: 'scaleX(0)',
+          },
+          '100%': {
+            transform: 'scaleX(1)',
+          },
+        },
+
+        'slide-out-left': {
+          '0%': {
+            transform: 'scaleX(1)',
+          },
+          '100%': {
+            transform: 'scaleX(0)',
+          },
+        },
+      },
+      animation: {
+        'slide-in-left': 'slide-in-left 0.3s ease forwards',
+        'slide-out-left': 'slide-out-left 0.3s ease forwards',
+      },
+      transformOrigin: {
+        'top-right': '100% 0%',
+      },
     },
   },
   plugins: [],

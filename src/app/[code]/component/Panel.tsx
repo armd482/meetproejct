@@ -4,6 +4,7 @@ import { useContext } from 'react';
 import { PanelContext } from '@/context/MeetingContext';
 import { PanelType } from '@/type/panelType';
 import { DeleteIcon } from '@/asset';
+import { ButtonTag } from '@/component';
 import { UserPanel, InfoPanel } from './part/Panel';
 
 interface CurrentPanelProps {
@@ -29,29 +30,45 @@ function CurrentPanel({ type }: CurrentPanelProps) {
 }
 
 export default function Panel() {
-  const { panelType, handlePanelType } = useContext(PanelContext);
+  const { panelType, isOpen, handlePanelType, handleOpenStatus } =
+    useContext(PanelContext);
 
   const handleClickDeleteButton = () => {
     handlePanelType(null);
   };
 
+  const handlePanelAnimationEnd = () => {
+    if (panelType === null) {
+      handleOpenStatus(false);
+    }
+  };
+
   return (
     <div className='h-full select-none'>
-      {panelType && (
-        <div className='h-full w-[368px] rounded-lg bg-white'>
-          <div className='size-full font-googleSans'>
-            <div className='relative flex h-16 items-center px-6 py-3 text-lg text-[#202124]'>
-              <p>{PANEL_TITLE[panelType]}</p>
-              <button
-                type='button'
-                onClick={handleClickDeleteButton}
-                className='absolute right-3 top-1/2 flex size-12 -translate-y-1/2 items-center justify-center rounded-full'
-              >
-                <DeleteIcon width={24} height={24} fill='#444746' />
-              </button>
+      {isOpen && (
+        <div
+          className={`h-full w-[368px] origin-top-right animate-slide-in-left rounded-lg bg-white ${panelType === null && 'animate-slide-out-left'}`}
+          onAnimationEnd={handlePanelAnimationEnd}
+        >
+          {panelType && (
+            <div className='size-full font-googleSans'>
+              <div className='relative flex h-16 items-center px-6 py-3 text-lg text-[#202124]'>
+                <p>{PANEL_TITLE[panelType]}</p>
+                <div className='absolute right-3 top-1/2 size-12 -translate-y-1/2'>
+                  <ButtonTag name='닫기' position='bottom'>
+                    <button
+                      type='button'
+                      onClick={handleClickDeleteButton}
+                      className='flex size-12 items-center justify-center rounded-full hover:bg-[#F0F1F1] active:bg-[#DEE0DF]'
+                    >
+                      <DeleteIcon width={24} height={24} fill='#444746' />
+                    </button>
+                  </ButtonTag>
+                </div>
+              </div>
+              <CurrentPanel type={panelType} />
             </div>
-            <CurrentPanel type={panelType} />
-          </div>
+          )}
         </div>
       )}
     </div>
