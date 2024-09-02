@@ -16,8 +16,8 @@ export default function Page({ params }: MeetingPageProps) {
   }
 
   return (
-    <div className='relative flex size-full flex-col bg-black'>
-      <div className='flex flex-1 p-4'>
+    <div className='relative flex h-screen w-screen flex-col overflow-hidden bg-black'>
+      <div className='flex flex-1 overflow-hidden p-4'>
         <div className='flex-1 border border-solid border-black'>test</div>
         <Panel />
       </div>

@@ -33,9 +33,9 @@ export default function Panel() {
   };
 
   return (
-    <div>
+    <div className='relative h-full overflow-hidden'>
       {panelType && (
-        <div className='h-full w-[368px] rounded-lg bg-white'>
+        <div className='h-full w-[368px] overflow-hidden rounded-lg bg-white'>
           <div className='size-full overflow-hidden font-googleSans'>
             <div className='relative flex h-16 items-center px-6 py-3 text-lg text-[#202124]'>
               <p>{PANEL_TITLE[panelType]}</p>
