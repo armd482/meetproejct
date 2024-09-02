@@ -5,7 +5,7 @@ import { UserList } from './part/Panel';
 
 export default function UserPanel() {
   return (
-    <div className='flex flex-col gap-[15px] px-[10px]'>
+    <div className='flex select-none flex-col gap-[15px] px-[10px]'>
       <button
         type='button'
         className='flex h-12 w-fit items-center gap-2 rounded-full bg-[#C2E7FF] pl-4 pr-6 text-[#001D35]'

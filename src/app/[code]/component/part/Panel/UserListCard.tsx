@@ -1,5 +1,6 @@
 import { MenuIcon, MicOffIcon, ProfileIcon } from '@/asset';
 import { ButtonTag } from '@/component';
+import { getRandomHexColor } from '@/lib/getRandomColor';
 
 interface UserListCardProps {
   name: string;
@@ -14,8 +15,8 @@ export default function UserListCard({
 }: UserListCardProps) {
   return (
     <div className='flex h-14 flex-1 items-center justify-between'>
-      <div className='flex items-center gap-4 bg-white font-googleSans text-[#202124]'>
-        <ProfileIcon width={32} height={32} />
+      <div className='flex select-none items-center gap-4 bg-white font-googleSans text-[#202124]'>
+        <ProfileIcon width={32} height={32} fill={getRandomHexColor()} />
         <div>
           <p className='text-sm'>{name}</p>
           {host && <p className='text-xs text-[#5F6368]'>회의 호스트</p>}
