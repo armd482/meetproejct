@@ -6,6 +6,7 @@ export { default as CcIcon } from './icon/cc.svg';
 export { default as ChatOffIcon } from './icon/chatOff.svg';
 export { default as ChatOnIcon } from './icon/chatOn.svg';
 export { default as ChevronIcon } from './icon/chevron.svg';
+export { default as ClipboardIcon } from './icon/clipboard.svg';
 export { default as DeclarationIcon } from './icon/declaration.svg';
 export { default as DeleteIcon } from './icon/delete.svg';
 export { default as EmojiOffIcon } from './icon/emojiOff.svg';

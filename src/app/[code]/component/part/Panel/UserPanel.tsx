@@ -1,7 +1,7 @@
 'use client';
 
 import { InviteUserIcon, SearchIcon } from '@/asset';
-import { UserList } from './part/Panel';
+import UserList from './UserList';
 
 export default function UserPanel() {
   return (

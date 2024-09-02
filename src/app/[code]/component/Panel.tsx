@@ -4,7 +4,7 @@ import { useContext } from 'react';
 import { PanelContext } from '@/context/MeetingContext';
 import { PanelType } from '@/type/panelType';
 import { DeleteIcon } from '@/asset';
-import UserPanel from './UserPanel';
+import { UserPanel, InfoPanel } from './part/Panel';
 
 interface CurrentPanelProps {
   type: PanelType;
@@ -22,6 +22,9 @@ function CurrentPanel({ type }: CurrentPanelProps) {
   if (type === 'USER') {
     return <UserPanel />;
   }
+  if (type === 'INFO') {
+    return <InfoPanel />;
+  }
   return <div>{type}</div>;
 }
 
@@ -33,7 +36,7 @@ export default function Panel() {
   };
 
   return (
-    <div className='relative h-full overflow-hidden'>
+    <div className='h-full select-none overflow-hidden'>
       {panelType && (
         <div className='h-full w-[368px] overflow-hidden rounded-lg bg-white'>
           <div className='size-full overflow-hidden font-googleSans'>
