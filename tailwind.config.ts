@@ -6,6 +6,7 @@ const config: Config = {
     extend: {
       fontSize: {
         '1.5xl': ['22px', '30px'],
+        '4.5xl': ['44px', '1'],
       },
       fontFamily: {
         googleSans: ['Google Sans', 'Roboto', 'Arial', 'sans-serif'],

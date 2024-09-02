@@ -69,7 +69,7 @@ export default function OptionButton({
         {isVisibleOption && (
           <button
             type='button'
-            className='flex size-12 items-center justify-center pr-2'
+            className='flex size-12 items-center justify-center pl-1'
             onClick={handleChevronClick}
             onMouseEnter={handleChevronMouseEnter}
           >
