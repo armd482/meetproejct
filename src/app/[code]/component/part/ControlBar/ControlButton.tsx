@@ -1,28 +1,30 @@
 'use client';
 
 import { ButtonTag } from '@/component';
-import { ReactNode, useState } from 'react';
+import { ToggleContext } from '@/context/ToggleContext';
+import { ToggleType } from '@/type/toggleType';
+import { ReactNode, useContext } from 'react';
 
 interface ControlButtonProps {
-  onClickButton: (isClicked: boolean) => void;
   icon: ReactNode;
   clickedIcon: ReactNode;
   name: string;
+  type: ToggleType;
 }
 
 export default function ControlButton({
-  onClickButton,
   icon,
   clickedIcon,
   name,
+  type,
 }: ControlButtonProps) {
-  const [isClickedButton, setIsClickedButton] = useState(false);
+  const { toggleStatus, handleToggleStatus } = useContext(ToggleContext);
+  const isClickedButton = toggleStatus[type];
+
   const handleButtonClick = () => {
-    setIsClickedButton((prev) => {
-      onClickButton(!prev);
-      return !prev;
-    });
+    handleToggleStatus(type);
   };
+
   return (
     <ButtonTag name={name}>
       <button

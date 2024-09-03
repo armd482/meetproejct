@@ -1,7 +1,7 @@
 'use client';
 
 import { useContext } from 'react';
-import { PanelContext } from '@/context/MeetingContext';
+import { PanelContext } from '@/context/PanelContext';
 import { PanelType } from '@/type/panelType';
 import { DeleteIcon } from '@/asset';
 import { ButtonTag } from '@/component';

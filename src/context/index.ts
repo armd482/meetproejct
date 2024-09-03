@@ -1,3 +1,3 @@
-import { PanelContextProvider } from './MeetingContext';
+import { PanelContextProvider } from './PanelContext';
 
 export { PanelContextProvider };

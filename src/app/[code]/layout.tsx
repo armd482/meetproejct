@@ -2,7 +2,12 @@
 
 import { PropsWithChildren } from 'react';
 import { PanelContextProvider } from '@/context';
+import { ToggleContextProvider } from '@/context/ToggleContext';
 
 export default function Layout({ children }: PropsWithChildren) {
-  return <PanelContextProvider>{children}</PanelContextProvider>;
+  return (
+    <PanelContextProvider>
+      <ToggleContextProvider>{children}</ToggleContextProvider>
+    </PanelContextProvider>
+  );
 }
