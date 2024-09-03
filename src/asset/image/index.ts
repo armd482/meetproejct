@@ -1,0 +1,9 @@
+export { default as clapEmoji } from './clapEmoji.png';
+export { default as curiousEmoji } from './curiousEmoji.png';
+export { default as heartEmoji } from './heartEmoji.png';
+export { default as laughterEmoji } from './laughterEmoji.png';
+export { default as partyPoperEmoji } from './partyPoperEmoji.png';
+export { default as sadEmoji } from './sadEmoji.png';
+export { default as surpriceEmoji } from './surpriceEmoji.png';
+export { default as thumbDownEmoji } from './thumbDownEmoji.png';
+export { default as thumbUpEmoji } from './thumbUpEmoji.png';

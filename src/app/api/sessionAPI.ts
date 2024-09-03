@@ -6,6 +6,7 @@ const SERVER_SECRET = 'MY_SECRET';
 export const postCreateSession = async (sessionId: string) => {
   const response = await fetch(`${SERVER_URL}/openvidu/api/sessions`, {
     method: 'POST',
+    cache: 'no-cache',
     headers: {
       Authorization: `Basic ${btoa(`OPENVIDUAPP:${SERVER_SECRET}`)}`,
       'Content-Type': 'application/json',
@@ -30,6 +31,7 @@ export const postToken = async (sessionId: string) => {
     `${SERVER_URL}/openvidu/api/sessions/${sessionId}/connection`,
     {
       method: 'POST',
+      cache: 'no-cache',
       headers: {
         Authorization: `Basic ${btoa(`OPENVIDUAPP:${SERVER_SECRET}`)}`,
         'Content-Type': 'application/json',
