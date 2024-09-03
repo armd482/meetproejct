@@ -3,7 +3,7 @@
 import { useContext } from 'react';
 import { PanelContext } from '@/context/PanelContext';
 import { PanelType } from '@/type/panelType';
-import { DeleteIcon } from '@/asset';
+import * as Icon from '@/asset/icon';
 import { ButtonTag } from '@/component';
 import { UserPanel, InfoPanel } from './part/Panel';
 
@@ -61,7 +61,7 @@ export default function Panel() {
                       onClick={handleClickDeleteButton}
                       className='flex size-12 items-center justify-center rounded-full hover:bg-[#F0F1F1] active:bg-[#DEE0DF]'
                     >
-                      <DeleteIcon width={24} height={24} fill='#444746' />
+                      <Icon.Delete width={24} height={24} fill='#444746' />
                     </button>
                   </ButtonTag>
                 </div>

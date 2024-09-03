@@ -1,6 +1,6 @@
 'use client';
 
-import { InviteUserIcon, SearchIcon } from '@/asset';
+import * as Icon from '@/asset/icon';
 import UserList from './UserList';
 
 export default function UserPanel() {
@@ -14,13 +14,13 @@ export default function UserPanel() {
           type='button'
           className='flex h-12 w-fit items-center gap-2 rounded-full bg-[#C2E7FF] pl-4 pr-6 text-[#001D35]'
         >
-          <InviteUserIcon width={24} height={24} fill='#001D35' />
+          <Icon.InviteUser width={24} height={24} fill='#001D35' />
           <p>사용자 추가</p>
         </button>
       </div>
       <div className='size-full overflow-auto px-[10px] py-[15px]'>
         <div className='relative w-full'>
-          <SearchIcon
+          <Icon.Search
             width={24}
             height={24}
             fill='#5F6368'

@@ -1,8 +1,8 @@
 'use client';
 
-import { MenuIcon } from '@/asset';
-import { ButtonTag } from '@/component';
 import { useState } from 'react';
+import * as Icon from '@/asset/icon';
+import { ButtonTag } from '@/component';
 
 export default function MenuButton() {
   const [isClickedButton, setIsClickedButton] = useState(false);
@@ -18,7 +18,7 @@ export default function MenuButton() {
           onClick={handleButtonClick}
           className='flex h-12 w-9 items-center justify-center rounded-full bg-[#393B3D] hover:bg-[#414345] active:bg-[#585A5C]'
         >
-          <MenuIcon
+          <Icon.Menu
             width={18}
             height={18}
             fill='#E3E3E3'

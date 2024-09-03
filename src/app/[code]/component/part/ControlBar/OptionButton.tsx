@@ -1,8 +1,8 @@
 'use client';
 
-import { ChevronIcon } from '@/asset';
-import { ButtonTag } from '@/component';
 import { ReactNode, useEffect, useState, MouseEvent } from 'react';
+import * as Icon from '@/asset/icon';
+import { ButtonTag } from '@/component';
 
 interface OptionButtonProps {
   onClickButton: (isClicked: boolean) => void;
@@ -73,7 +73,7 @@ export default function OptionButton({
             onClick={handleChevronClick}
             onMouseEnter={handleChevronMouseEnter}
           >
-            <ChevronIcon
+            <Icon.Chevron
               width={10}
               height={10}
               className={`${!isClickedChevron && 'rotate-180'} duration-75`}

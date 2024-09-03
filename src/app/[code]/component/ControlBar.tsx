@@ -1,21 +1,14 @@
 'use client';
 
-import {
-  MicOnIcon,
-  MicOffIcon,
-  VideoOnIcon,
-  VideoOffIcon,
-  CcIcon,
-  EmojiOffIcon,
-  EmojiOnIcon,
-  ScreenShareIcon,
-  HandOffIcon,
-  HandOnIcon,
-} from '@/asset';
-import { ToggleType } from '@/type/toggleType';
 import { ReactNode } from 'react';
-import { ControlButton, MenuButton, OptionButton } from './part/ControlBar';
-import CallEndButton from './part/ControlBar/CallEndButton';
+import * as Icon from '@/asset/icon';
+import { ToggleType } from '@/type/toggleType';
+import {
+  ControlButton,
+  MenuButton,
+  OptionButton,
+  CallEndButton,
+} from './part/ControlBar';
 
 interface ControlButtonType {
   name: string;
@@ -31,26 +24,26 @@ const CONTROL_BUTTON: ControlButtonType[] = [
   {
     name: '자막 사용(c)',
     type: 'caption',
-    icon: <CcIcon {...CONTROL_BUTTON_OFF_PROPS} />,
-    clickedIcon: <CcIcon {...CONTROL_BUTTON_ON_PROPS} />,
+    icon: <Icon.Cc {...CONTROL_BUTTON_OFF_PROPS} />,
+    clickedIcon: <Icon.Cc {...CONTROL_BUTTON_ON_PROPS} />,
   },
   {
     name: '반응 보내기',
     type: 'emoji',
-    icon: <EmojiOffIcon {...CONTROL_BUTTON_OFF_PROPS} />,
-    clickedIcon: <EmojiOnIcon {...CONTROL_BUTTON_ON_PROPS} />,
+    icon: <Icon.EmojiOff {...CONTROL_BUTTON_OFF_PROPS} />,
+    clickedIcon: <Icon.EmojiOn {...CONTROL_BUTTON_ON_PROPS} />,
   },
   {
     name: '발표 시작',
     type: 'screen',
-    icon: <ScreenShareIcon {...CONTROL_BUTTON_OFF_PROPS} />,
-    clickedIcon: <ScreenShareIcon {...CONTROL_BUTTON_ON_PROPS} />,
+    icon: <Icon.ScreenShare {...CONTROL_BUTTON_OFF_PROPS} />,
+    clickedIcon: <Icon.ScreenShare {...CONTROL_BUTTON_ON_PROPS} />,
   },
   {
     name: '손들기(ctrl + alt + h)',
     type: 'handsUp',
-    icon: <HandOffIcon {...CONTROL_BUTTON_OFF_PROPS} />,
-    clickedIcon: <HandOnIcon {...CONTROL_BUTTON_ON_PROPS} />,
+    icon: <Icon.HandOff {...CONTROL_BUTTON_OFF_PROPS} />,
+    clickedIcon: <Icon.HandOn {...CONTROL_BUTTON_ON_PROPS} />,
   },
 ];
 
@@ -93,16 +86,16 @@ export default function ControlBar() {
         onClickButton={handleMicButtonClick}
         onClickChevron={handleMicChevronClick}
         isVisibleOption
-        icon={<MicOnIcon width={20} height={20} fill='#E3E3E3' />}
-        clickedIcon={<MicOffIcon width={20} height={20} fill='#5F1312' />}
+        icon={<Icon.MicOn width={20} height={20} fill='#E3E3E3' />}
+        clickedIcon={<Icon.MicOff width={20} height={20} fill='#5F1312' />}
         name={{ chevron: '오디오 설정', icon: '마이크 끄기(ctrl + d)' }}
       />
       <OptionButton
         onClickButton={handleVideoButtonClick}
         onClickChevron={handleVideoChevronClick}
         isVisibleOption
-        icon={<VideoOnIcon width={26} height={26} fill='#E3E3E3' />}
-        clickedIcon={<VideoOffIcon width={24} height={24} fill='#5F1312' />}
+        icon={<Icon.VideoOn width={26} height={26} fill='#E3E3E3' />}
+        clickedIcon={<Icon.VideoOff width={24} height={24} fill='#5F1312' />}
         name={{ chevron: '영상 설정', icon: '마이크 끄기(ctrl + d)' }}
       />
       {CONTROL_BUTTON.map((button) => (

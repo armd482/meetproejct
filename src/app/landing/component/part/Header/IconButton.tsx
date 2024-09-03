@@ -1,5 +1,5 @@
-import { ButtonTag } from '@/component';
 import { ReactNode } from 'react';
+import { ButtonTag } from '@/component';
 
 interface IconButtonProps {
   children: ReactNode;

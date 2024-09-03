@@ -1,4 +1,4 @@
-import { MenuIcon, MicOffIcon, ProfileIcon } from '@/asset';
+import * as Icon from '@/asset/icon';
 import { ButtonTag } from '@/component';
 import { getRandomHexColor } from '@/lib/getRandomColor';
 
@@ -16,7 +16,7 @@ export default function UserListCard({
   return (
     <div className='flex h-14 flex-1 items-center justify-between'>
       <div className='flex select-none items-center gap-4 bg-white font-googleSans text-[#202124]'>
-        <ProfileIcon width={32} height={32} fill={getRandomHexColor()} />
+        <Icon.Profile width={32} height={32} fill={getRandomHexColor()} />
         <div>
           <p className='text-sm'>{name}</p>
           {host && <p className='text-xs text-[#5F6368]'>회의 호스트</p>}
@@ -26,10 +26,10 @@ export default function UserListCard({
         <div className='flex size-12 items-center justify-center'>
           {isMicOn ? (
             <div className='flex size-6 items-center justify-center rounded-full bg-[#1A73E8]'>
-              <MenuIcon width={18} height={18} fill='#ffffff' />
+              <Icon.Menu width={18} height={18} fill='#ffffff' />
             </div>
           ) : (
-            <MicOffIcon width={24} height={24} fill='#5F6368' />
+            <Icon.MicOff width={24} height={24} fill='#5F6368' />
           )}
         </div>
         <ButtonTag name='추가 작업' position='bottom'>
@@ -37,7 +37,7 @@ export default function UserListCard({
             type='button'
             className='flex size-12 items-center justify-center rounded-full hover:bg-[#EFEFEF]'
           >
-            <MenuIcon
+            <Icon.Menu
               width={18}
               height={18}
               fill='#5F6368'

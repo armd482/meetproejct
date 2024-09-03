@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { LogoIcon, DeclarationIcon, HelpIcon, SettingIcon } from '@/asset';
+import * as Icon from '@/asset/icon';
 import { CurrentDate, IconButton } from './part/Header';
 
 const ICON_PROPS = {
@@ -13,15 +13,15 @@ const ICON_PROPS = {
 const BUTTON_LIST = [
   {
     name: '지원',
-    icon: <HelpIcon {...ICON_PROPS} />,
+    icon: <Icon.Help {...ICON_PROPS} />,
   },
   {
     name: '문제 신고',
-    icon: <DeclarationIcon {...ICON_PROPS} />,
+    icon: <Icon.Declaration {...ICON_PROPS} />,
   },
   {
     name: '설정',
-    icon: <SettingIcon {...ICON_PROPS} />,
+    icon: <Icon.Setting {...ICON_PROPS} />,
   },
 ];
 
@@ -32,7 +32,7 @@ export default function Header() {
         href='/'
         className='absolute left-5 top-1/2 flex h-10 -translate-y-1/2 items-center gap-2 whitespace-nowrap'
       >
-        <LogoIcon width={36} height={36} />
+        <Icon.Logo width={36} height={36} />
         <p className='text-1.5xl font-semibold text-gray-600'>Project</p>
         <p className='text-1.5xl font-medium text-gray-600'>Meet</p>
       </Link>

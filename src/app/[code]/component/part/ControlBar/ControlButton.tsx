@@ -1,9 +1,9 @@
 'use client';
 
+import { ReactNode, useContext } from 'react';
 import { ButtonTag } from '@/component';
 import { ToggleContext } from '@/context/ToggleContext';
 import { ToggleType } from '@/type/toggleType';
-import { ReactNode, useContext } from 'react';
 
 interface ControlButtonProps {
   icon: ReactNode;

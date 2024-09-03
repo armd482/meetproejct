@@ -2,7 +2,7 @@
 
 import { ChangeEvent, FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { KeypadIcon } from '@/asset';
+import * as Icon from '@/asset/icon';
 import { checkKey } from '@/lib/checkKey';
 
 export default function ParticipateMeetingForm() {
@@ -26,7 +26,7 @@ export default function ParticipateMeetingForm() {
       onSubmit={handleFormSubmit}
       className='relative flex shrink items-center gap-2'
     >
-      <KeypadIcon
+      <Icon.Keypad
         className='absolute left-4 top-1/2 -translate-y-2/4'
         width={22}
         height={16}

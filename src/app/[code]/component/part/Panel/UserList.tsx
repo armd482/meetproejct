@@ -1,7 +1,7 @@
 'use client';
 
-import { ChevronIcon } from '@/asset';
 import { useEffect, useState } from 'react';
+import * as Icon from '@/asset/icon';
 import UserListCard from './UserListCard';
 
 interface UserPanelProps {
@@ -34,7 +34,7 @@ export default function UserPanel({ filterValue, userList }: UserPanelProps) {
           <p className='font-medium'>{currentUser.length}</p>
         </div>
         <div className='flex size-10 items-center justify-center pr-2'>
-          <ChevronIcon
+          <Icon.Chevron
             width={12}
             height={12}
             fill='#202124'

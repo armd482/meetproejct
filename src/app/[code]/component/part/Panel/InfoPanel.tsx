@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { ClipboardIcon } from '@/asset';
+import * as Icon from '@/asset/icon';
 
 export default function InfoPanel() {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -33,7 +33,7 @@ export default function InfoPanel() {
         onClick={handleClipboardButtonClick}
         className='mx-4 my-1 flex h-10 items-center gap-2 rounded-full px-3 py-px hover:bg-[#ECF2FC] active:bg-[#D5E2F8]'
       >
-        <ClipboardIcon width={18} height={18} fill='#0B57D0' />
+        <Icon.Clipboard width={18} height={18} fill='#0B57D0' />
         <p className='font-medium text-[#0B57D0]'>참여 정보 복사</p>
       </button>
       <div className='my-[7px] h-0 w-full border-t border-solid border-[#DADCE0]' />
