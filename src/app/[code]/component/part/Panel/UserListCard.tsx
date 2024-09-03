@@ -18,7 +18,7 @@ export default function UserListCard({
       <div className='flex select-none items-center gap-4 bg-white font-googleSans text-[#202124]'>
         <Icon.Profile width={32} height={32} fill={getRandomHexColor()} />
         <div>
-          <p className='text-sm'>{name}</p>
+          <p className='max-w-[180px] truncate text-sm'>{name}</p>
           {host && <p className='text-xs text-[#5F6368]'>회의 호스트</p>}
         </div>
       </div>

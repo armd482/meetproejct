@@ -44,7 +44,11 @@ export default function UserPanel({ filterValue, userList }: UserPanelProps) {
       </button>
       {isOpen && (
         <div className='rounded-b-lg border border-t-0 border-solid border-[#DADCE0] py-2 pl-4 pr-1'>
-          <UserListCard name='test1' isMicOn={false} host />
+          <UserListCard
+            name='test1adfahdfkahfdklajdlkajdhalkjhfkladjhfkajhakldjfhaklfjlasfhkafhaksfhkasfhjklshfsljahfadfjlajfhdaklhalfj'
+            isMicOn={false}
+            host
+          />
           <UserListCard name='test1' isMicOn />
           <UserListCard name='test1' isMicOn={false} />
         </div>
