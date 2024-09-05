@@ -1,6 +1,7 @@
 'use client';
 
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
+import { getParticipant, PostSessionId } from '@/app/api/mongoAPI';
 
 export default function Page() {
   const [value, setValue] = useState('');
@@ -8,18 +9,15 @@ export default function Page() {
     setValue(e.target.value);
   };
   const submitButton = async () => {
-    try {
-      const res = await fetch('/api/mongoDB', {
-        cache: 'no-cache',
-        method: 'POST',
-        body: JSON.stringify({ value }),
-      });
-      const result = await res.json();
-      console.log(result);
-    } catch (error) {
-      console.log(error);
-    }
+    await PostSessionId(value);
   };
+  useEffect(() => {
+    const getData = async () => {
+      const data = await getParticipant('test');
+      console.log(data);
+    };
+    getData();
+  }, []);
   return (
     <div>
       <input
