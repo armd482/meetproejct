@@ -1,6 +1,6 @@
-import { connectDB } from '@/lib/dbPromise';
-import { ErrorResponse } from '@/type/errorType';
 import { NextResponse } from 'next/server';
+import { connectDB } from '@/lib/connectDB';
+import { ErrorResponse } from '@/type/errorType';
 
 export async function POST(req: Request) {
   const { sessionId } = await req.json();
