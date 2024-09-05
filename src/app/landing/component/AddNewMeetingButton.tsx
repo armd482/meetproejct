@@ -12,7 +12,7 @@ import { Alert } from '@/component';
 export default function AddNewMeetingButton() {
   const router = useRouter();
   const [isClicked, setIsClicked] = useState(false);
-  const [isFailed, setIsFailed] = useState(true);
+  const [isFailed, setIsFailed] = useState(false);
 
   const responseSessionId = async (count: number) => {
     if (count === 0) {

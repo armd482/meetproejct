@@ -5,7 +5,6 @@ import { ObjectId } from 'mongodb';
 
 export async function POST(req: Request) {
   const { sessionId } = await req.json();
-  console.log(sessionId);
   try {
     const db = (await connectDB).db('session');
     try {
@@ -14,7 +13,6 @@ export async function POST(req: Request) {
         .insertOne({ _id: new ObjectId(), sessionId });
     } catch (error) {
       const e = error as ErrorResponse;
-      console.log(error);
       if (e.code === 121) {
         return NextResponse.json({ message: e.errmsg }, { status: 400 });
       }
