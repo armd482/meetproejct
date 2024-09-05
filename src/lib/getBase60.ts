@@ -1,8 +1,8 @@
+import { BASE_60_DIGIT } from '@/asset/constant/id';
+
 export const getBase60 = (value: number): string => {
-  const DIGITS =
-    '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
   if (value < 60) {
-    return DIGITS[value];
+    return BASE_60_DIGIT[value];
   }
-  return getBase60(Math.floor(value / 60)) + DIGITS[value % 60];
+  return getBase60(Math.floor(value / 60)) + BASE_60_DIGIT[value % 60];
 };

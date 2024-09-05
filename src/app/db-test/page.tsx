@@ -2,6 +2,7 @@
 
 import { ChangeEvent, useEffect, useState } from 'react';
 import { getParticipant, PostSessionId } from '@/app/api/mongoAPI';
+import { getRandomId } from '@/lib/getRandomId';
 
 export default function Page() {
   const [value, setValue] = useState('');
@@ -17,6 +18,7 @@ export default function Page() {
       console.log(data);
     };
     getData();
+    console.log(getRandomId(3));
   }, []);
   return (
     <div>
