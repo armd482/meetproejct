@@ -9,7 +9,7 @@ export default function Page() {
   return (
     <div className='flex size-full flex-col'>
       <Header />
-      <div className='flex flex-1 items-center justify-center'>
+      <div className='relative flex flex-1 items-center justify-center'>
         <div className='max-w-[655px] shrink px-[3em] py-[1em]'>
           <div className='pb-2 font-googleSans text-4.5xl font-normal leading-[3.25rem]'>
             모든 사용자를 위한 영상 통화 및 화상 회의

@@ -11,6 +11,16 @@ export const PostSessionId = async (sessionId: string) => {
   }
 };
 
+export const DeleteSessionId = async (sessionId: string) => {
+  const response = await fetch(`/api/sessionId?sessionId=${sessionId}`, {
+    method: 'DELETE',
+  });
+  if (!response.ok) {
+    const result = await response.json();
+    throw new Error(result.message);
+  }
+};
+
 export const getParticipant = async (
   sessionId: string,
 ): Promise<ParticipantDataType[]> => {

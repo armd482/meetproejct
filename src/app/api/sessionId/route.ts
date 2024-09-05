@@ -1,15 +1,20 @@
 import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/connectDB';
 import { ErrorResponse } from '@/type/errorType';
+import { ObjectId } from 'mongodb';
 
 export async function POST(req: Request) {
   const { sessionId } = await req.json();
+  console.log(sessionId);
   try {
     const db = (await connectDB).db('session');
     try {
-      await db.collection('session').insertOne({ sessionId });
+      await db
+        .collection('session')
+        .insertOne({ _id: new ObjectId(), sessionId });
     } catch (error) {
       const e = error as ErrorResponse;
+      console.log(error);
       if (e.code === 121) {
         return NextResponse.json({ message: e.errmsg }, { status: 400 });
       }
@@ -26,6 +31,28 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ message: '값이 저장되었습니다', sessionId });
+  } catch {
+    return NextResponse.json(
+      { message: '데이터 베이스 연결에 실패하였습니다' },
+      { status: 500 },
+    );
+  }
+}
+
+export async function DELETE(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const sessionId = searchParams.get('sessionId');
+  try {
+    const db = (await connectDB).db('session');
+    try {
+      await db.collection('participant').deleteOne({ sessionId });
+      return NextResponse.json({ message: '값을 삭제하였습니다', sessionId });
+    } catch (error) {
+      return NextResponse.json(
+        { message: '값을 찾을 수 없습니다' },
+        { status: 500 },
+      );
+    }
   } catch {
     return NextResponse.json(
       { message: '데이터 베이스 연결에 실패하였습니다' },

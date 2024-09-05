@@ -1,4 +1,4 @@
-const KEY_REGEX = /^[A-Za-z]{3}-[A-Za-z]{4}$/;
+const KEY_REGEX = /^[A-Za-z0-9]{3}-[A-Za-z0-9]{7}$/;
 
 const getKey = (value: string) => {
   if (value.startsWith('http')) {
