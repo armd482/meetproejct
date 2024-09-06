@@ -1,18 +1,37 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
-import { useDevice } from '@/hook/useDevice';
+import { useCheckChrome, useDevice } from '@/hook';
 import { useDeviceStore } from '@/store/DeviceStore';
 import * as Icon from '@/asset/icon';
+import { setTrackChage } from '@/lib/setTrackChange';
+import DeviceButton from './part/Device/DeviceButton';
 
 export default function Device() {
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  const deviceEnable = useDeviceStore((state) => state.deviceEnable);
+  const { deviceEnable, audioInput, audioOutput, videoInput } = useDeviceStore(
+    useShallow((state) => ({
+      deviceEnable: state.deviceEnable,
+      audioInput: state.audioInput,
+      audioOutput: state.audioOutput,
+      videoInput: state.videoInput,
+    })),
+  );
 
-  const { stream, isPendingStream, toggleVideoInput, toggleAudioInput } =
-    useDevice();
+  const {
+    stream,
+    isPendingStream,
+    audioInputList,
+    videoInputList,
+    audioOutputList,
+    toggleVideoInput,
+    toggleAudioInput,
+  } = useDevice();
+
+  const { isChrome } = useCheckChrome();
 
   useEffect(() => {
     if (stream && videoRef.current) {
@@ -28,13 +47,16 @@ export default function Device() {
     toggleVideoInput();
   };
 
+  const handleTrackChange = async (device: MediaDeviceInfo, type: 'audioInput' | 'videoInput' | 'audioOutput') => {
+    setTrackChage(stream, videoRef, device, type, audioInput.id, videoInput.id);
+  };
+
   return (
-    <div className='w-full p-4 pb-0 pr-2'>
+    <div className='w-full max-w-[764px] p-4 pb-0 pr-2'>
       <div
-        className='relative mb-4 aspect-video w-full max-w-[764px] overflow-hidden rounded-lg'
+        className='relative mb-4 aspect-video w-full overflow-hidden rounded-lg'
         style={{
-          boxShadow:
-            '0 1px 2px 0 rgba(60, 64, 67, .3), 0 1px 3px 1px rgba(60, 64, 67, .15)',
+          boxShadow: '0 1px 2px 0 rgba(60, 64, 67, .3), 0 1px 3px 1px rgba(60, 64, 67, .15)',
         }}
       >
         <video
@@ -42,14 +64,12 @@ export default function Device() {
           ref={videoRef}
           className='aspect-video size-full object-cover'
           style={{ transform: 'rotateY(180deg)' }}
-          muted
         />
         {(!deviceEnable.video || isPendingStream) && (
           <div className='absolute top-0 flex size-full items-center justify-center bg-[#202124] text-2xl text-white'>
             {isPendingStream ? '카메라 시작 중' : '카메라가 꺼져 있음'}
           </div>
         )}
-
         <div className='absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-6 px-3'>
           <button
             type='button'
@@ -75,7 +95,31 @@ export default function Device() {
           </button>
         </div>
       </div>
-      <div>test</div>
+      {isChrome && (
+        <div className='flex w-full items-center gap-1'>
+          <DeviceButton
+            icon={<Icon.MicOn width={14} height={14} fill='#5F6368' />}
+            currentDevice={audioInput}
+            deviceList={audioInputList}
+            type='audioInput'
+            onTrackChange={handleTrackChange}
+          />
+          <DeviceButton
+            icon={<Icon.Sound width={14} height={14} fill='#5F6368' />}
+            currentDevice={audioOutput}
+            deviceList={audioOutputList}
+            type='audioOutput'
+            onTrackChange={handleTrackChange}
+          />
+          <DeviceButton
+            icon={<Icon.VideoOn width={14} height={14} fill='#5F6368' />}
+            currentDevice={videoInput}
+            deviceList={videoInputList}
+            type='videoInput'
+            onTrackChange={handleTrackChange}
+          />
+        </div>
+      )}
     </div>
   );
 }

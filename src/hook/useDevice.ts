@@ -1,56 +1,66 @@
+import { getCurrentDeviceInfo } from '@/lib/getCurrentDeviceInfo';
 import { useDeviceStore } from '@/store/DeviceStore';
 import { useCallback, useEffect, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
-export const useDevice = () => {
-  const {
-    deviceEnable,
-    setAudioInputId,
-    setAudioOutputId,
-    setVideoInputId,
-    setDeviceEnable,
-  } = useDeviceStore(
-    useShallow((state) => ({
-      deviceEnable: state.deviceEnable,
-      setAudioInputId: state.setAudioInputId,
-      setAudioOutputId: state.setAudioOutputId,
-      setVideoInputId: state.setVideoInputId,
-      setDeviceEnable: state.setDeviceEnable,
-    })),
-  );
+const useDevice = () => {
+  const { deviceEnable, audioInput, videoInput, setAudioInput, setAudioOutput, setVideoInput, setDeviceEnable } =
+    useDeviceStore(
+      useShallow((state) => ({
+        deviceEnable: state.deviceEnable,
+        audioInput: state.audioInput,
+        videoInput: state.videoInput,
+        setAudioInput: state.setAudioInput,
+        setAudioOutput: state.setAudioOutput,
+        setVideoInput: state.setVideoInput,
+        setDeviceEnable: state.setDeviceEnable,
+      })),
+    );
 
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [isPendingStream, setIsPendingStream] = useState(false);
+  const [isGetStream, setIsGetStream] = useState<boolean>(true);
 
   const [videoInputList, setVideoInputList] = useState<MediaDeviceInfo[]>([]);
   const [audioOutputList, setAudioOutputList] = useState<MediaDeviceInfo[]>([]);
   const [audioInputList, setAudioInputList] = useState<MediaDeviceInfo[]>([]);
 
-  const [enable, setEnable] = useState({
-    video: deviceEnable.video,
-    mic: deviceEnable.mic,
-  });
-
-  const handleAudioInputChange = (value: string) => {
-    setAudioInputId(value);
+  const handleAudioInputChange = (value: Record<'id' | 'name', string>) => {
+    setAudioInput(value);
   };
 
-  const handleAudioOutputChange = (value: string) => {
-    setAudioOutputId(value);
+  const handleAudioOutputChange = (value: Record<'id' | 'name', string>) => {
+    setAudioOutput(value);
   };
 
-  const handleVideoInputChange = (value: string) => {
-    setVideoInputId(value);
+  const handleVideoInputChange = (value: Record<'id' | 'name', string>) => {
+    setVideoInput(value);
   };
 
   const getStream = useCallback(
     async (video: boolean, audio: boolean) => {
       const startDate = new Date().getTime();
-      setIsPendingStream(true);
+      if (deviceEnable.video) {
+        setIsPendingStream(true);
+      }
+
       const newStream = await navigator.mediaDevices.getUserMedia({
-        video,
-        audio,
+        audio: audioInput.id ? { deviceId: audioInput.id } : true,
+        video: videoInput.id ? { deviceId: videoInput.id } : true,
       });
+
+      if (!audio) {
+        newStream.getAudioTracks().forEach((track) => {
+          track.enabled = audio;
+        });
+      }
+
+      if (!video) {
+        newStream.getAudioTracks().forEach((track) => {
+          track.stop();
+        });
+      }
+
       setStream(newStream);
       const timeDiff = new Date().getTime() - startDate;
       setTimeout(
@@ -60,48 +70,29 @@ export const useDevice = () => {
         Math.max(1000 - timeDiff, 0),
       );
 
-      const deviceInfo = await navigator.mediaDevices.enumerateDevices();
-      setVideoInputList(
-        deviceInfo.filter((device) => device.kind === 'videoinput'),
-      );
-      setAudioOutputList(
-        deviceInfo.filter((device) => device.kind === 'audiooutput'),
-      );
-      setAudioInputList(
-        deviceInfo.filter((device) => device.kind === 'audioinput'),
-      );
+      const deviceInfo = await getCurrentDeviceInfo(newStream);
 
-      const audioOutput = deviceInfo.filter(
-        (device) => device.kind === 'audiooutput',
-      );
-      setVideoInputId(
-        newStream.getVideoTracks()[0]?.getSettings().deviceId ?? '',
-      );
-      setAudioInputId(
-        newStream.getAudioTracks()[0]?.getSettings().deviceId ?? '',
-      );
-      setAudioOutputId(audioOutput.length > 0 ? audioOutput[0].deviceId : '');
+      setVideoInputList(deviceInfo.currentVideoInputList);
+      setAudioInputList(deviceInfo.currentAudioInputList);
+      setAudioOutputList(deviceInfo.currentAudioOutputList);
+
+      setAudioInput(deviceInfo.currentAudioInput);
+      setAudioOutput(deviceInfo.currentAudioOutput);
+      setVideoInput(deviceInfo.currentVideoInput);
     },
-    [setVideoInputId, setAudioInputId, setAudioOutputId],
+    [setVideoInput, setAudioInput, setAudioOutput, audioInput, videoInput, deviceEnable],
   );
 
   const toggleVideoInput = async () => {
     if (stream) {
-      setEnable((prev) => {
-        const newValue = !prev.video;
-        if (newValue) {
-          getStream(true, prev.mic);
-        } else {
-          stream.getVideoTracks().forEach((track) => track.stop());
-        }
-        return { ...prev, video: newValue };
-      });
+      setDeviceEnable((prev) => ({ ...prev, video: !prev.video }));
+      setIsGetStream(true);
     }
   };
 
   const toggleAudioInput = async () => {
     if (stream) {
-      setEnable((prev) => {
+      setDeviceEnable((prev) => {
         const newValue = !prev.mic;
         stream.getAudioTracks().forEach((track) => {
           track.enabled = newValue;
@@ -112,12 +103,15 @@ export const useDevice = () => {
   };
 
   useEffect(() => {
-    setDeviceEnable(enable);
-  }, [enable, setDeviceEnable]);
+    setIsGetStream(true);
+  }, [audioInput, videoInput]);
 
   useEffect(() => {
-    getStream(true, true);
-  }, [getStream]);
+    if (isGetStream) {
+      getStream(deviceEnable.video, deviceEnable.mic);
+    }
+    setIsGetStream(false);
+  }, [getStream, isGetStream, deviceEnable]);
 
   useEffect(() => {
     navigator.mediaDevices.ondevicechange = () => {
@@ -141,3 +135,5 @@ export const useDevice = () => {
     toggleAudioInput,
   };
 };
+
+export default useDevice;

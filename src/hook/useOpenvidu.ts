@@ -1,10 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import {
-  OpenVidu,
-  Session as OVSession,
-  Publisher,
-  Subscriber,
-} from 'openvidu-browser';
+import { OpenVidu, Session as OVSession, Publisher, Subscriber } from 'openvidu-browser';
 import { postCreateSession, postToken } from '@/app/api/sessionAPI';
 
 const useOpenvidu = () => {
@@ -41,10 +36,7 @@ const useOpenvidu = () => {
         if (!entry.stream) {
           return;
         }
-        data.push([
-          entry.connectionId,
-          newSession.subscribe(entry.stream, undefined),
-        ]);
+        data.push([entry.connectionId, newSession.subscribe(entry.stream, undefined)]);
       });
       return data;
     });
@@ -110,9 +102,7 @@ const useOpenvidu = () => {
         delete newParticipants[connectionId];
         return newParticipants;
       });
-      setSubscribers((prev) =>
-        prev.filter((entity) => entity[0] !== connectionId),
-      );
+      setSubscribers((prev) => prev.filter((entity) => entity[0] !== connectionId));
     });
   }, [session]);
 

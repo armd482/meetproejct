@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 
-export const useCurrentDate = () => {
+const useCurrentDate = () => {
   const [time, setTime] = useState(new Date());
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -26,3 +26,5 @@ export const useCurrentDate = () => {
 
   return time;
 };
+
+export default useCurrentDate;
