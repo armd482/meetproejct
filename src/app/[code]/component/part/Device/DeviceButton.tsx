@@ -4,16 +4,25 @@ import { useDeviceStore } from '@/store/DeviceStore';
 import * as Icon from '@/asset/icon';
 import { useOutsideClick } from '@/hook';
 import DeviceCard from './DeviceCard';
+import DeviceSubButton from './DeviceSubButton';
 
 interface DeviceButtonIcon {
   icon: ReactNode;
   currentDevice: Record<'name' | 'id', string>;
   deviceList: MediaDeviceInfo[];
   type: 'audioInput' | 'audioOutput' | 'videoInput';
+  volume?: number;
   onTrackChange: (device: MediaDeviceInfo, type: 'audioInput' | 'audioOutput' | 'videoInput') => void;
 }
 
-export default function DeviceButton({ icon, currentDevice, deviceList, type, onTrackChange }: DeviceButtonIcon) {
+export default function DeviceButton({
+  icon,
+  currentDevice,
+  deviceList,
+  type,
+  volume,
+  onTrackChange,
+}: DeviceButtonIcon) {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleOutSideClick = () => {
@@ -52,7 +61,6 @@ export default function DeviceButton({ icon, currentDevice, deviceList, type, on
 
     onTrackChange(device, type);
   };
-
   return (
     <div className='relative m-px font-googleSans' ref={targetRef}>
       <button
@@ -83,6 +91,7 @@ export default function DeviceButton({ icon, currentDevice, deviceList, type, on
               />
             ))}
           </div>
+          <DeviceSubButton type={type} volume={volume} />
         </div>
       )}
     </div>

@@ -1,4 +1,4 @@
-import create from 'zustand';
+import { create } from 'zustand';
 
 type DeviceType = Record<'id' | 'name', string>;
 type Callback = (deviceEnable: Record<'video' | 'mic', boolean>) => Record<'video' | 'mic', boolean>;

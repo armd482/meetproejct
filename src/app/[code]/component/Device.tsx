@@ -7,6 +7,8 @@ import { useCheckChrome, useDevice } from '@/hook';
 import { useDeviceStore } from '@/store/DeviceStore';
 import * as Icon from '@/asset/icon';
 import { setTrackChage } from '@/lib/setTrackChange';
+import useVolume from '@/hook/useVolume';
+import { Visualizer } from '@/component';
 import DeviceButton from './part/Device/DeviceButton';
 
 export default function Device() {
@@ -32,6 +34,8 @@ export default function Device() {
   } = useDevice();
 
   const { isChrome } = useCheckChrome();
+
+  const { volume, isExpand } = useVolume(stream);
 
   useEffect(() => {
     if (stream && videoRef.current) {
@@ -64,12 +68,19 @@ export default function Device() {
           ref={videoRef}
           className='aspect-video size-full object-cover'
           style={{ transform: 'rotateY(180deg)' }}
+          muted
         />
         {(!deviceEnable.video || isPendingStream) && (
           <div className='absolute top-0 flex size-full items-center justify-center bg-[#202124] text-2xl text-white'>
             {isPendingStream ? '카메라 시작 중' : '카메라가 꺼져 있음'}
           </div>
         )}
+        {deviceEnable.mic && (
+          <div className='absolute bottom-4 left-4'>
+            <Visualizer volume={volume} isExpand={isExpand} />
+          </div>
+        )}
+
         <div className='absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-6 px-3'>
           <button
             type='button'
@@ -103,6 +114,7 @@ export default function Device() {
             deviceList={audioInputList}
             type='audioInput'
             onTrackChange={handleTrackChange}
+            volume={volume}
           />
           <DeviceButton
             icon={<Icon.Sound width={14} height={14} fill='#5F6368' />}

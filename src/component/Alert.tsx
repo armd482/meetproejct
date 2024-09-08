@@ -24,12 +24,7 @@ function AlertPortal({ children }: PropsWithChildren) {
   return ReactDOM.createPortal(children, portalElement) as JSX.Element;
 }
 
-export default function Alert({
-  text,
-  isOpen,
-  onCloseAlert,
-  interval = 4000,
-}: AlertProps) {
+export default function Alert({ text, isOpen, onCloseAlert, interval = 4000 }: AlertProps) {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
