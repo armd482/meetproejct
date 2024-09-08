@@ -37,56 +37,66 @@ const useDevice = () => {
     setVideoInput(value);
   };
 
-  const getStream = useCallback(
-    async (video: boolean, audio: boolean) => {
-      const startDate = new Date().getTime();
-      if (deviceEnable.video) {
-        setIsPendingStream(true);
-      }
+  const getStream = useCallback(async () => {
+    const startDate = new Date().getTime();
+    if (deviceEnable.video) {
+      setIsPendingStream(true);
+    }
 
-      const newStream = await navigator.mediaDevices.getUserMedia({
-        audio: audioInput.id ? { deviceId: audioInput.id } : true,
-        video: videoInput.id ? { deviceId: videoInput.id } : true,
+    const newStream = await navigator.mediaDevices.getUserMedia({
+      audio: audioInput.id
+        ? {
+            deviceId: audioInput.id,
+            ...AUDIO_CONSTRAINT,
+          }
+        : AUDIO_CONSTRAINT,
+      video: videoInput.id ? { deviceId: videoInput.id } : true,
+    });
+
+    if (!deviceEnable.mic) {
+      newStream.getAudioTracks().forEach((track) => {
+        track.enabled = deviceEnable.mic;
       });
+    }
 
-      if (!audio) {
-        newStream.getAudioTracks().forEach((track) => {
-          track.enabled = audio;
-        });
-      }
+    if (!deviceEnable.video) {
+      newStream.getVideoTracks().forEach((track) => {
+        track.stop();
+      });
+    }
 
-      if (!video) {
-        newStream.getAudioTracks().forEach((track) => {
-          track.stop();
-        });
-      }
+    setStream(newStream);
+    const timeDiff = new Date().getTime() - startDate;
+    setTimeout(
+      () => {
+        setIsPendingStream(false);
+      },
+      Math.max(1000 - timeDiff, 0),
+    );
 
-      setStream(newStream);
-      const timeDiff = new Date().getTime() - startDate;
-      setTimeout(
-        () => {
-          setIsPendingStream(false);
-        },
-        Math.max(1000 - timeDiff, 0),
-      );
+    const deviceInfo = await getCurrentDeviceInfo(newStream);
 
-      const deviceInfo = await getCurrentDeviceInfo(newStream);
+    setVideoInputList(deviceInfo.currentVideoInputList);
+    setAudioInputList(deviceInfo.currentAudioInputList);
+    setAudioOutputList(deviceInfo.currentAudioOutputList);
 
-      setVideoInputList(deviceInfo.currentVideoInputList);
-      setAudioInputList(deviceInfo.currentAudioInputList);
-      setAudioOutputList(deviceInfo.currentAudioOutputList);
-
-      setAudioInput(deviceInfo.currentAudioInput);
-      setAudioOutput(deviceInfo.currentAudioOutput);
-      setVideoInput(deviceInfo.currentVideoInput);
-    },
-    [setVideoInput, setAudioInput, setAudioOutput, audioInput, videoInput, deviceEnable],
-  );
+    setAudioInput(deviceInfo.currentAudioInput);
+    setAudioOutput(deviceInfo.currentAudioOutput);
+    setVideoInput(deviceInfo.currentVideoInput);
+  }, [setVideoInput, setAudioInput, setAudioOutput, audioInput, videoInput, deviceEnable]);
 
   const toggleVideoInput = async () => {
     if (stream) {
-      setDeviceEnable((prev) => ({ ...prev, video: !prev.video }));
-      setIsGetStream(true);
+      setDeviceEnable((prev) => {
+        if (prev.video) {
+          stream.getVideoTracks().forEach((track) => {
+            track.stop();
+          });
+        } else {
+          setIsGetStream(true);
+        }
+        return { ...prev, video: !prev.video };
+      });
     }
   };
 
@@ -103,19 +113,15 @@ const useDevice = () => {
   };
 
   useEffect(() => {
-    setIsGetStream(true);
-  }, [audioInput, videoInput]);
-
-  useEffect(() => {
     if (isGetStream) {
-      getStream(deviceEnable.video, deviceEnable.mic);
+      getStream();
     }
     setIsGetStream(false);
-  }, [getStream, isGetStream, deviceEnable]);
+  }, [getStream, isGetStream, deviceEnable, stream]);
 
   useEffect(() => {
     navigator.mediaDevices.ondevicechange = () => {
-      getStream(deviceEnable.video, deviceEnable.mic);
+      getStream();
     };
     return () => {
       navigator.mediaDevices.ondevicechange = null;

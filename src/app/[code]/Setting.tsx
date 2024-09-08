@@ -17,8 +17,8 @@ export default function Setting() {
         <div className='h-[400px] w-[448px]'>test</div>
       </div>
       <footer className='flex items-center justify-center p-2 text-center text-xs text-[#5F6368]'>
-        가입하면 서비스 약관 및 개인정보처리방침에 동의하게 됩니다. 봇이 아닌
-        실제 사용자인지 확인하기 위해 시스템 정보가 전송됩니다.
+        가입하면 서비스 약관 및 개인정보처리방침에 동의하게 됩니다. 봇이 아닌 실제 사용자인지 확인하기 위해 시스템
+        정보가 전송됩니다.
       </footer>
     </div>
   );

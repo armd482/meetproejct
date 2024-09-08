@@ -16,7 +16,10 @@ export const setTrackChage = async (
   }
   if (stream && mediaRef.current) {
     const newStream = await navigator.mediaDevices.getUserMedia({
-      audio: { deviceId: type === 'audioInput' ? device.deviceId : audioInputId },
+      audio: {
+        deviceId: type === 'audioInput' ? device.deviceId : audioInputId,
+        ...AUDIO_CONSTRAINT,
+      },
       video: { deviceId: type === 'videoInput' ? device.deviceId : videoInputId },
     });
     const newTrack = type === 'audioInput' ? newStream.getAudioTracks()[0] : newStream.getVideoTracks()[0];
@@ -27,6 +30,5 @@ export const setTrackChage = async (
     }
 
     stream.addTrack(newTrack);
-    mediaRef.current.srcObject = stream;
   }
 };

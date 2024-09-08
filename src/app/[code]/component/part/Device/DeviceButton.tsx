@@ -35,6 +35,10 @@ export default function DeviceButton({ icon, currentDevice, deviceList, type, on
   };
 
   const handleCardClick = (device: MediaDeviceInfo) => {
+    if (device.deviceId === currentDevice.id) {
+      return;
+    }
+
     if (type === 'audioInput') {
       setAudioInput({ name: device.label, id: device.deviceId });
     }
