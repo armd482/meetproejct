@@ -2,6 +2,7 @@ import { getCurrentDeviceInfo } from '@/lib/getCurrentDeviceInfo';
 import { useDeviceStore } from '@/store/DeviceStore';
 import { useCallback, useEffect, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
+import { AUDIO_CONSTRAINT } from '@/asset/constant/stream';
 
 const useDevice = () => {
   const { deviceEnable, audioInput, videoInput, setAudioInput, setAudioOutput, setVideoInput, setDeviceEnable } =

@@ -52,9 +52,9 @@ export default function Device() {
   };
 
   return (
-    <div className='w-full max-w-[764px] p-4 pb-0 pr-2'>
+    <div className='max-w-[764px] p-4 pr-2 lg-max:w-[448px] lg-max:pr-4'>
       <div
-        className='relative mb-4 aspect-video w-full overflow-hidden rounded-lg'
+        className='relative aspect-video w-full overflow-hidden rounded-lg'
         style={{
           boxShadow: '0 1px 2px 0 rgba(60, 64, 67, .3), 0 1px 3px 1px rgba(60, 64, 67, .15)',
         }}
@@ -96,7 +96,7 @@ export default function Device() {
         </div>
       </div>
       {isChrome && (
-        <div className='flex w-full items-center gap-1'>
+        <div className='mt-4 flex w-full items-center gap-1 lg-max:hidden'>
           <DeviceButton
             icon={<Icon.MicOn width={14} height={14} fill='#5F6368' />}
             currentDevice={audioInput}

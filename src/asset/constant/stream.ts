@@ -1,4 +1,4 @@
-const AUDIO_CONSTRAINT = {
+export const AUDIO_CONSTRAINT = {
   echoCancellation: true,
   noiseSuppression: true,
   autoGainControl: true,

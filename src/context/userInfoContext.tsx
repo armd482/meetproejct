@@ -1,10 +1,4 @@
-import {
-  createContext,
-  PropsWithChildren,
-  useCallback,
-  useMemo,
-  useState,
-} from 'react';
+import { createContext, PropsWithChildren, useCallback, useMemo, useState } from 'react';
 
 interface UserInfoContextType {
   name: string | null;
@@ -30,9 +24,5 @@ export function UserInfoContextProvider({ children }: PropsWithChildren) {
     [name, handleNameChange],
   );
 
-  return (
-    <UserInfoContext.Provider value={value}>
-      {children}
-    </UserInfoContext.Provider>
-  );
+  return <UserInfoContext.Provider value={value}>{children}</UserInfoContext.Provider>;
 }

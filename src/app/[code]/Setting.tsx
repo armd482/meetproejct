@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import * as Icon from '@/asset/icon';
-import { Device } from './component';
+import { Device, NameForm } from './component';
 
 export default function Setting() {
   return (
@@ -12,9 +12,12 @@ export default function Setting() {
           <p className='text-1.5xl font-medium text-gray-600'>Meet</p>
         </Link>
       </div>
-      <div className='flex flex-1 items-center justify-center'>
+      <div className='flex flex-1 items-center justify-center lg-max:flex-col'>
         <Device />
-        <div className='h-[400px] w-[448px]'>test</div>
+        <div className='m-4 flex w-[448px] flex-col items-center font-googleSans'>
+          <p className='text-2xl'>이름이 무엇인가요?</p>
+          <NameForm />
+        </div>
       </div>
       <footer className='flex items-center justify-center p-2 text-center text-xs text-[#5F6368]'>
         가입하면 서비스 약관 및 개인정보처리방침에 동의하게 됩니다. 봇이 아닌 실제 사용자인지 확인하기 위해 시스템

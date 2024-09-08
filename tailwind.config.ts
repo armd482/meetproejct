@@ -13,8 +13,7 @@ const config: Config = {
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-conic':
-          'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
       colors: {
         'black-87': 'rgba(0, 0, 0, 0.87)',
@@ -47,6 +46,9 @@ const config: Config = {
       },
       transformOrigin: {
         'top-right': '100% 0%',
+      },
+      screens: {
+        'lg-max': { max: '1023px' },
       },
     },
   },
