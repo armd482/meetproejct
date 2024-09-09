@@ -2,7 +2,8 @@ import { ReactNode, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useDeviceStore } from '@/store/DeviceStore';
 import * as Icon from '@/asset/icon';
-import { useOutsideClick } from '@/hook';
+import { useOutsideClick, useVolume } from '@/hook';
+import { StreamStatusType } from '@/type/streamType';
 import DeviceCard from './DeviceCard';
 import DeviceSubButton from './DeviceSubButton';
 
@@ -11,8 +12,9 @@ interface DeviceButtonIcon {
   currentDevice: Record<'name' | 'id', string>;
   deviceList: MediaDeviceInfo[];
   type: 'audioInput' | 'audioOutput' | 'videoInput';
-  volume?: number;
+  stream?: MediaStream | null;
   onTrackChange: (device: MediaDeviceInfo, type: 'audioInput' | 'audioOutput' | 'videoInput') => void;
+  status?: StreamStatusType;
 }
 
 export default function DeviceButton({
@@ -20,10 +22,16 @@ export default function DeviceButton({
   currentDevice,
   deviceList,
   type,
-  volume,
+  stream,
+  status,
   onTrackChange,
 }: DeviceButtonIcon) {
   const [isOpen, setIsOpen] = useState(false);
+
+  const isDisabled =
+    status === 'failed' || status === 'rejected' || (status === 'videoFailed' && type === 'videoInput');
+
+  const { volume } = useVolume(stream);
 
   const handleOutSideClick = () => {
     setIsOpen(false);
@@ -61,17 +69,41 @@ export default function DeviceButton({
 
     onTrackChange(device, type);
   };
+
+  const getStatusText = () => {
+    if (status === 'failed') {
+      if (type === 'audioInput') {
+        return '마이크를 찾을 수 없습니다';
+      }
+      if (type === 'videoInput') {
+        return '카메라를 찾을 수 없습니다';
+      }
+      return '스피커를 찾을 수 없습니다';
+    }
+    if (status === 'rejected') {
+      return '권한이 필요합니다';
+    }
+
+    if (status === 'videoFailed' && type === 'videoInput') {
+      return '카메라를 사용할 수 없습니다';
+    }
+  };
+  const disabledText = getStatusText();
+
   return (
     <div className='relative m-px font-googleSans' ref={targetRef}>
       <button
         type='button'
         onClick={handleButtonClick}
-        className='flex h-[34px] items-center rounded-full border-[0.8px] border-solid border-white px-[10px] hover:border-[#DADCE0] hover:bg-[#F6FAFE]'
+        disabled={isDisabled}
+        className={`flex h-[34px] items-center rounded-full border-[0.8px] border-solid px-[10px] ${isDisabled ? 'border-[#E7E8E8]' : 'border-white  hover:border-[#DADCE0] active:bg-[#F6FAFE]'}  `}
       >
         <div className='mr-2 flex size-[18px] items-center justify-center'>{icon}</div>
-        <p className='w-[105px] truncate text-sm text-[#5f6368]'>{currentDevice.name}</p>
+        <p className={`w-[105px] truncate text-sm ${isDisabled ? 'text-[#B5B6B7]' : 'text-[#5f6368]'}`}>
+          {isDisabled ? disabledText : currentDevice.name}
+        </p>
         <div className='w-[18px]'>
-          <Icon.Chevron width={12} height={12} fill='#5F6368' />
+          <Icon.Chevron width={12} height={12} fill={isDisabled ? '#B5B6B7' : '#5F6368'} />
         </div>
       </button>
       {isOpen && (

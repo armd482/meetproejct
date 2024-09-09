@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 
-const useVolume = (stream: MediaStream | null) => {
+const useVolume = (stream: MediaStream | null | undefined) => {
   const [volume, setVolume] = useState(0);
   const [isExpand, setIsExpand] = useState(false);
   const dataArrayRef = useRef<Uint8Array | null>(null);

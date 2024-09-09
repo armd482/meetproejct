@@ -1,5 +1,5 @@
-const getDevice = (deviceList: MediaDeviceInfo[], currentDevice: MediaStreamTrack | MediaDeviceInfo) => {
-  if (deviceList.length === 0) {
+const getDevice = (deviceList: MediaDeviceInfo[], currentDevice: MediaStreamTrack | MediaDeviceInfo | undefined) => {
+  if (deviceList.length === 0 || !currentDevice) {
     return { name: '', id: '' };
   }
 
@@ -38,5 +38,7 @@ export const getCurrentDeviceInfo = async (stream: MediaStream) => {
     currentAudioInput: getDevice(audioInputList, currentAudioInput),
     currentAudioOutput: getDevice(audioOutputList, currentAudioOutput),
     currentVideoInput: getDevice(videoInputList, currentVideoInput),
+    audioTrack: currentAudioInput,
+    videoTrack: currentVideoInput,
   };
 };

@@ -1,9 +1,5 @@
 import Link from 'next/link';
-import {
-  AddNewMeetingButton,
-  ParticipateMeetingForm,
-  Header,
-} from './component';
+import { AddNewMeetingButton, ParticipateMeetingForm, Header } from './component';
 
 export default function Page() {
   return (
@@ -15,8 +11,7 @@ export default function Page() {
             모든 사용자를 위한 영상 통화 및 화상 회의
           </div>
           <div className='max-w-[480px] pb-8 font-googleSans text-1.5xl font-normal leading-7 text-gray-600'>
-            Project Meet로 어디서나 연결하고 공동작업하고 기념일을 축하할 수
-            있습니다.
+            Project Meet로 어디서나 연결하고 공동작업하고 기념일을 축하할 수 있습니다.
           </div>
           <div className='flex flex-wrap items-center gap-6'>
             <AddNewMeetingButton />

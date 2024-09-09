@@ -3,11 +3,10 @@
 import { useEffect, useRef } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
-import { useCheckChrome, useDevice } from '@/hook';
+import { useDevice } from '@/hook';
 import { useDeviceStore } from '@/store/DeviceStore';
 import * as Icon from '@/asset/icon';
 import { setTrackChage } from '@/lib/setTrackChange';
-import useVolume from '@/hook/useVolume';
 import { Visualizer } from '@/component';
 import DeviceButton from './part/Device/DeviceButton';
 
@@ -23,19 +22,23 @@ export default function Device() {
     })),
   );
 
-  const {
-    stream,
-    isPendingStream,
-    audioInputList,
-    videoInputList,
-    audioOutputList,
-    toggleVideoInput,
-    toggleAudioInput,
-  } = useDevice();
+  const { stream, streamStatus, audioInputList, videoInputList, audioOutputList, toggleVideoInput, toggleAudioInput } =
+    useDevice();
 
-  const { isChrome } = useCheckChrome();
+  const getStreamMessage = () => {
+    if (streamStatus === 'pause') {
+      return '카메라가 꺼져 있음';
+    }
 
-  const { volume, isExpand } = useVolume(stream);
+    if (streamStatus === 'pending') {
+      return '카메라 시작 중';
+    }
+
+    if (streamStatus === 'failed' || streamStatus === 'videoFailed') {
+      return '카메라를 사용할 수 없음';
+    }
+    return '';
+  };
 
   useEffect(() => {
     if (stream && videoRef.current) {
@@ -44,11 +47,15 @@ export default function Device() {
   }, [stream]);
 
   const handleMicButton = () => {
-    toggleAudioInput();
+    if (stream) {
+      toggleAudioInput();
+    }
   };
 
   const handleVideoButton = () => {
-    toggleVideoInput();
+    if (stream) {
+      toggleVideoInput();
+    }
   };
 
   const handleTrackChange = async (device: MediaDeviceInfo, type: 'audioInput' | 'videoInput' | 'audioOutput') => {
@@ -56,9 +63,9 @@ export default function Device() {
   };
 
   return (
-    <div className='max-w-[764px] p-4 pr-2 lg-max:w-[448px] lg-max:pr-4'>
+    <div className='w-full max-w-[764px] p-4 pr-2 lg-max:w-[448px] lg-max:pr-4'>
       <div
-        className='relative aspect-video w-full overflow-hidden rounded-lg'
+        className='relative aspect-video size-full overflow-hidden rounded-lg'
         style={{
           boxShadow: '0 1px 2px 0 rgba(60, 64, 67, .3), 0 1px 3px 1px rgba(60, 64, 67, .15)',
         }}
@@ -70,14 +77,14 @@ export default function Device() {
           style={{ transform: 'rotateY(180deg)' }}
           muted
         />
-        {(!deviceEnable.video || isPendingStream) && (
+        {streamStatus !== 'success' && (
           <div className='absolute top-0 flex size-full items-center justify-center bg-[#202124] text-2xl text-white'>
-            {isPendingStream ? '카메라 시작 중' : '카메라가 꺼져 있음'}
+            {getStreamMessage()}
           </div>
         )}
-        {deviceEnable.mic && (
+        {deviceEnable.mic && stream && (
           <div className='absolute bottom-4 left-4'>
-            <Visualizer volume={volume} isExpand={isExpand} />
+            <Visualizer stream={stream} />
           </div>
         )}
 
@@ -85,53 +92,92 @@ export default function Device() {
           <button
             type='button'
             onClick={handleMicButton}
-            className={`flex items-center justify-center border border-solid ${deviceEnable.mic ? 'border-white' : 'border-[#EA4335] bg-[#EA4335]'} size-14 rounded-full`}
+            className={`relative flex items-center justify-center border border-solid ${deviceEnable.mic ? 'border-white' : 'border-[#EA4335] bg-[#EA4335]'} size-14 rounded-full`}
           >
             {deviceEnable.mic ? (
               <Icon.MicOn width={24} height={24} fill='#ffffff' />
             ) : (
-              <Icon.MicOff width={24} height={24} fill='#ffffff' />
+              <Icon.MicOff width={28} height={28} fill='#ffffff' />
+            )}
+            {(streamStatus === 'failed' || streamStatus === 'rejected') && (
+              <div className='absolute right-0 top-0 size-3 rounded-full bg-white'>
+                <Icon.Warn width={20} height={20} fill='#FA7B17' className='relative -left-1 -top-1' />
+              </div>
             )}
           </button>
           <button
             type='button'
             onClick={handleVideoButton}
-            className={`flex items-center justify-center border border-solid ${deviceEnable.video ? 'border-white' : 'border-[#EA4335] bg-[#EA4335]'} size-14 rounded-full`}
+            className={`relative flex items-center justify-center border border-solid ${deviceEnable.video ? 'border-white' : 'border-[#EA4335] bg-[#EA4335]'} size-14 rounded-full`}
           >
             {deviceEnable.video ? (
               <Icon.VideoOn width={24} height={24} fill='#ffffff' />
             ) : (
               <Icon.VideoOff width={24} height={24} fill='#ffffff' />
             )}
+            {(streamStatus === 'failed' || streamStatus === 'rejected' || streamStatus === 'videoFailed') && (
+              <div className='absolute right-0 top-0 size-3 rounded-full bg-white'>
+                <Icon.Warn width={20} height={20} fill='#FA7B17' className='relative -left-1 -top-1' />
+              </div>
+            )}
           </button>
         </div>
       </div>
-      {isChrome && (
-        <div className='mt-4 flex w-full items-center gap-1 lg-max:hidden'>
-          <DeviceButton
-            icon={<Icon.MicOn width={14} height={14} fill='#5F6368' />}
-            currentDevice={audioInput}
-            deviceList={audioInputList}
-            type='audioInput'
-            onTrackChange={handleTrackChange}
-            volume={volume}
-          />
-          <DeviceButton
-            icon={<Icon.Sound width={14} height={14} fill='#5F6368' />}
-            currentDevice={audioOutput}
-            deviceList={audioOutputList}
-            type='audioOutput'
-            onTrackChange={handleTrackChange}
-          />
-          <DeviceButton
-            icon={<Icon.VideoOn width={14} height={14} fill='#5F6368' />}
-            currentDevice={videoInput}
-            deviceList={videoInputList}
-            type='videoInput'
-            onTrackChange={handleTrackChange}
-          />
-        </div>
-      )}
+      <div className='mt-4 flex w-full items-center gap-1 lg-max:hidden'>
+        {streamStatus !== 'none' && streamStatus !== 'pending' ? (
+          <>
+            <DeviceButton
+              icon={
+                <Icon.MicOn
+                  width={14}
+                  height={14}
+                  fill={streamStatus === 'failed' || streamStatus === 'rejected' ? '#B5B6B7' : '#5F6368'}
+                />
+              }
+              currentDevice={audioInput}
+              deviceList={audioInputList}
+              type='audioInput'
+              onTrackChange={handleTrackChange}
+              stream={stream}
+              status={streamStatus}
+            />
+            <DeviceButton
+              icon={
+                <Icon.Sound
+                  width={14}
+                  height={14}
+                  fill={streamStatus === 'failed' || streamStatus === 'rejected' ? '#B5B6B7' : '#5F6368'}
+                />
+              }
+              currentDevice={audioOutput}
+              deviceList={audioOutputList}
+              type='audioOutput'
+              onTrackChange={handleTrackChange}
+              status={streamStatus}
+            />
+            <DeviceButton
+              icon={
+                <Icon.VideoOn
+                  width={14}
+                  height={14}
+                  fill={
+                    streamStatus === 'failed' || streamStatus === 'rejected' || streamStatus === 'videoFailed'
+                      ? '#B5B6B7'
+                      : '#5F6368'
+                  }
+                />
+              }
+              currentDevice={videoInput}
+              deviceList={videoInputList}
+              type='videoInput'
+              onTrackChange={handleTrackChange}
+              status={streamStatus}
+            />
+          </>
+        ) : (
+          <div className='h-[36px] w-full' />
+        )}
+      </div>
     </div>
   );
 }
