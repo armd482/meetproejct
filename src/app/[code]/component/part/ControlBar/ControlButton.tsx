@@ -12,12 +12,7 @@ interface ControlButtonProps {
   type: ToggleType;
 }
 
-export default function ControlButton({
-  icon,
-  clickedIcon,
-  name,
-  type,
-}: ControlButtonProps) {
+export default function ControlButton({ icon, clickedIcon, name, type }: ControlButtonProps) {
   const { toggleStatus, handleToggleStatus } = useContext(ToggleContext);
   const isClickedButton = toggleStatus[type];
 

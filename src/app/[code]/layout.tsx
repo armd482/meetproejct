@@ -1,13 +1,14 @@
 'use client';
 
 import { PropsWithChildren } from 'react';
-import { PanelContextProvider } from '@/context';
-import { ToggleContextProvider } from '@/context/ToggleContext';
+import { PanelContextProvider, ToggleContextProvider, UserInfoContextProvider } from '@/context';
 
 export default function Layout({ children }: PropsWithChildren) {
   return (
     <PanelContextProvider>
-      <ToggleContextProvider>{children}</ToggleContextProvider>
+      <ToggleContextProvider>
+        <UserInfoContextProvider>{children}</UserInfoContextProvider>
+      </ToggleContextProvider>
     </PanelContextProvider>
   );
 }

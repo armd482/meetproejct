@@ -30,8 +30,7 @@ function CurrentPanel({ type }: CurrentPanelProps) {
 }
 
 export default function Panel() {
-  const { panelType, isOpen, handlePanelType, handleOpenStatus } =
-    useContext(PanelContext);
+  const { panelType, isOpen, handlePanelType, handleOpenStatus } = useContext(PanelContext);
 
   const handleClickDeleteButton = () => {
     handlePanelType(null);

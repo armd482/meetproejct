@@ -23,10 +23,7 @@ export default function ButtonTag({
   const [isDrag, setIsDrag] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const positionStyle =
-    position === 'top'
-      ? { top: `calc(-50% - ${gap}px)` }
-      : { bottom: `calc(-50% - ${gap}px)` };
+  const positionStyle = position === 'top' ? { top: `calc(-50% - ${gap}px)` } : { bottom: `calc(-50% - ${gap}px)` };
 
   const handleButtonMouseEnter = () => {
     timerRef.current = setTimeout(() => {
@@ -43,11 +40,7 @@ export default function ButtonTag({
     setIsDrag(false);
   };
   return (
-    <div
-      className='relative size-fit'
-      onMouseEnter={handleButtonMouseEnter}
-      onMouseLeave={handleButtonMouseLeave}
-    >
+    <div className='relative size-fit' onMouseEnter={handleButtonMouseEnter} onMouseLeave={handleButtonMouseLeave}>
       {children}
       {isDrag && (
         <div

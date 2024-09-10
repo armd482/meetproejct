@@ -1,18 +1,10 @@
 'use client';
 
-import useOpenvidu from '@/hook/useOpenvidu';
+import { useOpenvidu } from '@/hook';
 import { useRef, useEffect } from 'react';
 
 export default function Page() {
-  const {
-    session,
-    publisher,
-    subscribers,
-    participants,
-    createSession,
-    joinSession,
-    leaveSession,
-  } = useOpenvidu();
+  const { session, publisher, subscribers, participants, createSession, joinSession, leaveSession } = useOpenvidu();
   const videoRef = useRef<HTMLVideoElement>(null);
   const subscriberRef = useRef<(HTMLVideoElement | null)[]>([]);
 
@@ -36,18 +28,10 @@ export default function Page() {
     <main className='flex min-h-screen flex-col items-center justify-between p-24'>
       {!session ? (
         <div>
-          <button
-            type='button'
-            onClick={() =>
-              createSession('test', new Date().getTime().toString())
-            }
-          >
+          <button type='button' onClick={() => createSession('test', new Date().getTime().toString())}>
             생성하기
           </button>
-          <button
-            type='button'
-            onClick={() => joinSession('test', new Date().getTime().toString())}
-          >
+          <button type='button' onClick={() => joinSession('test', new Date().getTime().toString())}>
             참가하기
           </button>
         </div>

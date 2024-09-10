@@ -1,11 +1,5 @@
 import { ToggleStatusType, ToggleType } from '@/type/toggleType';
-import {
-  createContext,
-  PropsWithChildren,
-  useCallback,
-  useMemo,
-  useState,
-} from 'react';
+import { createContext, PropsWithChildren, useCallback, useMemo, useState } from 'react';
 
 interface ToggleContextType {
   toggleStatus: ToggleStatusType;
@@ -48,7 +42,5 @@ export function ToggleContextProvider({ children }: PropsWithChildren) {
     [toggleStatus, isVisibleToggle, handleToggleStatus, handleVisibleToggle],
   );
 
-  return (
-    <ToggleContext.Provider value={value}>{children}</ToggleContext.Provider>
-  );
+  return <ToggleContext.Provider value={value}>{children}</ToggleContext.Provider>;
 }

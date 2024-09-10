@@ -3,12 +3,7 @@
 import { ReactNode } from 'react';
 import * as Icon from '@/asset/icon';
 import { ToggleType } from '@/type/toggleType';
-import {
-  ControlButton,
-  MenuButton,
-  OptionButton,
-  CallEndButton,
-} from './part/ControlBar';
+import { ControlButton, MenuButton, OptionButton, CallEndButton } from './part/ControlBar';
 
 interface ControlButtonType {
   name: string;
