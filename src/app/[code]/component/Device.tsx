@@ -50,7 +50,7 @@ export default function Device() {
     if (stream && !audioDisabled) {
       toggleAudioInput();
     }
-    if (permission && !permission.audio) {
+    if (audioDisabled) {
       setIsOpenModal(true);
     }
   };
@@ -59,8 +59,7 @@ export default function Device() {
     if (stream && !videoDisabled) {
       toggleVideoInput();
     }
-
-    if (permission && !permission.video) {
+    if (videoDisabled) {
       setIsOpenModal(true);
     }
   };
@@ -99,7 +98,7 @@ export default function Device() {
         )}
 
         <div className='absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-6 px-3'>
-          {audioInput && (
+          {(audioInput.id || (permission && !permission.audio)) && (
             <button
               type='button'
               onClick={handleMicButton}
@@ -118,7 +117,7 @@ export default function Device() {
             </button>
           )}
 
-          {videoInput && (
+          {(videoInput.id || (permission && !permission.video)) && (
             <button
               type='button'
               onClick={handleVideoButton}
@@ -195,7 +194,12 @@ export default function Device() {
           status={streamStatus}
         />
       </div>
-      <PermissionModal isOpenModal={isOpenModal} onClose={handleModalClose} onUpdateStream={handleUpdateStream} />
+      <PermissionModal
+        isOpenModal={isOpenModal}
+        status={streamStatus}
+        onClose={handleModalClose}
+        onUpdateStream={handleUpdateStream}
+      />
     </div>
   );
 }

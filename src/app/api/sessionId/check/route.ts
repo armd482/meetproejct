@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/connectDB';
-import { ErrorResponse } from '@/type/errorType';
-import { ObjectId } from 'mongodb';
 
 /* 해당 세션 있는 지 여부 확인 */
 export async function POST(req: Request) {

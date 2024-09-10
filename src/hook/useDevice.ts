@@ -54,6 +54,7 @@ const useDevice = () => {
   };
 
   const handleUpdateStream = () => {
+    setDeviceEnable({ video: true, mic: true });
     setIsUpdateStream(true);
   };
 
@@ -90,28 +91,35 @@ const useDevice = () => {
         await navigator.mediaDevices.getUserMedia({ audio, video });
         setPermission({ audio, video });
         setDeviceEnable((prev) => ({ mic: audio && prev.mic, video: video && prev.video }));
+        setIsUpdateStream(true);
         return true;
-      } catch (error) {
-        const e = error as DOMException;
-        if (e.name === 'NotAllowedError') {
-          if (audio) {
-            if (await checkPermission(!audio, video)) {
-              return true;
-            }
-          }
-          if (video) {
-            if (await checkPermission(audio, !video)) {
-              return true;
-            }
-          }
-          return false;
-        }
-        setPermission({ audio, video });
-        return true;
+      } catch {
+        return false;
       }
     },
-    [setPermission, setDeviceEnable],
+    [setDeviceEnable, setPermission],
   );
+
+  const updatePermission = useCallback(async () => {
+    if (await checkPermission(true, true)) {
+      return;
+    }
+
+    if (await checkPermission(true, false)) {
+      return;
+    }
+
+    if (await checkPermission(false, true)) {
+      return;
+    }
+
+    if (await checkPermission(false, false)) {
+      return;
+    }
+    setPermission({ audio: false, video: false });
+    setDeviceEnable({ mic: false, video: false });
+    setIsUpdateStream(true);
+  }, [checkPermission, setPermission, setDeviceEnable]);
 
   const getStream = useCallback(async () => {
     if (!permission) {
@@ -186,15 +194,9 @@ const useDevice = () => {
   }, [stream, deviceEnable, permission, getStream, setAudioInput, setAudioOutput, setVideoInput, setDeviceEnable]);
 
   useEffect(() => {
-    const getPermission = async () => {
-      if (!(await checkPermission(true, true))) {
-        setPermission({ audio: false, video: false });
-        setDeviceEnable({ mic: false, video: false });
-      }
-    };
-    getPermission();
+    updatePermission();
     setIsUpdateStream(true);
-  }, [checkPermission, setPermission, setDeviceEnable]);
+  }, [updatePermission, setPermission, setDeviceEnable]);
 
   useEffect(() => {
     if (isUpdateStream && permission) {
@@ -218,12 +220,8 @@ const useDevice = () => {
     }
     const checkTrack = async (id: NodeJS.Timeout) => {
       if (!stream.active) {
-        if (!(await checkPermission(true, true))) {
-          setPermission({ audio: false, video: false });
-          setDeviceEnable({ mic: false, video: false });
-        }
-        setIsUpdateStream(true);
         clearInterval(id);
+        updatePermission();
       }
     };
 
@@ -231,7 +229,7 @@ const useDevice = () => {
     return () => {
       clearInterval(timerId);
     };
-  }, [stream, checkPermission, setPermission, setDeviceEnable]);
+  }, [stream, updatePermission, setPermission, setDeviceEnable]);
 
   return {
     stream,

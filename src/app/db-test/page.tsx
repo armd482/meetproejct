@@ -1,7 +1,7 @@
 'use client';
 
 import { ChangeEvent, useEffect, useState } from 'react';
-import { getParticipant, PostSessionId, PostCheckSessionId } from '@/app/api/mongoAPI';
+import { getParticipant, PostCheckSessionId } from '@/app/api/mongoAPI';
 import { getRandomId } from '@/lib/getRandomId';
 
 export default function Page() {

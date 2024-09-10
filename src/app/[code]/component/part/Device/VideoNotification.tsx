@@ -49,9 +49,9 @@ export default function VideoNotification({ status, onClickButton }: VideoNotifi
           <button
             type='button'
             onClick={handleCheckPermissionButtonClick}
-            className='my-[15px] rounded-[4px] bg-[#1A73E8] px-6 py-2 text-center text-sm'
+            className='my-[15px] min-w-[185px] rounded-[4px] bg-[#1A73E8] px-6 py-2 text-center text-sm'
           >
-            마이크 및 카메라 허용
+            {permission && permission.audio ? '비디오 허용' : '마이크 및 카메라 허용'}
           </button>
         </div>
       ) : (
