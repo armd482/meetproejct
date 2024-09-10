@@ -36,7 +36,7 @@ export async function GET(req: Request) {
       const result = await db.collection('participant').find({ sessionId }).toArray();
       return NextResponse.json({ data: result });
     } catch (error) {
-      return NextResponse.json({ message: '값을 찾을 수 없습니다' }, { status: 500 });
+      return NextResponse.json({ message: '값을 찾을 수 없습니다' }, { status: 404 });
     }
   } catch {
     return NextResponse.json({ message: '데이터 베이스 연결에 실패하였습니다' }, { status: 500 });

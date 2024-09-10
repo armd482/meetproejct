@@ -1,6 +1,9 @@
 'use client';
 
+import { usePathname, useRouter } from 'next/navigation';
+import { PostCheckSessionId } from '@/app/api/mongoAPI';
 import { UserInfoContext } from '@/context/userInfoContext';
+
 import { ChangeEvent, FormEvent, useContext, useState } from 'react';
 
 const MAX_SIZE = 60;
@@ -8,17 +11,27 @@ const MAX_SIZE = 60;
 export default function NameForm() {
   const [name, setName] = useState('');
   const { handleNameChange } = useContext(UserInfoContext);
+  const sessionId = usePathname().slice(1);
+  const router = useRouter();
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.slice(0, MAX_SIZE);
     setName(value);
   };
 
-  const handleFromSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleFromSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (name.length === 0) {
       return;
     }
+
+    const isValidSessionId = await PostCheckSessionId(sessionId);
+    if (!isValidSessionId) {
+      alert('이미 닫힌 회의방입니다.');
+      router.push('/');
+      return;
+    }
+
     handleNameChange(name);
   };
   return (

@@ -3,6 +3,7 @@ import { connectDB } from '@/lib/connectDB';
 import { ErrorResponse } from '@/type/errorType';
 import { ObjectId } from 'mongodb';
 
+/* 세션 생성 */
 export async function POST(req: Request) {
   const { sessionId } = await req.json();
   try {
@@ -26,13 +27,15 @@ export async function POST(req: Request) {
   }
 }
 
+/* 해당 세션 삭제, 세션 참가자 모두 삭제 */
 export async function DELETE(req: Request) {
   const { searchParams } = new URL(req.url);
   const sessionId = searchParams.get('sessionId');
   try {
     const db = (await connectDB).db('session');
     try {
-      await db.collection('participant').deleteOne({ sessionId });
+      await db.collection('session').deleteOne({ sessionId });
+      await db.collection('participant').deleteMany({ sessionId });
       return NextResponse.json({ message: '값을 삭제하였습니다', sessionId });
     } catch (error) {
       return NextResponse.json({ message: '값을 찾을 수 없습니다' }, { status: 500 });

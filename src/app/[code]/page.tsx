@@ -1,23 +1,28 @@
-'use client';
-
-import { useContext } from 'react';
-import { redirect } from 'next/navigation';
-
 import { checkKey } from '@/lib/checkKey';
-import { UserInfoContext } from '@/context/userInfoContext';
 import Meetting from './Meeting';
-import Setting from './Setting';
+import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
+import { PostCheckSessionId } from '../api/mongoAPI';
+import Provider from './Provider';
 
 interface MeetingPageProps {
   params: Record<string, string>;
 }
 
-export default function Page({ params }: MeetingPageProps) {
-  const { code } = params;
-  const { name } = useContext(UserInfoContext);
-  if (!checkKey(code)) {
+export default async function Page({ params }: MeetingPageProps) {
+  const headerList = headers();
+  const domain = headerList.get('x-pathname');
+  const origin = headerList.get('x-origin');
+
+  if (!domain || !origin) {
     redirect('/landing');
   }
 
-  return name ? <Meetting /> : <Setting />;
+  const isValidSessionId = await PostCheckSessionId(domain.slice(1), origin);
+
+  if (!isValidSessionId) {
+    redirect('/landing');
+  }
+  console.log('pathname', domain);
+  return <Provider />;
 }

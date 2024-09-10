@@ -13,9 +13,9 @@ export default function ParticipateMeetingForm() {
     setValue(e.target.value);
   };
 
-  const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleFormSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const result = checkKey(value);
+    const result = await checkKey(value);
     if (result) {
       router.push(`/${result}`);
     }
