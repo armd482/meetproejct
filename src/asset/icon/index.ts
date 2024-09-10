@@ -25,7 +25,7 @@ export { default as Logo } from './logo.svg';
 export { default as Menu } from './menu.svg';
 export { default as MicOn } from './micOn.svg';
 export { default as MicOff } from './micOff.svg';
-export { default as Permission } from './permission.svg';
+export { default as PermissionSetting } from './permissionSetting.svg';
 export { default as Profile } from './profile.svg';
 export { default as UserOff } from './userOff.svg';
 export { default as UserOn } from './userOn.svg';

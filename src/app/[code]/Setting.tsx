@@ -12,7 +12,7 @@ export default function Setting() {
           <p className='text-1.5xl font-medium text-gray-600'>Meet</p>
         </Link>
       </div>
-      <div className='flex flex-1 items-center justify-center lg-max:flex-col'>
+      <div className='flex flex-1 items-center justify-center lg:flex-col'>
         <Device />
         <div className='m-4 flex w-[448px] flex-col items-center font-googleSans'>
           <p className='text-2xl'>이름이 무엇인가요?</p>

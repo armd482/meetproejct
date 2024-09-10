@@ -1,1 +1,3 @@
-export type StreamStatusType = 'none' | 'pending' | 'failed' | 'success' | 'pause' | 'rejected' | 'videoFailed';
+type StatusType = null | 'failed' | 'success' | 'rejected';
+
+export type StreamStatusType = StatusType | 'pending';

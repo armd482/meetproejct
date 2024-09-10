@@ -1,30 +1,41 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
-import { StreamStatusType } from '@/type/streamType';
 import { useDeviceStore } from '@/store/DeviceStore';
-import { AUDIO_CONSTRAINT } from '@/asset/constant/stream';
+import { StreamStatusType } from '@/type/streamType';
+import { getStreamConstraint } from '@/lib/getStreamConstraint';
 import { getCurrentDeviceInfo } from '@/lib/getCurrentDeviceInfo';
 
 const useDevice = () => {
-  const { deviceEnable, audioInput, videoInput, setAudioInput, setAudioOutput, setVideoInput, setDeviceEnable } =
-    useDeviceStore(
-      useShallow((state) => ({
-        deviceEnable: state.deviceEnable,
-        audioInput: state.audioInput,
-        videoInput: state.videoInput,
-        setAudioInput: state.setAudioInput,
-        setAudioOutput: state.setAudioOutput,
-        setVideoInput: state.setVideoInput,
-        setDeviceEnable: state.setDeviceEnable,
-      })),
-    );
+  const {
+    permission,
+    deviceEnable,
+    audioInput,
+    videoInput,
+    setPermission,
+    setDeviceEnable,
+    setAudioInput,
+    setAudioOutput,
+    setVideoInput,
+  } = useDeviceStore(
+    useShallow((state) => ({
+      permission: state.permission,
+      deviceEnable: state.deviceEnable,
+      audioInput: state.audioInput,
+      videoInput: state.videoInput,
+      setPermission: state.setPermission,
+      setDeviceEnable: state.setDeviceEnable,
+      setAudioInput: state.setAudioInput,
+      setAudioOutput: state.setAudioOutput,
+      setVideoInput: state.setVideoInput,
+    })),
+  );
 
   const [stream, setStream] = useState<MediaStream | null>(null);
-  const [streamStatus, setStreamStatus] = useState<StreamStatusType>('none');
-  const [isUpdateStream, setIsUpdateStream] = useState<boolean>(true);
+  const [streamStatus, setStreamStatus] = useState<StreamStatusType>(null);
+  const [isUpdateStream, setIsUpdateStream] = useState<boolean>(false);
 
   const [videoInputList, setVideoInputList] = useState<MediaDeviceInfo[]>([]);
   const [audioOutputList, setAudioOutputList] = useState<MediaDeviceInfo[]>([]);
@@ -40,6 +51,10 @@ const useDevice = () => {
 
   const handleVideoInputChange = (value: Record<'id' | 'name', string>) => {
     setVideoInput(value);
+  };
+
+  const handleUpdateStream = () => {
+    setIsUpdateStream(true);
   };
 
   const toggleAudioInput = async () => {
@@ -61,7 +76,6 @@ const useDevice = () => {
           stream.getVideoTracks().forEach((track) => {
             track.stop();
           });
-          setStreamStatus('pause');
         } else {
           setIsUpdateStream(true);
         }
@@ -70,12 +84,44 @@ const useDevice = () => {
     }
   };
 
+  const checkPermission = useCallback(
+    async (audio: boolean, video: boolean) => {
+      try {
+        await navigator.mediaDevices.getUserMedia({ audio, video });
+        setPermission({ audio, video });
+        setDeviceEnable((prev) => ({ mic: audio && prev.mic, video: video && prev.video }));
+        return true;
+      } catch (error) {
+        const e = error as DOMException;
+        if (e.name === 'NotAllowedError') {
+          if (audio) {
+            if (await checkPermission(!audio, video)) {
+              return true;
+            }
+          }
+          if (video) {
+            if (await checkPermission(audio, !video)) {
+              return true;
+            }
+          }
+          return false;
+        }
+        setPermission({ audio, video });
+        return true;
+      }
+    },
+    [setPermission, setDeviceEnable],
+  );
+
   const getStream = useCallback(async () => {
+    if (!permission) {
+      return 'failed';
+    }
+
     try {
-      const newStream = await navigator.mediaDevices.getUserMedia({
-        audio: audioInput.id ? { deviceId: audioInput.id, ...AUDIO_CONSTRAINT } : { ...AUDIO_CONSTRAINT },
-        video: videoInput.id ? { deviceId: videoInput.id } : true,
-      });
+      const newStream = await navigator.mediaDevices.getUserMedia(
+        getStreamConstraint(permission, { audio: audioInput.id, video: videoInput.id }),
+      );
       return newStream;
     } catch (error) {
       const e = error as DOMException;
@@ -83,103 +129,79 @@ const useDevice = () => {
         return 'rejected';
       }
 
-      if (e.name === 'NotReadableError') {
-        try {
-          const s = await navigator.mediaDevices.getUserMedia({
-            audio: audioInput.id ? { deviceId: audioInput.id, ...AUDIO_CONSTRAINT } : { ...AUDIO_CONSTRAINT },
-            video: false,
-          });
-          return s;
-        } catch (err) {
-          const er = err as DOMException;
-          if (er.name === 'NotAllowedError') {
-            return 'rejected';
-          }
-          return 'failed';
-        }
-      }
       return 'failed';
     }
-  }, [audioInput, videoInput]);
+  }, [audioInput, videoInput, permission]);
 
-  useEffect(() => {
-    if (!isUpdateStream) {
+  const setTrack = useCallback(async () => {
+    if (!permission) {
+      return;
+    }
+    setStreamStatus('pending');
+    if (stream) {
+      stream.getTracks().forEach((track) => track.stop());
+    }
+    const startDate = new Date().getTime();
+    const newStream = await getStream();
+
+    if (newStream === 'failed' || newStream === 'rejected') {
+      setStreamStatus(newStream);
+      setStream(null);
+      setDeviceEnable({ mic: false, video: false });
       return;
     }
 
-    const setTrack = async () => {
-      if (stream) {
-        stream.getTracks().forEach((track) => track.stop());
-      }
+    if (!deviceEnable.mic) {
+      newStream.getAudioTracks().forEach((track) => {
+        track.enabled = false;
+      });
+    }
 
-      const startDate = new Date().getTime();
-      setStreamStatus('pending');
+    if (!deviceEnable.video) {
+      newStream.getVideoTracks().forEach((track) => {
+        track.stop();
+      });
+    }
 
-      const newStream = await getStream();
-      if (newStream === 'failed' || newStream === 'rejected') {
-        setStreamStatus(newStream);
+    const deviceInfo = await getCurrentDeviceInfo(newStream);
+
+    setVideoInput(deviceInfo.currentVideoInput);
+    setVideoInputList(deviceInfo.currentVideoInputList);
+
+    setAudioInput(deviceInfo.currentAudioInput);
+    setAudioInputList(deviceInfo.currentAudioInputList);
+
+    setAudioOutput(deviceInfo.currentAudioOutput);
+    setAudioOutputList(deviceInfo.currentAudioOutputList);
+
+    setStream(newStream);
+
+    const timeDiff = new Date().getTime() - startDate;
+    setTimeout(
+      () => {
+        setStreamStatus('success');
+      },
+      Math.max(1000 - timeDiff, 0),
+    );
+  }, [stream, deviceEnable, permission, getStream, setAudioInput, setAudioOutput, setVideoInput, setDeviceEnable]);
+
+  useEffect(() => {
+    const getPermission = async () => {
+      if (!(await checkPermission(true, true))) {
+        setPermission({ audio: false, video: false });
         setDeviceEnable({ mic: false, video: false });
-        return;
-      }
-
-      if (!deviceEnable.mic) {
-        newStream.getAudioTracks().forEach((track) => {
-          track.enabled = deviceEnable.mic;
-        });
-      }
-
-      if (!deviceEnable.video) {
-        newStream.getVideoTracks().forEach((track) => {
-          track.stop();
-        });
-      }
-
-      const deviceInfo = await getCurrentDeviceInfo(newStream);
-
-      deviceInfo.audioTrack.onended = () => {
-        setStreamStatus('rejected');
-      };
-
-      if (deviceInfo.currentVideoInput.id) {
-        deviceInfo.videoTrack.onended = () => {
-          setStreamStatus('rejected');
-        };
-
-        setVideoInput(deviceInfo.currentVideoInput);
-        setVideoInputList(deviceInfo.currentVideoInputList);
-      }
-
-      setAudioInputList(deviceInfo.currentAudioInputList);
-      setAudioOutputList(deviceInfo.currentAudioOutputList);
-
-      setAudioInput(deviceInfo.currentAudioInput);
-      setAudioOutput(deviceInfo.currentAudioOutput);
-
-      setStream(newStream);
-      if (!deviceInfo.currentVideoInput.id) {
-        setStreamStatus('videoFailed');
-        setDeviceEnable((prev) => ({ ...prev, video: false }));
-        return;
-      }
-
-      const timeDiff = new Date().getTime() - startDate;
-      setTimeout(
-        () => {
-          setStreamStatus('success');
-        },
-        Math.max(1000 - timeDiff, 0),
-      );
-    };
-
-    setTrack();
-    setIsUpdateStream(false);
-
-    return () => {
-      if (stream) {
-        stream.getTracks().forEach((track) => track.stop());
       }
     };
-  }, [getStream, setAudioInput, setAudioOutput, setVideoInput, setDeviceEnable, stream, deviceEnable, isUpdateStream]);
+    getPermission();
+    setIsUpdateStream(true);
+  }, [checkPermission, setPermission, setDeviceEnable]);
+
+  useEffect(() => {
+    if (isUpdateStream && permission) {
+      setIsUpdateStream(false);
+      setTrack();
+    }
+  }, [stream, permission, isUpdateStream, getStream, setTrack]);
 
   useEffect(() => {
     navigator.mediaDevices.ondevicechange = () => {
@@ -189,6 +211,27 @@ const useDevice = () => {
       navigator.mediaDevices.ondevicechange = null;
     };
   }, []);
+
+  useEffect(() => {
+    if (!stream) {
+      return;
+    }
+    const checkTrack = async (id: NodeJS.Timeout) => {
+      if (!stream.active) {
+        if (!(await checkPermission(true, true))) {
+          setPermission({ audio: false, video: false });
+          setDeviceEnable({ mic: false, video: false });
+        }
+        setIsUpdateStream(true);
+        clearInterval(id);
+      }
+    };
+
+    const timerId = setInterval(() => checkTrack(timerId), 1000);
+    return () => {
+      clearInterval(timerId);
+    };
+  }, [stream, checkPermission, setPermission, setDeviceEnable]);
 
   return {
     stream,
@@ -201,6 +244,7 @@ const useDevice = () => {
     handleVideoInputChange,
     toggleAudioInput,
     toggleVideoInput,
+    handleUpdateStream,
   };
 };
 

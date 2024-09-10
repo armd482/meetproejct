@@ -8,7 +8,7 @@ const useVolume = (stream: MediaStream | null | undefined) => {
   const dataArrayRef = useRef<Uint8Array | null>(null);
 
   useEffect(() => {
-    if (!stream) {
+    if (!stream || stream.getAudioTracks().length === 0) {
       return;
     }
 

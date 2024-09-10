@@ -15,6 +15,7 @@ export default function RootLayout({
     <html lang='ko'>
       <body className='flex h-screen w-screen flex-col'>
         <div id='alert' />
+        <div id='modal' />
         <div className='flex-1'>{children}</div>
       </body>
     </html>

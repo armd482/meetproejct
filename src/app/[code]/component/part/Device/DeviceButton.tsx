@@ -1,3 +1,5 @@
+'use client';
+
 import { ReactNode, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useDeviceStore } from '@/store/DeviceStore';
@@ -14,7 +16,7 @@ interface DeviceButtonIcon {
   type: 'audioInput' | 'audioOutput' | 'videoInput';
   stream?: MediaStream | null;
   onTrackChange: (device: MediaDeviceInfo, type: 'audioInput' | 'audioOutput' | 'videoInput') => void;
-  status?: StreamStatusType;
+  status: StreamStatusType;
 }
 
 export default function DeviceButton({
@@ -27,9 +29,29 @@ export default function DeviceButton({
   onTrackChange,
 }: DeviceButtonIcon) {
   const [isOpen, setIsOpen] = useState(false);
+  const permission = useDeviceStore((state) => state.permission);
 
-  const isDisabled =
-    status === 'failed' || status === 'rejected' || (status === 'videoFailed' && type === 'videoInput');
+  const getDisabledStatus = () => {
+    if (status === 'rejected' || status === 'failed') {
+      return true;
+    }
+
+    if (type === 'audioInput' || type === 'audioOutput') {
+      if (permission && !permission.audio) {
+        return true;
+      }
+    }
+
+    if (type === 'videoInput') {
+      if (permission && !permission.video) {
+        return true;
+      }
+    }
+
+    return false;
+  };
+
+  const isDisabled = getDisabledStatus();
 
   const { volume } = useVolume(stream);
 
@@ -71,21 +93,31 @@ export default function DeviceButton({
   };
 
   const getStatusText = () => {
-    if (status === 'failed') {
-      if (type === 'audioInput') {
-        return '마이크를 찾을 수 없습니다';
+    if (type === 'audioInput' || type === 'audioOutput') {
+      if ((permission && !permission.audio) || status === 'rejected') {
+        return '권한 필요';
       }
-      if (type === 'videoInput') {
-        return '카메라를 찾을 수 없습니다';
-      }
-      return '스피커를 찾을 수 없습니다';
-    }
-    if (status === 'rejected') {
-      return '권한이 필요합니다';
     }
 
-    if (status === 'videoFailed' && type === 'videoInput') {
-      return '카메라를 사용할 수 없습니다';
+    if (type === 'audioInput') {
+      if (status === 'failed' || !currentDevice.id) {
+        return '마이크를 찾을 수 없습니다';
+      }
+    }
+
+    if (type === 'audioOutput') {
+      if (status === 'failed' || !currentDevice.id) {
+        return '스피커를 찾을 수 없습니다';
+      }
+    }
+
+    if (type === 'videoInput') {
+      if (permission && !permission.video) {
+        return '권한 필요';
+      }
+      if (status === 'failed' || !currentDevice.id) {
+        return '카메라를 찾을 수 없습니다';
+      }
     }
   };
   const disabledText = getStatusText();
@@ -99,7 +131,7 @@ export default function DeviceButton({
         className={`flex h-[34px] items-center rounded-full border-[0.8px] border-solid px-[10px] ${isDisabled ? 'border-[#E7E8E8]' : 'border-white  hover:border-[#DADCE0] active:bg-[#F6FAFE]'}  `}
       >
         <div className='mr-2 flex size-[18px] items-center justify-center'>{icon}</div>
-        <p className={`w-[105px] truncate text-sm ${isDisabled ? 'text-[#B5B6B7]' : 'text-[#5f6368]'}`}>
+        <p className={`w-[105px] truncate text-sm text-left ${isDisabled ? 'text-[#B5B6B7]' : 'text-[#5f6368]'}`}>
           {isDisabled ? disabledText : currentDevice.name}
         </p>
         <div className='w-[18px]'>
