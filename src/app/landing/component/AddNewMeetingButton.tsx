@@ -56,11 +56,7 @@ export default function AddNewMeetingButton() {
       >
         <Icon.AddMeeting width={18} height={18} />새 회의
       </button>
-      <Alert
-        text='세션 생성에 실패하였습니다.'
-        isOpen={isFailed}
-        onCloseAlert={handleCloseAlert}
-      />
+      <Alert text='세션 생성에 실패하였습니다.' isOpen={isFailed} onCloseAlert={handleCloseAlert} />
     </>
   );
 }

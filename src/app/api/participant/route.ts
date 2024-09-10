@@ -14,25 +14,16 @@ export async function POST(req: Request) {
         return NextResponse.json({ message: e.errmsg }, { status: 400 });
       }
       if (e.code === 11000) {
-        return NextResponse.json(
-          { message: '중복된 키 값 저장' },
-          { status: 400 },
-        );
+        return NextResponse.json({ message: '중복된 키 값 저장' }, { status: 400 });
       }
-      return NextResponse.json(
-        { message: '값을 넣을 수 없습니다' },
-        { status: 500 },
-      );
+      return NextResponse.json({ message: '값을 넣을 수 없습니다' }, { status: 500 });
     }
     return NextResponse.json({
       message: '값이 저장되었습니다',
       data: { sessionId, userName },
     });
   } catch {
-    return NextResponse.json(
-      { message: '데이터 베이스 연결에 실패하였습니다' },
-      { status: 500 },
-    );
+    return NextResponse.json({ message: '데이터 베이스 연결에 실패하였습니다' }, { status: 500 });
   }
 }
 
@@ -42,21 +33,12 @@ export async function GET(req: Request) {
   try {
     const db = (await connectDB).db('session');
     try {
-      const result = await db
-        .collection('participant')
-        .find({ sessionId })
-        .toArray();
+      const result = await db.collection('participant').find({ sessionId }).toArray();
       return NextResponse.json({ data: result });
     } catch (error) {
-      return NextResponse.json(
-        { message: '값을 찾을 수 없습니다' },
-        { status: 500 },
-      );
+      return NextResponse.json({ message: '값을 찾을 수 없습니다' }, { status: 500 });
     }
   } catch {
-    return NextResponse.json(
-      { message: '데이터 베이스 연결에 실패하였습니다' },
-      { status: 500 },
-    );
+    return NextResponse.json({ message: '데이터 베이스 연결에 실패하였습니다' }, { status: 500 });
   }
 }

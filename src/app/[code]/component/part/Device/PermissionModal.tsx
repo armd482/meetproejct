@@ -54,8 +54,8 @@ export default function PermissionModal({ isOpenModal, onClose, onUpdateStream }
           <div className='flex w-full items-center justify-center'>
             <Image src={permissionRequest} alt='허용 클릭' width={230} height={230} />
           </div>
-          <div className='pt-5 px-10 font-googleSans text-[#444746]'>
-            <h1 className='text-2xl mb-4'>
+          <div className='pt-5 px-10 text-[#444746] font-googleSans'>
+            <h1 className='mb-4 text-2xl'>
               <span className='font-semibold'>허용</span> 클릭
             </h1>
             <p>회의 중에 언제든지 마이크 및 카메라를 끌 수 있습니다</p>

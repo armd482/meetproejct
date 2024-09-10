@@ -13,15 +13,8 @@ interface IconButtonProps {
   align?: 'left' | 'center' | 'right';
 }
 
-export default function IconButton({
-  icon,
-  clickedIcon,
-  type,
-  name,
-  align = 'center',
-}: IconButtonProps) {
-  const { panelType, handlePanelType, handleOpenStatus } =
-    useContext(PanelContext);
+export default function IconButton({ icon, clickedIcon, type, name, align = 'center' }: IconButtonProps) {
+  const { panelType, handlePanelType, handleOpenStatus } = useContext(PanelContext);
   const handleButtonClick = () => {
     if (panelType === type) {
       handlePanelType(null);

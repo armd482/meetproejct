@@ -22,16 +22,8 @@ export default function Page() {
   }, []);
   return (
     <div>
-      <input
-        value={value}
-        onChange={handleValueChange}
-        className='border border-solid border-gray-600'
-      />
-      <button
-        type='button'
-        onClick={submitButton}
-        className='border border-solid border-black'
-      >
+      <input value={value} onChange={handleValueChange} className='border border-solid border-gray-600' />
+      <button type='button' onClick={submitButton} className='border border-solid border-black'>
         제출
       </button>
     </div>

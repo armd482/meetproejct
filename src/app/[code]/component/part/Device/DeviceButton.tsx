@@ -128,7 +128,7 @@ export default function DeviceButton({
         type='button'
         onClick={handleButtonClick}
         disabled={isDisabled}
-        className={`flex h-[34px] items-center rounded-full border-[0.8px] border-solid px-[10px] ${isDisabled ? 'border-[#E7E8E8]' : 'border-white  hover:border-[#DADCE0] active:bg-[#F6FAFE]'}  `}
+        className={`flex h-[34px] items-center rounded-full border-[0.8px] border-solid ${isDisabled ? 'border-[#E7E8E8]' : 'border-white  hover:border-[#DADCE0] active:bg-[#F6FAFE]'} px-[10px]`}
       >
         <div className='mr-2 flex size-[18px] items-center justify-center'>{icon}</div>
         <p className={`w-[105px] truncate text-sm text-left ${isDisabled ? 'text-[#B5B6B7]' : 'text-[#5f6368]'}`}>

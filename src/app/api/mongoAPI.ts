@@ -21,9 +21,7 @@ export const DeleteSessionId = async (sessionId: string) => {
   }
 };
 
-export const getParticipant = async (
-  sessionId: string,
-): Promise<ParticipantDataType[]> => {
+export const getParticipant = async (sessionId: string): Promise<ParticipantDataType[]> => {
   const response = await fetch(`/api/participant?sessionId=${sessionId}`, {
     method: 'GET',
     cache: 'no-cache',

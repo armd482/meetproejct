@@ -8,11 +8,7 @@ interface UserListCardProps {
   isMicOn: boolean;
 }
 
-export default function UserListCard({
-  name,
-  host,
-  isMicOn,
-}: UserListCardProps) {
+export default function UserListCard({ name, host, isMicOn }: UserListCardProps) {
   return (
     <div className='flex h-14 flex-1 items-center justify-between'>
       <div className='flex select-none items-center gap-4 bg-white font-googleSans text-[#202124]'>
@@ -33,16 +29,8 @@ export default function UserListCard({
           )}
         </div>
         <ButtonTag name='추가 작업' position='bottom'>
-          <button
-            type='button'
-            className='flex size-12 items-center justify-center rounded-full hover:bg-[#EFEFEF]'
-          >
-            <Icon.Menu
-              width={18}
-              height={18}
-              fill='#5F6368'
-              className='rotate-90'
-            />
+          <button type='button' className='flex size-12 items-center justify-center rounded-full hover:bg-[#EFEFEF]'>
+            <Icon.Menu width={18} height={18} fill='#5F6368' className='rotate-90' />
           </button>
         </ButtonTag>
       </div>

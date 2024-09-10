@@ -57,11 +57,7 @@ export default function OptionButton({
   return (
     <ButtonTag
       name={name[currentHover]}
-      align={
-        name.chevron !== '영상 설정' || currentHover !== 'chevron'
-          ? 'left'
-          : 'center'
-      }
+      align={name.chevron !== '영상 설정' || currentHover !== 'chevron' ? 'left' : 'center'}
     >
       <div
         className={`relative h-12 ${isVisibleOption ? 'w-[88px]' : 'w-12'} items-center ${isClickedButton ? 'rounded-xl' : 'rounded-[26px]'} ${isClickedButton ? 'bg-[#5F1312] hover:bg-[#641B1A] active:bg-[#6E2B2A]' : 'bg-[#282A2C] hover:bg-[#2D2F31] active:bg-[#3B3D3F]'} duration-150 `}
@@ -87,9 +83,7 @@ export default function OptionButton({
           className={`absolute ${isVisibleOption ? 'left-10' : 'left-0'} top-0 flex items-center justify-center ${isClickedButton ? 'bg-[#F9DEDC]' : 'bg-[#333537] hover:bg-[#414345]'} size-12 ${isClickedButton ? 'rounded-xl' : 'rounded-full'} duration-150`}
           onMouseEnter={handleButtonMouseEnter}
         >
-          <div className='delay-150'>
-            {isClickedButton ? clickedIcon : icon}
-          </div>
+          <div className='delay-150'>{isClickedButton ? clickedIcon : icon}</div>
         </button>
       </div>
     </ButtonTag>

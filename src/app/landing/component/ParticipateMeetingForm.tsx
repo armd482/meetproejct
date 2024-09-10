@@ -22,16 +22,8 @@ export default function ParticipateMeetingForm() {
   };
 
   return (
-    <form
-      onSubmit={handleFormSubmit}
-      className='relative flex shrink items-center gap-2'
-    >
-      <Icon.Keypad
-        className='absolute left-4 top-1/2 -translate-y-2/4'
-        width={22}
-        height={16}
-        fill='#5F6368'
-      />
+    <form onSubmit={handleFormSubmit} className='relative flex shrink items-center gap-2'>
+      <Icon.Keypad className='absolute left-4 top-1/2 -translate-y-2/4' width={22} height={16} fill='#5F6368' />
       <input
         className='max-w-[246px] shrink rounded-[4px] border border-solid border-[#80868B] py-[11px] pl-12 pr-4 text-[16px] text-[#3C4043] outline-[#1B77E4]'
         placeholder='코드 또는 링크 입력'

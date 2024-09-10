@@ -1,10 +1,4 @@
-import {
-  createContext,
-  PropsWithChildren,
-  useCallback,
-  useMemo,
-  useState,
-} from 'react';
+import { createContext, PropsWithChildren, useCallback, useMemo, useState } from 'react';
 import { PanelType } from '@/type/panelType';
 
 interface PanelContextType {
@@ -43,7 +37,5 @@ export function PanelContextProvider({ children }: PropsWithChildren) {
     [panelType, isOpen, handlePanelType, handleOpenStatus],
   );
 
-  return (
-    <PanelContext.Provider value={value}>{children}</PanelContext.Provider>
-  );
+  return <PanelContext.Provider value={value}>{children}</PanelContext.Provider>;
 }
