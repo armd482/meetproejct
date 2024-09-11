@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
-import { OpenVidu, Session as OVSession, Publisher, Subscriber } from 'openvidu-browser';
-import { postCreateSession, postToken } from '@/app/api/sessionAPI';
+import { useShallow } from 'zustand/react/shallow';
+import { OpenVidu, Session as OVSession, Publisher, StreamEvent, Subscriber } from 'openvidu-browser';
+import { postToken } from '@/app/api/sessionAPI';
+import { useDeviceStore } from '@/store/DeviceStore';
+
+const UNPUBLISH = new Set(['unpublish', 'forceUnpublishByUser', 'forceUnpublishByServer']);
 
 const useOpenvidu = () => {
   const [session, setSession] = useState<OVSession | null>(null);
@@ -13,6 +17,13 @@ const useOpenvidu = () => {
   });
   const [OV, setOV] = useState<OpenVidu | null>(null);
 
+  const { audioInput, videoInput } = useDeviceStore(
+    useShallow((state) => ({
+      audioInput: state.audioInput,
+      videoInput: state.videoInput,
+    })),
+  );
+
   const joinSession = async (sid: string, name: string) => {
     const token = await postToken(sid);
     const newOV = new OpenVidu();
@@ -23,8 +34,8 @@ const useOpenvidu = () => {
     await newSession.connect(token, { clientData: name });
     setSession(newSession);
     const newPublisher = newOV.initPublisher(undefined, {
-      audioSource: true,
-      videoSource: true,
+      audioSource: audioInput.id ?? false,
+      videoSource: videoInput.id ?? false,
       publishAudio: true,
       publishVideo: true,
     });
@@ -58,11 +69,6 @@ const useOpenvidu = () => {
     setUser({ id: connectionId, name: JSON.parse(data).clientData });
   };
 
-  const createSession = async (sid: string, name: string) => {
-    const id = await postCreateSession(sid);
-    await joinSession(id, name);
-  };
-
   const leaveSession = useCallback(() => {
     if (session) {
       session.disconnect();
@@ -73,6 +79,24 @@ const useOpenvidu = () => {
     setPublisher(null);
     setSubscribers([]);
   }, [session]);
+
+  const changeDevice = async (type: 'audio' | 'video', value: boolean | string) => {
+    if (!publisher) {
+      return;
+    }
+
+    const constraint = typeof value === 'string' ? { deviceId: value } : value;
+
+    if (type === 'audio') {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: constraint });
+      const track = stream.getAudioTracks()[0];
+      publisher.replaceTrack(track);
+      return;
+    }
+    const stream = await navigator.mediaDevices.getUserMedia({ video: constraint });
+    const track = stream.getVideoTracks()[0];
+    publisher.replaceTrack(track);
+  };
 
   useEffect(() => {
     window.addEventListener('beforeunload', leaveSession);
@@ -85,26 +109,50 @@ const useOpenvidu = () => {
     if (!session) {
       return;
     }
-    session.on('streamCreated', (e) => {
+    const handleCreateStream = (e: StreamEvent) => {
       const { connectionId, data } = e.stream.connection;
+
+      if (connectionId === user.id) {
+        return;
+      }
+
       setParticipants((prev) => ({
         ...prev,
         [connectionId]: JSON.parse(data).clientData,
       }));
       const newSubscribe = session.subscribe(e.stream, undefined);
-      setSubscribers((prev) => [...prev, [connectionId, newSubscribe]]);
-    });
+      setSubscribers((prev) => [
+        ...prev.filter((subscriber) => subscriber[0] !== connectionId),
+        [connectionId, newSubscribe],
+      ]);
+    };
 
-    session.on('streamDestroyed', (e) => {
+    const handleDestroyStream = (e: StreamEvent) => {
+      const isDisconnected = !UNPUBLISH.has(e.reason);
       const { connectionId } = e.stream.connection;
-      setParticipants((prev) => {
-        const newParticipants = { ...prev };
-        delete newParticipants[connectionId];
-        return newParticipants;
-      });
-      setSubscribers((prev) => prev.filter((entity) => entity[0] !== connectionId));
-    });
-  }, [session]);
+
+      if (connectionId === user.id) {
+        return;
+      }
+
+      if (isDisconnected) {
+        setParticipants((prev) => {
+          const newParticipants = { ...prev };
+          delete newParticipants[connectionId];
+          return newParticipants;
+        });
+        setSubscribers((prev) => prev.filter((subscriber) => subscriber[0] !== connectionId));
+      }
+    };
+
+    session.on('streamCreated', handleCreateStream);
+    session.on('streamDestroyed', handleDestroyStream);
+
+    return () => {
+      session.off('streamCreated', handleCreateStream);
+      session.off('streamDestroyed', handleDestroyStream);
+    };
+  }, [session, user]);
 
   return {
     user,
@@ -113,9 +161,9 @@ const useOpenvidu = () => {
     session,
     participants,
     OV,
-    createSession,
     joinSession,
     leaveSession,
+    changeDevice,
   };
 };
 
