@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 
 const useVolume = (stream: MediaStream | null | undefined) => {
+  const animationRef = useRef<number | null>(null);
   const [volume, setVolume] = useState(0);
   const [isExpand, setIsExpand] = useState(false);
   const dataArrayRef = useRef<Uint8Array | null>(null);
@@ -15,6 +16,7 @@ const useVolume = (stream: MediaStream | null | undefined) => {
     const audioContext = new AudioContext();
     const analyser = audioContext.createAnalyser();
     analyser.fftSize = 2048;
+
     const source = audioContext.createMediaStreamSource(stream);
     source.connect(analyser);
 
@@ -23,7 +25,7 @@ const useVolume = (stream: MediaStream | null | undefined) => {
     dataArrayRef.current = dataArray;
 
     const updateVolume = () => {
-      requestAnimationFrame(updateVolume);
+      animationRef.current = requestAnimationFrame(updateVolume);
       if (!dataArrayRef.current) {
         return;
       }
@@ -42,6 +44,9 @@ const useVolume = (stream: MediaStream | null | undefined) => {
 
     return () => {
       audioContext.close();
+      if (animationRef.current !== null) {
+        cancelAnimationFrame(animationRef.current);
+      }
     };
   }, [stream]);
 

@@ -62,7 +62,7 @@ const BUTTON_LIST: ButtonType[] = [
 
 export default function InfoBar() {
   return (
-    <div className='absolute right-5 top-1/2 flex -translate-y-1/2 items-center'>
+    <div className='flex items-center justify-end'>
       {BUTTON_LIST.map((button) => (
         <IconButton key={button.type} {...button} />
       ))}
