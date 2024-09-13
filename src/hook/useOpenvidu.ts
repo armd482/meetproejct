@@ -1,25 +1,36 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
-import { OpenVidu, Session as OVSession, Publisher, StreamEvent, Subscriber } from 'openvidu-browser';
+import {
+  OpenVidu,
+  Session as OVSession,
+  Publisher,
+  PublisherProperties,
+  StreamEvent,
+  StreamPropertyChangedEvent,
+  Subscriber,
+} from 'openvidu-browser';
 import { postToken } from '@/app/api/sessionAPI';
 import { useDeviceStore } from '@/store/DeviceStore';
 import { useRouter } from 'next/navigation';
-import useCheckPermission from './useCheckPermission';
-import useCurrentDevice from './useCurrentDevice';
 import { getDevicePermission } from '@/lib/getDevicePermission';
 import useDevice from './useDevice';
+
+interface UserInfo {
+  name: string;
+  audio: boolean;
+  video: boolean;
+}
 
 const UNPUBLISH = new Set(['unpublish', 'forceUnpublishByUser', 'forceUnpublishByServer']);
 
 const useOpenvidu = (sessionId: string, name: string) => {
   const router = useRouter();
-  const { updateDevice } = useCurrentDevice();
 
   const [isInitial, setIsInitial] = useState(true);
   const [session, setSession] = useState<OVSession | null>(null);
   const [publisher, setPublisher] = useState<Publisher | null>(null);
   const [subscribers, setSubscribers] = useState<[string, Subscriber][]>([]);
-  const [participants, setParticipants] = useState<Record<string, string>>({});
+  const [participants, setParticipants] = useState<Record<string, UserInfo>>({});
   const [user, setUser] = useState<Record<'id' | 'name', null | string>>({
     id: null,
     name: null,
@@ -59,12 +70,20 @@ const useOpenvidu = (sessionId: string, name: string) => {
       const newSession = newOV.initSession();
       await newSession.connect(token, { clientData: name });
       setSession(newSession);
-      const newPublisher = newOV.initPublisher(undefined, {
+      const publishConstraint = {
         audioSource: !permission || (permission && permission.audio) ? (audioInput.id ?? true) : false,
         videoSource: !permission || (permission && permission.video) ? (videoInput.id ?? true) : false,
         publishAudio: true,
         publishVideo: true,
-      });
+        filter: {
+          type: 'GStreamerFilter',
+          options: {
+            command: 'videoflip method=vertical-flip',
+          },
+        },
+      } as unknown as PublisherProperties;
+
+      const newPublisher = newOV.initPublisher(undefined, publishConstraint);
       await newSession.publish(newPublisher);
       setPublisher(newPublisher);
       setSubscribers(() => {
@@ -83,7 +102,11 @@ const useOpenvidu = (sessionId: string, name: string) => {
         newSession.remoteConnections.forEach((entry) => {
           const { connectionId, data } = entry;
           Object.assign(totalParticipants, {
-            [connectionId]: JSON.parse(data).clientData,
+            [connectionId]: {
+              name: JSON.parse(data).clientData,
+              audio: entry.stream?.audioActive,
+              video: entry.stream?.videoActive,
+            },
           });
         });
         return totalParticipants;
@@ -137,7 +160,7 @@ const useOpenvidu = (sessionId: string, name: string) => {
       await publisher.replaceTrack(track);
       return newStream;
     },
-    [publisher, setPermission, setDeviceEnable],
+    [publisher, session, setPermission, setDeviceEnable],
   );
 
   useEffect(() => {
@@ -171,13 +194,13 @@ const useOpenvidu = (sessionId: string, name: string) => {
     const handleCreateStream = (e: StreamEvent) => {
       const { connectionId, data } = e.stream.connection;
 
-      if (connectionId === user.id) {
-        return;
-      }
-
       setParticipants((prev) => ({
         ...prev,
-        [connectionId]: JSON.parse(data).clientData,
+        [connectionId]: {
+          name: JSON.parse(data).clientData,
+          audio: e.stream.audioActive,
+          video: e.stream.videoActive,
+        },
       }));
       const newSubscribe = session.subscribe(e.stream, undefined);
       setSubscribers((prev) => [
@@ -187,6 +210,10 @@ const useOpenvidu = (sessionId: string, name: string) => {
     };
 
     const handleDestroyStream = (e: StreamEvent) => {
+      if (e.stream.connection.connectionId === user.id) {
+        return;
+      }
+
       const isDisconnected = !UNPUBLISH.has(e.reason);
       const { connectionId } = e.stream.connection;
 
@@ -200,12 +227,43 @@ const useOpenvidu = (sessionId: string, name: string) => {
       }
     };
 
+    const handleStreamPropertyChanged = (event: StreamPropertyChangedEvent) => {
+      const { changedProperty, newValue } = event;
+      const { connectionId } = event.stream.connection;
+
+      if (connectionId === user.id) {
+        return;
+      }
+
+      if (changedProperty === 'audioActive') {
+        setParticipants((prev) => ({
+          ...prev,
+          [connectionId]: {
+            ...prev[connectionId],
+            audio: newValue as boolean,
+          },
+        }));
+      }
+      if (changedProperty === 'videoActive') {
+        const { connectionId } = event.stream.connection;
+        setParticipants((prev) => ({
+          ...prev,
+          [connectionId]: {
+            ...prev[connectionId],
+            video: newValue as boolean,
+          },
+        }));
+      }
+    };
+
     session.on('streamCreated', handleCreateStream);
     session.on('streamDestroyed', handleDestroyStream);
+    session.on('streamPropertyChanged', handleStreamPropertyChanged);
 
     return () => {
       session.off('streamCreated', handleCreateStream);
       session.off('streamDestroyed', handleDestroyStream);
+      session.off('streamPropertyChanged', handleStreamPropertyChanged);
     };
   }, [session, user]);
 

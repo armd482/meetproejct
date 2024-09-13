@@ -121,7 +121,7 @@ export default function ControlBar({ stream, changeDevice, handleUpdateStream }:
       <CallEndButton />
       <PermissionModal
         isOpenModal={isOpenModal}
-        status={'success'}
+        status='success'
         onClose={handleModalClose}
         onUpdateStream={handleUpdateStream}
       />
