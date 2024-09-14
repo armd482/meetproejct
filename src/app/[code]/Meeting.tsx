@@ -1,16 +1,17 @@
 'use client';
 
 import { useOpenvidu } from '@/hook';
-import { useContext, useState } from 'react';
+import { useContext, useEffect } from 'react';
 import { UserInfoContext } from '@/context/userInfoContext';
 import { usePathname } from 'next/navigation';
-import { ControlBar, InfoBar, Panel, Toggle, MeetInfoBar } from './component';
-import VideoStream from './component/VideoStream';
 import { useDeviceStore } from '@/store/DeviceStore';
 import { useShallow } from 'zustand/react/shallow';
+import { ControlBar, InfoBar, Panel, Toggle, MeetInfoBar } from './component';
+import VideoStream from './component/VideoStream';
+import { deleteParticipant, postParticipant } from '../api/mongoAPI';
 
 export default function Meetting() {
-  const { name } = useContext(UserInfoContext);
+  const { name, color } = useContext(UserInfoContext);
   const pathname = usePathname();
   const { deviceEnable } = useDeviceStore(
     useShallow((state) => ({
@@ -20,20 +21,40 @@ export default function Meetting() {
   const { subscribers, participants, publisher, stream, user, changeDevice, handleUpdateStream } = useOpenvidu(
     pathname.slice(1),
     name as string,
+    color as string,
   );
+
+  useEffect(() => {
+    const registParticipant = async () => {
+      if (user.id && user.name && user.color) {
+        await postParticipant(pathname.slice(1), user.id, user.name, user.color);
+      }
+    };
+
+    const deleteDB = async () => {
+      if (user.id) {
+        await deleteParticipant(pathname.slice(1), user.id);
+      }
+    };
+
+    registParticipant();
+    return () => {
+      deleteDB();
+    };
+  }, [user, pathname]);
 
   return (
     <div className='relative flex h-screen w-screen flex-col overflow-hidden bg-[#202124]'>
-      <div className='flex flex-1 gap-4 overflow-hidden p-4'>
+      <div className='flex size-full flex-1 gap-4 p-4'>
         <div
-          className='grid flex-1 gap-4 border border-solid border-black'
+          className='grid size-full flex-1 gap-4 border border-solid border-black'
           style={{
-            gridTemplateColumns: `repeat(${Math.ceil(Math.sqrt(subscribers.length))}, 1fr)`,
+            gridTemplateColumns: `repeat(${Math.ceil(Math.sqrt(subscribers.length + 1))}, 1fr)`,
           }}
         >
-          {publisher && <VideoStream user={{ name: name as string, ...deviceEnable }} subscriber={publisher} muted />}
+          {publisher && <VideoStream user={{ ...user, ...deviceEnable }} subscriber={publisher} muted />}
           {subscribers.map((entity) => (
-            <VideoStream key={entity[0]} user={participants[entity[0]]} subscriber={entity[1]} />
+            <VideoStream key={entity[0]} user={{ id: entity[0], ...participants[entity[0]] }} subscriber={entity[1]} />
           ))}
         </div>
         <Panel />

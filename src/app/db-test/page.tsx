@@ -1,7 +1,7 @@
 'use client';
 
 import { ChangeEvent, useEffect, useState } from 'react';
-import { getParticipant, PostCheckSessionId } from '@/app/api/mongoAPI';
+import { getParticipant, postParticipant } from '@/app/api/mongoAPI';
 import { getRandomId } from '@/lib/getRandomId';
 
 export default function Page() {
@@ -10,7 +10,7 @@ export default function Page() {
     setValue(e.target.value);
   };
   const submitButton = async () => {
-    const response = await PostCheckSessionId(value);
+    const response = await postParticipant('test', 'test1', 'testName', 'testColor');
     console.log(response);
   };
   useEffect(() => {

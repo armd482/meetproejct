@@ -17,13 +17,14 @@ import useDevice from './useDevice';
 
 interface UserInfo {
   name: string;
+  color: string;
   audio: boolean;
   video: boolean;
 }
 
 const UNPUBLISH = new Set(['unpublish', 'forceUnpublishByUser', 'forceUnpublishByServer']);
 
-const useOpenvidu = (sessionId: string, name: string) => {
+const useOpenvidu = (sessionId: string, name: string, color: string) => {
   const router = useRouter();
 
   const [isInitial, setIsInitial] = useState(true);
@@ -31,9 +32,10 @@ const useOpenvidu = (sessionId: string, name: string) => {
   const [publisher, setPublisher] = useState<Publisher | null>(null);
   const [subscribers, setSubscribers] = useState<[string, Subscriber][]>([]);
   const [participants, setParticipants] = useState<Record<string, UserInfo>>({});
-  const [user, setUser] = useState<Record<'id' | 'name', null | string>>({
-    id: null,
-    name: null,
+  const [user, setUser] = useState<Record<'id' | 'name' | 'color', string>>({
+    id: '',
+    name: '',
+    color: '',
   });
 
   const [OV, setOV] = useState<OpenVidu | null>(null);
@@ -63,12 +65,12 @@ const useOpenvidu = (sessionId: string, name: string) => {
 
   const joinSession = useCallback(async () => {
     try {
-      const token = await postToken(sessionId);
+      const token = await postToken(sessionId, name, color);
       const newOV = new OpenVidu();
       newOV.enableProdMode();
       setOV(newOV);
       const newSession = newOV.initSession();
-      await newSession.connect(token, { clientData: name });
+      await newSession.connect(token, { clientData: { name, color } });
       setSession(newSession);
       const publishConstraint = {
         audioSource: !permission || (permission && permission.audio) ? (audioInput.id ?? true) : false,
@@ -103,7 +105,8 @@ const useOpenvidu = (sessionId: string, name: string) => {
           const { connectionId, data } = entry;
           Object.assign(totalParticipants, {
             [connectionId]: {
-              name: JSON.parse(data).clientData,
+              name: JSON.parse(data).clientData.name,
+              color: JSON.parse(data).clientData.color,
               audio: entry.stream?.audioActive,
               video: entry.stream?.videoActive,
             },
@@ -115,13 +118,13 @@ const useOpenvidu = (sessionId: string, name: string) => {
       const {
         connection: { connectionId, data },
       } = newSession;
-      setUser({ id: connectionId, name: JSON.parse(data).clientData });
+      setUser({ id: connectionId, name: JSON.parse(data).clientData.name, color: JSON.parse(data).clientData.color });
     } catch {
       alert('이미 닫힌 회의실입니다');
       leaveSession();
       router.push('/landing');
     }
-  }, [name, sessionId, audioInput, videoInput, permission, router, leaveSession]);
+  }, [name, sessionId, color, audioInput, videoInput, permission, router, leaveSession]);
 
   const changeDevice = useCallback(
     async (type: 'audio' | 'video', value: boolean | string) => {
@@ -197,7 +200,8 @@ const useOpenvidu = (sessionId: string, name: string) => {
       setParticipants((prev) => ({
         ...prev,
         [connectionId]: {
-          name: JSON.parse(data).clientData,
+          name: JSON.parse(data).clientData.name,
+          color: JSON.parse(data).clientData.color,
           audio: e.stream.audioActive,
           video: e.stream.videoActive,
         },
@@ -245,7 +249,6 @@ const useOpenvidu = (sessionId: string, name: string) => {
         }));
       }
       if (changedProperty === 'videoActive') {
-        const { connectionId } = event.stream.connection;
         setParticipants((prev) => ({
           ...prev,
           [connectionId]: {

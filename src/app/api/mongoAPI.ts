@@ -1,6 +1,6 @@
 import { ParticipantDataType } from '@/type/participantType';
 
-export const PostSessionId = async (sessionId: string, origin?: string) => {
+export const postSessionId = async (sessionId: string, origin?: string) => {
   const url = origin ? `${origin}/api/sessionId` : '/api/sessionId';
   const response = await fetch(url, {
     method: 'POST',
@@ -12,7 +12,7 @@ export const PostSessionId = async (sessionId: string, origin?: string) => {
   }
 };
 
-export const DeleteSessionId = async (sessionId: string, origin?: string) => {
+export const deleteSessionId = async (sessionId: string, origin?: string) => {
   const url = origin ? `${origin}/api/sessionId?sessionId=${sessionId}` : `/api/sessionId?sessionId=${sessionId}`;
   const response = await fetch(url, {
     method: 'DELETE',
@@ -37,11 +37,17 @@ export const getParticipant = async (sessionId: string, origin?: string): Promis
   return data;
 };
 
-export const PostParticipant = async (sessionId: string, userName: string, origin?: string) => {
+export const postParticipant = async (
+  sessionId: string,
+  userId: string,
+  userName: string,
+  color: string,
+  origin?: string,
+) => {
   const url = origin ? `${origin}/api/participant` : '/api/participant';
   const response = await fetch(url, {
     method: 'POST',
-    body: JSON.stringify({ sessionId, userName }),
+    body: JSON.stringify({ sessionId, userId, userName, color }),
   });
   if (!response.ok) {
     const result = await response.json();
@@ -49,7 +55,19 @@ export const PostParticipant = async (sessionId: string, userName: string, origi
   }
 };
 
-export const PostCheckSessionId = async (sessionId: string, origin?: string) => {
+export const deleteParticipant = async (sessionId: string, userId: string, origin?: string) => {
+  const url = origin ? `${origin}/api/participant` : '/api/participant';
+  const response = await fetch(url, {
+    method: 'DELETE',
+    body: JSON.stringify({ sessionId, userId }),
+  });
+  if (!response.ok) {
+    const result = await response.json();
+    throw new Error(result.message);
+  }
+};
+
+export const postCheckSessionId = async (sessionId: string, origin?: string) => {
   const url = origin
     ? `${origin}/api/sessionId/check?sessionId=${sessionId}`
     : `/api/sessionId/check?sessionId=${sessionId}`;

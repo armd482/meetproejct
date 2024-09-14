@@ -1,6 +1,6 @@
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { PostCheckSessionId } from '../api/mongoAPI';
+import { postCheckSessionId } from '../api/mongoAPI';
 import Provider from './Provider';
 
 export default async function Page() {
@@ -12,7 +12,7 @@ export default async function Page() {
     redirect('/landing');
   }
 
-  const isValidSessionId = await PostCheckSessionId(domain.slice(1), origin);
+  const isValidSessionId = await postCheckSessionId(domain.slice(1), origin);
 
   if (!isValidSessionId) {
     redirect('/landing');
