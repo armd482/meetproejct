@@ -5,10 +5,16 @@ import { PanelContext } from '@/context/PanelContext';
 import { PanelType } from '@/type/panelType';
 import * as Icon from '@/asset/icon';
 import { ButtonTag } from '@/component';
+import { UserListType } from '@/type/participantType';
 import { UserPanel, InfoPanel } from './part/Panel';
+
+interface PanelProps {
+  userList: UserListType[];
+}
 
 interface CurrentPanelProps {
   type: PanelType;
+  userList: UserListType[];
 }
 
 const PANEL_TITLE = {
@@ -19,9 +25,9 @@ const PANEL_TITLE = {
   HOST: '호스트 제어 기능',
 };
 
-function CurrentPanel({ type }: CurrentPanelProps) {
+function CurrentPanel({ type, userList }: CurrentPanelProps) {
   if (type === 'USER') {
-    return <UserPanel />;
+    return <UserPanel userList={userList} />;
   }
   if (type === 'INFO') {
     return <InfoPanel />;
@@ -29,7 +35,7 @@ function CurrentPanel({ type }: CurrentPanelProps) {
   return <div>{type}</div>;
 }
 
-export default function Panel() {
+export default function Panel({ userList }: PanelProps) {
   const { panelType, isOpen, handlePanelType, handleOpenStatus } = useContext(PanelContext);
 
   const handleClickDeleteButton = () => {
@@ -65,7 +71,7 @@ export default function Panel() {
                   </ButtonTag>
                 </div>
               </div>
-              <CurrentPanel type={panelType} />
+              <CurrentPanel type={panelType} userList={userList} />
             </div>
           )}
         </div>

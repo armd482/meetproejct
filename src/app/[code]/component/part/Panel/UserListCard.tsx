@@ -1,18 +1,19 @@
 import * as Icon from '@/asset/icon';
-import { ButtonTag } from '@/component';
-import { getRandomHexColor } from '@/lib/getRandomColor';
+import { ButtonTag, Visualizer } from '@/component';
 
 interface UserListCardProps {
   name: string;
+  color: string;
   host?: boolean;
   isMicOn: boolean;
+  stream: MediaStream;
 }
 
-export default function UserListCard({ name, host, isMicOn }: UserListCardProps) {
+export default function UserListCard({ name, color, host, isMicOn, stream }: UserListCardProps) {
   return (
     <div className='flex h-14 flex-1 items-center justify-between'>
       <div className='flex select-none items-center gap-4 bg-white font-googleSans text-[#202124]'>
-        <Icon.Profile width={32} height={32} fill={getRandomHexColor()} />
+        <Icon.Profile width={32} height={32} fill={color} />
         <div>
           <p className='max-w-[180px] truncate text-sm'>{name}</p>
           {host && <p className='text-xs text-[#5F6368]'>회의 호스트</p>}
@@ -20,13 +21,7 @@ export default function UserListCard({ name, host, isMicOn }: UserListCardProps)
       </div>
       <div className='flex items-center'>
         <div className='flex size-12 items-center justify-center'>
-          {isMicOn ? (
-            <div className='flex size-6 items-center justify-center rounded-full bg-[#1A73E8]'>
-              <Icon.Menu width={18} height={18} fill='#ffffff' />
-            </div>
-          ) : (
-            <Icon.MicOff width={24} height={24} fill='#5F6368' />
-          )}
+          {isMicOn ? <Visualizer stream={stream} /> : <Icon.MicOff width={24} height={24} fill='#5F6368' />}
         </div>
         <ButtonTag name='추가 작업' position='bottom'>
           <button type='button' className='flex size-12 items-center justify-center rounded-full hover:bg-[#EFEFEF]'>

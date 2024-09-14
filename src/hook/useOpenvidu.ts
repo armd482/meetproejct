@@ -13,14 +13,8 @@ import { postToken } from '@/app/api/sessionAPI';
 import { useDeviceStore } from '@/store/DeviceStore';
 import { useRouter } from 'next/navigation';
 import { getDevicePermission } from '@/lib/getDevicePermission';
+import { UserInfo } from '@/type/sessionType';
 import useDevice from './useDevice';
-
-interface UserInfo {
-  name: string;
-  color: string;
-  audio: boolean;
-  video: boolean;
-}
 
 const UNPUBLISH = new Set(['unpublish', 'forceUnpublishByUser', 'forceUnpublishByServer']);
 

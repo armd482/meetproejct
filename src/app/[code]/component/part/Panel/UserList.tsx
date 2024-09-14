@@ -1,26 +1,40 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import * as Icon from '@/asset/icon';
+import { UserListType } from '@/type/participantType';
+import { charMatcher } from '@/lib/filterKeyword';
 import UserListCard from './UserListCard';
 
 interface UserPanelProps {
   filterValue?: string;
-  userList: string[];
+  userList: UserListType[];
 }
 
 export default function UserPanel({ filterValue, userList }: UserPanelProps) {
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
   const [isOpen, setIsOpen] = useState(true);
-  const [currentUser, setCurrentUser] = useState<string[]>(userList);
+  const [currentUser, setCurrentUser] = useState<UserListType[]>(userList);
 
   const handleClickButton = () => {
     setIsOpen((prev) => !prev);
   };
 
   useEffect(() => {
-    if (filterValue) {
-      setCurrentUser(userList);
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
     }
+    timerRef.current = setTimeout(() => {
+      if (filterValue) {
+        const matcher = charMatcher(filterValue.toLowerCase());
+        const filteredUser = userList.filter((user) => matcher.test(user.name.toLocaleLowerCase()));
+        setCurrentUser(filteredUser);
+        timerRef.current = null;
+        return;
+      }
+      setCurrentUser(userList);
+      timerRef.current = null;
+    }, 300);
   }, [filterValue, userList]);
   return (
     <div>
@@ -44,13 +58,15 @@ export default function UserPanel({ filterValue, userList }: UserPanelProps) {
       </button>
       {isOpen && (
         <div className='rounded-b-lg border border-t-0 border-solid border-[#DADCE0] py-2 pl-4 pr-1'>
-          <UserListCard
-            name='test1adfahdfkahfdklajdlkajdhalkjhfkladjhfkajhakldjfhaklfjlasfhkafhaksfhkasfhjklshfsljahfadfjlajfhdaklhalfj'
-            isMicOn={false}
-            host
-          />
-          <UserListCard name='test1' isMicOn />
-          <UserListCard name='test1' isMicOn={false} />
+          {currentUser.map((user) => (
+            <UserListCard
+              key={user.id}
+              name={user.name}
+              color={user.color}
+              isMicOn={user.isMicOn}
+              stream={user.stream}
+            />
+          ))}
         </div>
       )}
     </div>

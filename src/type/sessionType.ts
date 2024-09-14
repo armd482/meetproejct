@@ -1,3 +1,10 @@
+export interface UserInfo {
+  name: string;
+  color: string;
+  audio: boolean;
+  video: boolean;
+}
+
 interface RecordingPropertiesType {
   frameRate: number;
   hasAudio: boolean;

@@ -31,8 +31,8 @@ export default function VideoStream({ user, subscriber, muted = false }: VideoSt
   const stream = subscriber.stream.getMediaStream();
 
   return (
-    <div className='relative flex items-center'>
-      <div className='relative z-10 aspect-video overflow-hidden rounded-lg'>
+    <div className='relative flex w-full items-center'>
+      <div className='relative z-10 aspect-video w-full overflow-hidden rounded-lg'>
         {!user.video && (
           <div className='absolute left-0 top-0 z-20 size-full bg-[#3C4043]'>
             <div

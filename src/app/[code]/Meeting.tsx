@@ -24,6 +24,18 @@ export default function Meetting() {
     color as string,
   );
 
+  const userList = subscribers.map((entity) => {
+    const { name: userName, color: userColor, audio, video } = participants[entity[0]];
+    return {
+      id: entity[0],
+      name: userName,
+      color: userColor,
+      isMicOn: audio,
+      isVideoOn: video,
+      stream: entity[1].stream.getMediaStream(),
+    };
+  });
+
   useEffect(() => {
     const registParticipant = async () => {
       if (user.id && user.name && user.color) {
@@ -57,7 +69,19 @@ export default function Meetting() {
             <VideoStream key={entity[0]} user={{ id: entity[0], ...participants[entity[0]] }} subscriber={entity[1]} />
           ))}
         </div>
-        <Panel />
+        <Panel
+          userList={[
+            {
+              id: user.id,
+              name: name as string,
+              color: color as string,
+              isMicOn: deviceEnable.audio,
+              isVideoOn: deviceEnable.video,
+              stream: stream as MediaStream,
+            },
+            ...userList,
+          ]}
+        />
       </div>
       <div className='relative w-full bg-[#202124] font-googleSans text-base text-white'>
         <Toggle />
