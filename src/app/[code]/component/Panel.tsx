@@ -6,7 +6,7 @@ import { PanelType } from '@/type/panelType';
 import * as Icon from '@/asset/icon';
 import { ButtonTag } from '@/component';
 import { UserListType } from '@/type/participantType';
-import { UserPanel, InfoPanel } from './part/Panel';
+import { UserPanel, InfoPanel, ChatPanel } from './part/Panel';
 
 interface PanelProps {
   userList: UserListType[];
@@ -32,6 +32,9 @@ function CurrentPanel({ type, userList }: CurrentPanelProps) {
   if (type === 'INFO') {
     return <InfoPanel />;
   }
+  if (type === 'CHAT') {
+    return <ChatPanel />;
+  }
   return <div>{type}</div>;
 }
 
@@ -52,11 +55,11 @@ export default function Panel({ userList }: PanelProps) {
     <div className='h-full select-none'>
       {isOpen && (
         <div
-          className={`h-full w-[368px] origin-top-right animate-slide-in-left rounded-lg bg-white ${panelType === null && 'animate-slide-out-left'}`}
+          className={`h-full w-[368px] ml-4 origin-top-right animate-slide-in-left rounded-lg bg-white ${panelType === null && 'animate-slide-out-left'}`}
           onAnimationEnd={handlePanelAnimationEnd}
         >
           {panelType && (
-            <div className='size-full font-googleSans'>
+            <div className='flex flex-col size-full font-googleSans'>
               <div className='relative flex h-16 items-center px-6 py-3 text-lg text-[#202124]'>
                 <p>{PANEL_TITLE[panelType]}</p>
                 <div className='absolute right-3 top-1/2 size-12 -translate-y-1/2'>

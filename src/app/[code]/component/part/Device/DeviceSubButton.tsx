@@ -33,7 +33,6 @@ export default function DeviceSubButton({ type, volume, color }: DeviceSubButton
   if (type === 'videoInput' || (type === 'audioInput' && volume === undefined)) {
     return null;
   }
-
   return (
     <>
       <hr className={`my-2 h-px w-full ${color === 'black' ? 'border-[#47484B]' : 'border-[#E0E0E0]'} `} />
@@ -50,7 +49,7 @@ export default function DeviceSubButton({ type, volume, color }: DeviceSubButton
             <div
               className={`mx-2 my-4 h-1 w-full overflow-hidden rounded-sm ${color === 'black' ? 'bg-[#202124]' : 'bg-[#F1F3F4]'}`}
             >
-              <div className='h-full bg-[#1A73E8]' style={{ width: `${Math.min((volume / 3) * 10, 100)}%` }} />
+              <div className='h-full bg-[#1A73E8]' style={{ width: `${Math.min(volume * 2.2, 100)}%` }} />
             </div>
           ) : (
             <div className={`w-full text-sm ${color === 'black' ? 'text-[#76777A]' : 'text-[#B6B7B8]'}`}>

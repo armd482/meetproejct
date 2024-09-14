@@ -1,7 +1,7 @@
 'use client';
 
 import { useOpenvidu } from '@/hook';
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 import { UserInfoContext } from '@/context/userInfoContext';
 import { usePathname } from 'next/navigation';
 import { useDeviceStore } from '@/store/DeviceStore';
@@ -23,6 +23,8 @@ export default function Meetting() {
     name as string,
     color as string,
   );
+
+  const barRef = useRef<HTMLDivElement>(null);
 
   const userList = subscribers.map((entity) => {
     const { name: userName, color: userColor, audio, video } = participants[entity[0]];
@@ -55,11 +57,13 @@ export default function Meetting() {
     };
   }, [user, pathname]);
 
+  console.log(barRef.current?.clientHeight);
+
   return (
-    <div className='relative flex h-screen w-screen flex-col overflow-hidden bg-[#202124]'>
-      <div className='flex size-full flex-1 gap-4 p-4'>
+    <div className='relative flex h-screen w-screen flex-col bg-[#202124] overflow-hidden'>
+      <div className='flex flex-1 p-4' style={{ height: `calc(100vh - ${barRef.current?.clientHeight}px)` }}>
         <div
-          className='grid size-full flex-1 gap-4 border border-solid border-black'
+          className='grid flex-1 gap-4 border border-solid border-black'
           style={{
             gridTemplateColumns: `repeat(${Math.ceil(Math.sqrt(subscribers.length + 1))}, 1fr)`,
           }}
@@ -83,9 +87,9 @@ export default function Meetting() {
           ]}
         />
       </div>
-      <div className='relative w-full bg-[#202124] font-googleSans text-base text-white'>
+      <div ref={barRef} className='relative w-full bg-[#202124] font-googleSans text-base text-white shrink-0'>
         <Toggle />
-        <div className='relative grid grid-cols-[1fr_auto_1fr] items-center bg-[#212121] py-4'>
+        <div className='relative grid grid-cols-[1fr_auto_1fr] items-center bg-[#212121] p-4 shrink-0'>
           <MeetInfoBar />
           <ControlBar changeDevice={changeDevice} stream={stream} handleUpdateStream={handleUpdateStream} />
           <InfoBar />
