@@ -1,4 +1,4 @@
-import { PostCheckSessionId } from '@/app/api/mongoAPI';
+import { postCheckSessionId } from '@/app/api/mongoAPI';
 
 const KEY_REGEX = /^[A-Za-z0-9]{3}-[A-Za-z0-9]{7}$/;
 
@@ -24,7 +24,7 @@ export const checkKey = async (value: string) => {
   if (!key) {
     return false;
   }
-  const isValidKey = await PostCheckSessionId(value);
+  const isValidKey = await postCheckSessionId(value);
   if (!isValidKey) {
     return false;
   }

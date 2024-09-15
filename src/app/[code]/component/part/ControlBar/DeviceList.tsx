@@ -1,11 +1,12 @@
 'use client';
 
-import { useDeviceStore } from '@/store/DeviceStore';
+import { useEffect, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
+import { useDeviceStore } from '@/store/DeviceStore';
+
 import * as Icon from '@/asset/icon';
 import { StreamStatusType } from '@/type/streamType';
 import { DeviceButton } from '../Device';
-import { useEffect, useState } from 'react';
 
 interface DeviceListProps {
   type: 'audio' | 'video';
@@ -27,12 +28,12 @@ export default function DeviceList({ type, stream = null, status, changeDevice }
     })),
   );
 
-  const handleTrackChange = async (device: MediaDeviceInfo, type: 'audioInput' | 'audioOutput' | 'videoInput') => {
-    if (type === 'audioOutput') {
+  const handleTrackChange = async (device: MediaDeviceInfo, trackType: 'audioInput' | 'audioOutput' | 'videoInput') => {
+    if (trackType === 'audioOutput') {
       return;
     }
-    const result = await changeDevice(type === 'audioInput' ? 'audio' : 'video', device.deviceId);
-    if (type === 'audioInput' && result) {
+    const result = await changeDevice(trackType === 'audioInput' ? 'audio' : 'video', device.deviceId);
+    if (trackType === 'audioInput' && result) {
       setAudioStream(result);
     }
   };

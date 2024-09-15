@@ -1,5 +1,4 @@
 import { RefObject } from 'react';
-import { AUDIO_CONSTRAINT } from '@/asset/constant/stream';
 
 export const setTrackChage = async (
   stream: MediaStream | null,

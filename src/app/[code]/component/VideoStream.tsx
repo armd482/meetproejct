@@ -31,13 +31,14 @@ export default function VideoStream({ user, subscriber, muted = false }: VideoSt
   const stream = subscriber.stream.getMediaStream();
 
   return (
-    <div className='relative flex items-center '>
-      <div className='relative z-10 bg-[#3C4043] rounded-lg overflow-hidden'>
+    <div className='relative flex items-center'>
+      <div className=' relative flex w-full items-center justify-center overflow-hidden rounded-lg bg-[#3C4043]'>
+        <video ref={videoRef} autoPlay muted={muted} className='size-full rounded-lg bg-[#3C4043] object-fill' />
         {!user.video && (
           <div className='absolute left-0 top-0 z-20 size-full bg-[#3C4043]'>
             <div
               className='absolute left-1/2 top-1/2 flex aspect-square h-2/5 -translate-x-1/2 -translate-y-1/2 items-center justify-center truncate rounded-full font-bold text-white'
-              style={{ backgroundColor: user.color, fontSize: '150%' }}
+              style={{ backgroundColor: user.color, fontSize: '420%' }}
             >
               {user.name}
             </div>
@@ -55,7 +56,6 @@ export default function VideoStream({ user, subscriber, muted = false }: VideoSt
         <div className='absolute bottom-2 left-2 z-30 w-full truncate font-googleSans text-sm text-white'>
           {user.name}
         </div>
-        <video ref={videoRef} autoPlay muted={muted} className='bg-[#3C4043] max-h-full max-w-full min-h-0 min-w-0' />
       </div>
     </div>
   );

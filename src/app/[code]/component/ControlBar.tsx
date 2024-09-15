@@ -53,7 +53,7 @@ const CONTROL_BUTTON: ControlButtonType[] = [
 
 export default function ControlBar({ stream, changeDevice, handleUpdateStream }: ControlBarProps) {
   const [isOpenModal, setIsOpenModal] = useState(false);
-  const { permission, audioInput, videoInput } = useDeviceStore(
+  const { permission } = useDeviceStore(
     useShallow((state) => ({
       permission: state.permission,
       audioInput: state.audioInput,

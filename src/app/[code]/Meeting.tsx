@@ -1,28 +1,33 @@
 'use client';
 
 import { useOpenvidu } from '@/hook';
-import { useContext, useEffect, useRef } from 'react';
-import { UserInfoContext } from '@/context/userInfoContext';
+import { useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { useDeviceStore } from '@/store/DeviceStore';
 import { useShallow } from 'zustand/react/shallow';
+import { useUserInfoStore } from '@/store/UserInfoStore';
 import { ControlBar, InfoBar, Panel, Toggle, MeetInfoBar } from './component';
 import VideoStream from './component/VideoStream';
 import { deleteParticipant, postParticipant } from '../api/mongoAPI';
 
 export default function Meetting() {
-  const { name, color } = useContext(UserInfoContext);
   const pathname = usePathname();
   const { deviceEnable } = useDeviceStore(
     useShallow((state) => ({
       deviceEnable: state.deviceEnable,
     })),
   );
-  const { subscribers, participants, publisher, stream, user, changeDevice, handleUpdateStream } = useOpenvidu(
-    pathname.slice(1),
-    name as string,
-    color as string,
+
+  const { id, name, color } = useUserInfoStore(
+    useShallow((state) => ({
+      id: state.id,
+      name: state.name,
+      color: state.color,
+    })),
   );
+
+  const { subscribers, participants, publisher, stream, chatList, changeDevice, handleUpdateStream, sendMessage } =
+    useOpenvidu(pathname.slice(1));
 
   const barRef = useRef<HTMLDivElement>(null);
 
@@ -40,14 +45,14 @@ export default function Meetting() {
 
   useEffect(() => {
     const registParticipant = async () => {
-      if (user.id && user.name && user.color) {
-        await postParticipant(pathname.slice(1), user.id, user.name, user.color);
+      if (id && name && color) {
+        await postParticipant(pathname.slice(1), id, name, color);
       }
     };
 
     const deleteDB = async () => {
-      if (user.id) {
-        await deleteParticipant(pathname.slice(1), user.id);
+      if (id) {
+        await deleteParticipant(pathname.slice(1), id);
       }
     };
 
@@ -55,12 +60,10 @@ export default function Meetting() {
     return () => {
       deleteDB();
     };
-  }, [user, pathname]);
-
-  console.log(barRef.current?.clientHeight);
+  }, [id, color, name, pathname]);
 
   return (
-    <div className='relative flex h-screen w-screen flex-col bg-[#202124] overflow-hidden'>
+    <div className='relative flex h-screen w-screen flex-col overflow-hidden bg-[#202124]'>
       <div className='flex flex-1 p-4' style={{ height: `calc(100vh - ${barRef.current?.clientHeight}px)` }}>
         <div
           className='grid flex-1 gap-4 border border-solid border-black'
@@ -68,7 +71,7 @@ export default function Meetting() {
             gridTemplateColumns: `repeat(${Math.ceil(Math.sqrt(subscribers.length + 1))}, 1fr)`,
           }}
         >
-          {publisher && <VideoStream user={{ ...user, ...deviceEnable }} subscriber={publisher} muted />}
+          {publisher && <VideoStream user={{ id, name, color, ...deviceEnable }} subscriber={publisher} muted />}
           {subscribers.map((entity) => (
             <VideoStream key={entity[0]} user={{ id: entity[0], ...participants[entity[0]] }} subscriber={entity[1]} />
           ))}
@@ -76,20 +79,22 @@ export default function Meetting() {
         <Panel
           userList={[
             {
-              id: user.id,
-              name: name as string,
-              color: color as string,
+              id,
+              name,
+              color,
               isMicOn: deviceEnable.audio,
               isVideoOn: deviceEnable.video,
               stream: stream as MediaStream,
             },
             ...userList,
           ]}
+          chatList={chatList}
+          onSendMessage={sendMessage}
         />
       </div>
-      <div ref={barRef} className='relative w-full bg-[#202124] font-googleSans text-base text-white shrink-0'>
+      <div ref={barRef} className='relative w-full shrink-0 bg-[#202124] font-googleSans text-base text-white'>
         <Toggle />
-        <div className='relative grid grid-cols-[1fr_auto_1fr] items-center bg-[#212121] p-4 shrink-0'>
+        <div className='relative grid shrink-0 grid-cols-[1fr_auto_1fr] items-center bg-[#212121] p-4'>
           <MeetInfoBar />
           <ControlBar changeDevice={changeDevice} stream={stream} handleUpdateStream={handleUpdateStream} />
           <InfoBar />

@@ -5,6 +5,7 @@ import {
   Session as OVSession,
   Publisher,
   PublisherProperties,
+  SignalEvent,
   StreamEvent,
   StreamPropertyChangedEvent,
   Subscriber,
@@ -13,26 +14,36 @@ import { postToken } from '@/app/api/sessionAPI';
 import { useDeviceStore } from '@/store/DeviceStore';
 import { useRouter } from 'next/navigation';
 import { getDevicePermission } from '@/lib/getDevicePermission';
-import { UserInfo } from '@/type/sessionType';
+import { ChatInfo, UserInfo } from '@/type/sessionType';
+import { getBase60 } from '@/lib/getRandomId';
+import { timeDifferenceInMinutes } from '@/lib/getTimeDiff';
+import { useUserInfoStore } from '@/store/UserInfoStore';
 import useDevice from './useDevice';
 
 const UNPUBLISH = new Set(['unpublish', 'forceUnpublishByUser', 'forceUnpublishByServer']);
 
-const useOpenvidu = (sessionId: string, name: string, color: string) => {
+const useOpenvidu = (sessionId: string) => {
   const router = useRouter();
 
   const [isInitial, setIsInitial] = useState(true);
+
   const [session, setSession] = useState<OVSession | null>(null);
   const [publisher, setPublisher] = useState<Publisher | null>(null);
   const [subscribers, setSubscribers] = useState<[string, Subscriber][]>([]);
   const [participants, setParticipants] = useState<Record<string, UserInfo>>({});
-  const [user, setUser] = useState<Record<'id' | 'name' | 'color', string>>({
-    id: '',
-    name: '',
-    color: '',
-  });
-
   const [OV, setOV] = useState<OpenVidu | null>(null);
+  const [chatList, setChatList] = useState<ChatInfo[]>([]);
+
+  const { id, name, color, setId } = useUserInfoStore(
+    useShallow((state) => ({
+      id: state.id,
+      name: state.name,
+      color: state.color,
+      setId: state.setId,
+      setName: state.setName,
+      setColor: state.setColor,
+    })),
+  );
 
   const { permission, audioInput, videoInput, setDeviceEnable, setPermission } = useDeviceStore(
     useShallow((state) => ({
@@ -110,15 +121,15 @@ const useOpenvidu = (sessionId: string, name: string, color: string) => {
       });
 
       const {
-        connection: { connectionId, data },
+        connection: { connectionId },
       } = newSession;
-      setUser({ id: connectionId, name: JSON.parse(data).clientData.name, color: JSON.parse(data).clientData.color });
+      setId(connectionId);
     } catch {
       alert('이미 닫힌 회의실입니다');
       leaveSession();
       router.push('/landing');
     }
-  }, [name, sessionId, color, audioInput, videoInput, permission, router, leaveSession]);
+  }, [name, sessionId, color, audioInput, videoInput, permission, router, leaveSession, setId]);
 
   const changeDevice = useCallback(
     async (type: 'audio' | 'video', value: boolean | string) => {
@@ -158,6 +169,25 @@ const useOpenvidu = (sessionId: string, name: string, color: string) => {
       return newStream;
     },
     [publisher, session, setPermission, setDeviceEnable],
+  );
+
+  const sendMessage = useCallback(
+    (message: string) => {
+      if (!session) {
+        return;
+      }
+      session.signal({
+        type: 'chat',
+        data: JSON.stringify({
+          id: `${id}-${getBase60(new Date().getTime())}`,
+          userName: name,
+          userId: id,
+          date: new Date(),
+          content: message,
+        }),
+      });
+    },
+    [session, name, id],
   );
 
   useEffect(() => {
@@ -208,7 +238,7 @@ const useOpenvidu = (sessionId: string, name: string, color: string) => {
     };
 
     const handleDestroyStream = (e: StreamEvent) => {
-      if (e.stream.connection.connectionId === user.id) {
+      if (e.stream.connection.connectionId === id) {
         return;
       }
 
@@ -229,7 +259,7 @@ const useOpenvidu = (sessionId: string, name: string, color: string) => {
       const { changedProperty, newValue } = event;
       const { connectionId } = event.stream.connection;
 
-      if (connectionId === user.id) {
+      if (connectionId === id) {
         return;
       }
 
@@ -253,28 +283,51 @@ const useOpenvidu = (sessionId: string, name: string, color: string) => {
       }
     };
 
+    const handleMessageRecive = (e: SignalEvent) => {
+      if (e.data) {
+        const newChat = JSON.parse(e.data) as ChatInfo;
+        if (!newChat) {
+          return;
+        }
+
+        setChatList((prev) => {
+          if (prev.length === 0) {
+            return [{ ...newChat, header: true }];
+          }
+          const lastChat = prev[prev.length - 1];
+          if (timeDifferenceInMinutes(lastChat.date, newChat.date) > 2 || newChat.userId !== lastChat.userId) {
+            return [...prev, { ...newChat, header: true }];
+          }
+          return [...prev, { ...newChat, header: false }];
+        });
+      }
+    };
+
     session.on('streamCreated', handleCreateStream);
     session.on('streamDestroyed', handleDestroyStream);
     session.on('streamPropertyChanged', handleStreamPropertyChanged);
+    session.on('signal:chat', handleMessageRecive);
 
     return () => {
       session.off('streamCreated', handleCreateStream);
       session.off('streamDestroyed', handleDestroyStream);
       session.off('streamPropertyChanged', handleStreamPropertyChanged);
+      session.off('signal:chat', handleMessageRecive);
     };
-  }, [session, user]);
+  }, [session, id]);
 
   return {
-    user,
     publisher,
     subscribers,
     session,
     participants,
     OV,
     stream,
+    chatList,
     leaveSession,
     changeDevice,
     handleUpdateStream,
+    sendMessage,
   };
 };
 

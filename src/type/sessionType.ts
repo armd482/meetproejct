@@ -5,6 +5,15 @@ export interface UserInfo {
   video: boolean;
 }
 
+export interface ChatInfo {
+  id: string;
+  userName: string;
+  userId: string;
+  date: string;
+  content: string;
+  header?: boolean;
+}
+
 interface RecordingPropertiesType {
   frameRate: number;
   hasAudio: boolean;
