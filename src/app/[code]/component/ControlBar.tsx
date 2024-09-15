@@ -1,9 +1,18 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import * as Icon from '@/asset/icon';
 import { ToggleType } from '@/type/toggleType';
+import { useDeviceStore } from '@/store/DeviceStore';
+import { useShallow } from 'zustand/react/shallow';
 import { ControlButton, MenuButton, OptionButton, CallEndButton } from './part/ControlBar';
+import { PermissionModal } from './part/Device';
+
+interface ControlBarProps {
+  stream: MediaStream | null;
+  changeDevice: (type: 'audio' | 'video', value: boolean | string) => Promise<MediaStream | undefined>;
+  handleUpdateStream: () => void;
+}
 
 interface ControlButtonType {
   name: string;
@@ -42,24 +51,17 @@ const CONTROL_BUTTON: ControlButtonType[] = [
   },
 ];
 
-export default function ControlBar() {
-  const handleMicButtonClick = (isClicked: boolean) => {
-    if (isClicked) {
-      console.log('Clicked');
-      return;
-    }
-    console.log('canceled');
-  };
+export default function ControlBar({ stream, changeDevice, handleUpdateStream }: ControlBarProps) {
+  const [isOpenModal, setIsOpenModal] = useState(false);
+  const { permission } = useDeviceStore(
+    useShallow((state) => ({
+      permission: state.permission,
+      audioInput: state.audioInput,
+      videoInput: state.videoInput,
+    })),
+  );
 
   const handleMicChevronClick = (isClicked: boolean) => {
-    if (isClicked) {
-      console.log('Clicked');
-      return;
-    }
-    console.log('canceled');
-  };
-
-  const handleVideoButtonClick = (isClicked: boolean) => {
     if (isClicked) {
       console.log('Clicked');
       return;
@@ -75,29 +77,54 @@ export default function ControlBar() {
     console.log('canceled');
   };
 
+  const handleModalClose = () => {
+    setIsOpenModal(false);
+  };
+
+  const handleButtonClick = (type: 'audio' | 'video') => {
+    if (type === 'audio' && permission && permission.audio) {
+      return;
+    }
+    if (type === 'video' && permission && permission.video) {
+      return;
+    }
+    setIsOpenModal(true);
+  };
+
   return (
     <div className='z-10 flex h-12 items-center gap-2 bg-[#212121]'>
       <OptionButton
-        onClickButton={handleMicButtonClick}
+        type='audio'
+        onClickButton={handleButtonClick}
         onClickChevron={handleMicChevronClick}
-        isVisibleOption
         icon={<Icon.MicOn width={20} height={20} fill='#E3E3E3' />}
         clickedIcon={<Icon.MicOff width={20} height={20} fill='#5F1312' />}
         name={{ chevron: '오디오 설정', icon: '마이크 끄기(ctrl + d)' }}
+        status='success'
+        stream={stream}
+        changeDevice={changeDevice}
       />
       <OptionButton
-        onClickButton={handleVideoButtonClick}
+        type='video'
+        onClickButton={handleButtonClick}
         onClickChevron={handleVideoChevronClick}
-        isVisibleOption
         icon={<Icon.VideoOn width={26} height={26} fill='#E3E3E3' />}
         clickedIcon={<Icon.VideoOff width={24} height={24} fill='#5F1312' />}
         name={{ chevron: '영상 설정', icon: '마이크 끄기(ctrl + d)' }}
+        status='success'
+        changeDevice={changeDevice}
       />
       {CONTROL_BUTTON.map((button) => (
         <ControlButton key={button.type} {...button} />
       ))}
       <MenuButton />
       <CallEndButton />
+      <PermissionModal
+        isOpenModal={isOpenModal}
+        status='success'
+        onClose={handleModalClose}
+        onUpdateStream={handleUpdateStream}
+      />
     </div>
   );
 }

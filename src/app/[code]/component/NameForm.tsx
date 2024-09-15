@@ -1,16 +1,23 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
-import { PostCheckSessionId } from '@/app/api/mongoAPI';
-import { UserInfoContext } from '@/context/userInfoContext';
+import { postCheckSessionId } from '@/app/api/mongoAPI';
 
-import { ChangeEvent, FormEvent, useContext, useState } from 'react';
+import { ChangeEvent, FormEvent, useState } from 'react';
+import { getRandomHexColor } from '@/lib/getRandomColor';
+import { useUserInfoStore } from '@/store/UserInfoStore';
+import { useShallow } from 'zustand/react/shallow';
 
 const MAX_SIZE = 60;
 
 export default function NameForm() {
   const [name, setName] = useState('');
-  const { handleNameChange } = useContext(UserInfoContext);
+  const { setName: setUserName, setColor: setUserColor } = useUserInfoStore(
+    useShallow((state) => ({
+      setName: state.setName,
+      setColor: state.setColor,
+    })),
+  );
   const sessionId = usePathname().slice(1);
   const router = useRouter();
 
@@ -25,14 +32,16 @@ export default function NameForm() {
       return;
     }
 
-    const isValidSessionId = await PostCheckSessionId(sessionId);
+    const randomColor = getRandomHexColor();
+
+    const isValidSessionId = await postCheckSessionId(sessionId);
     if (!isValidSessionId) {
       alert('이미 닫힌 회의방입니다.');
       router.push('/');
       return;
     }
-
-    handleNameChange(name);
+    setUserName(name);
+    setUserColor(randomColor);
   };
   return (
     <form className='flex flex-col items-center justify-center' onSubmit={handleFromSubmit}>

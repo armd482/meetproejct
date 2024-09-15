@@ -13,32 +13,33 @@ import { PermissionModal, VideoNotification, DeviceButton } from './part/Device'
 export default function Device() {
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  const { permission, deviceEnable, audioInput, audioOutput, videoInput } = useDeviceStore(
+  const {
+    permission,
+    deviceEnable,
+    audioInput,
+    audioOutput,
+    videoInput,
+    audioInputList,
+    audioOutputList,
+    videoInputList,
+  } = useDeviceStore(
     useShallow((state) => ({
       permission: state.permission,
       deviceEnable: state.deviceEnable,
       audioInput: state.audioInput,
       audioOutput: state.audioOutput,
       videoInput: state.videoInput,
+      audioInputList: state.audioInputList,
+      audioOutputList: state.audioOuputList,
+      videoInputList: state.videoInputList,
     })),
   );
 
-  const {
-    stream,
-    streamStatus,
-    audioInputList,
-    videoInputList,
-    audioOutputList,
-    toggleVideoInput,
-    toggleAudioInput,
-    handleUpdateStream,
-  } = useDevice();
+  const { stream, streamStatus, toggleVideoInput, toggleAudioInput, handleUpdateStream } = useDevice();
 
   const [isOpenModal, setIsOpenModal] = useState(false);
-  const audioDisabled =
-    !audioInput.id || streamStatus === 'rejected' || streamStatus === 'failed' || (permission && !permission.audio);
-  const videoDisabled =
-    !videoInput.id || streamStatus === 'rejected' || streamStatus === 'failed' || (permission && !permission.video);
+  const audioDisabled = !audioInput.id || streamStatus === 'rejected' || (permission && !permission.audio);
+  const videoDisabled = !videoInput.id || streamStatus === 'rejected' || (permission && !permission.video);
 
   useEffect(() => {
     if (stream && videoRef.current) {
@@ -65,7 +66,7 @@ export default function Device() {
   };
 
   const handleTrackChange = async (device: MediaDeviceInfo, type: 'audioInput' | 'videoInput' | 'audioOutput') => {
-    setTrackChage(stream, videoRef, device, type, audioInput.id, videoInput.id);
+    setTrackChage(stream, videoRef, device, type, audioInput.id, videoInput.id, permission);
   };
 
   const handleVideoButtonClick = () => {
@@ -91,7 +92,7 @@ export default function Device() {
           style={{ transform: 'rotateY(180deg)' }}
         />
         <VideoNotification status={streamStatus} onClickButton={handleVideoButtonClick} />
-        {deviceEnable.mic && stream && (
+        {deviceEnable.audio && stream && (
           <div className='absolute bottom-4 left-4'>
             <Visualizer stream={stream} />
           </div>
@@ -102,9 +103,9 @@ export default function Device() {
             <button
               type='button'
               onClick={handleMicButton}
-              className={`relative flex items-center justify-center border border-solid ${deviceEnable.mic ? 'border-white' : 'border-[#EA4335] bg-[#EA4335]'} size-14 rounded-full`}
+              className={`relative flex items-center justify-center border border-solid ${deviceEnable.audio ? 'border-white' : 'border-[#EA4335] bg-[#EA4335]'} size-14 rounded-full`}
             >
-              {deviceEnable.mic ? (
+              {deviceEnable.audio ? (
                 <Icon.MicOn width={24} height={24} fill='#ffffff' />
               ) : (
                 <Icon.MicOff width={28} height={28} fill='#ffffff' />

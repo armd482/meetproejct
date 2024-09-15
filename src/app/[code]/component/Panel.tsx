@@ -5,10 +5,21 @@ import { PanelContext } from '@/context/PanelContext';
 import { PanelType } from '@/type/panelType';
 import * as Icon from '@/asset/icon';
 import { ButtonTag } from '@/component';
-import { UserPanel, InfoPanel } from './part/Panel';
+import { UserListType } from '@/type/participantType';
+import { ChatInfo } from '@/type/sessionType';
+import { UserPanel, InfoPanel, ChatPanel } from './part/Panel';
+
+interface PanelProps {
+  userList: UserListType[];
+  chatList: ChatInfo[];
+  onSendMessage: (value: string) => void;
+}
 
 interface CurrentPanelProps {
   type: PanelType;
+  userList: UserListType[];
+  chatList: ChatInfo[];
+  onSendMessage: (value: string) => void;
 }
 
 const PANEL_TITLE = {
@@ -19,17 +30,20 @@ const PANEL_TITLE = {
   HOST: '호스트 제어 기능',
 };
 
-function CurrentPanel({ type }: CurrentPanelProps) {
+function CurrentPanel({ type, userList, chatList, onSendMessage }: CurrentPanelProps) {
   if (type === 'USER') {
-    return <UserPanel />;
+    return <UserPanel userList={userList} />;
   }
   if (type === 'INFO') {
     return <InfoPanel />;
   }
+  if (type === 'CHAT') {
+    return <ChatPanel chatList={chatList} onSendMessage={onSendMessage} />;
+  }
   return <div>{type}</div>;
 }
 
-export default function Panel() {
+export default function Panel({ userList, chatList, onSendMessage }: PanelProps) {
   const { panelType, isOpen, handlePanelType, handleOpenStatus } = useContext(PanelContext);
 
   const handleClickDeleteButton = () => {
@@ -46,11 +60,11 @@ export default function Panel() {
     <div className='h-full select-none'>
       {isOpen && (
         <div
-          className={`h-full w-[368px] origin-top-right animate-slide-in-left rounded-lg bg-white ${panelType === null && 'animate-slide-out-left'}`}
+          className={`ml-4 h-full w-[368px] origin-top-right animate-slide-in-left rounded-lg bg-white ${panelType === null && 'animate-slide-out-left'}`}
           onAnimationEnd={handlePanelAnimationEnd}
         >
           {panelType && (
-            <div className='size-full font-googleSans'>
+            <div className='flex size-full flex-col font-googleSans'>
               <div className='relative flex h-16 items-center px-6 py-3 text-lg text-[#202124]'>
                 <p>{PANEL_TITLE[panelType]}</p>
                 <div className='absolute right-3 top-1/2 size-12 -translate-y-1/2'>
@@ -65,7 +79,7 @@ export default function Panel() {
                   </ButtonTag>
                 </div>
               </div>
-              <CurrentPanel type={panelType} />
+              <CurrentPanel type={panelType} userList={userList} chatList={chatList} onSendMessage={onSendMessage} />
             </div>
           )}
         </div>

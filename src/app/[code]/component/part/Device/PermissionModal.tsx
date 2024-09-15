@@ -35,7 +35,7 @@ function ModalContent({ status, onClose, onUpdateStream }: ModalContentProps) {
     return <InitialRequestModal />;
   }
 
-  if (devicePermission && devicePermission.video && status === 'failed') {
+  if (status === 'failed') {
     return <NotificationModal onClose={onClose} onUpdateStream={onUpdateStream} />;
   }
 

@@ -1,3 +1,19 @@
+export interface UserInfo {
+  name: string;
+  color: string;
+  audio: boolean;
+  video: boolean;
+}
+
+export interface ChatInfo {
+  id: string;
+  userName: string;
+  userId: string;
+  date: string;
+  content: string;
+  header?: boolean;
+}
+
 interface RecordingPropertiesType {
   frameRate: number;
   hasAudio: boolean;

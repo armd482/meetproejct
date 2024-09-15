@@ -19,6 +19,10 @@ export default function VideoNotification({ status, onClickButton }: VideoNotifi
   );
 
   const getStreamMessage = () => {
+    if (status === 'failed' || status === 'rejected' || (permission && !permission.video)) {
+      return '카메라를 사용할 수 없음';
+    }
+
     if (!deviceEnable.video && videoInput.id) {
       return '카메라가 꺼져 있음';
     }
@@ -27,9 +31,6 @@ export default function VideoNotification({ status, onClickButton }: VideoNotifi
       return '카메라 시작 중';
     }
 
-    if (status === 'failed' || status === 'rejected' || (permission && !permission.video)) {
-      return '카메라를 사용할 수 없음';
-    }
     return '';
   };
 
@@ -43,7 +44,7 @@ export default function VideoNotification({ status, onClickButton }: VideoNotifi
 
   return (
     <div className='absolute top-0 flex size-full items-center justify-center bg-[#202124] font-googleSans text-2xl text-white'>
-      {status === 'rejected' || (permission && !permission.video) ? (
+      {status === 'rejected' || (permission && !permission.video && status !== 'failed') ? (
         <div className='flex flex-col items-center justify-center p-[5px]'>
           <div className='text-center'>회의에서 참여자들이 나를 보고 듣도록 하시겠습니까?</div>
           <button

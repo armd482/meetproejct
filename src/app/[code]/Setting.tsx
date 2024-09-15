@@ -5,13 +5,13 @@ import { Device, NameForm } from './component';
 export default function Setting() {
   return (
     <div className='flex h-screen w-screen flex-col bg-white'>
-      <div className='relative p-4'>
+      <header className='relative p-4'>
         <Link href='/' className='flex items-center gap-2 whitespace-nowrap'>
           <Icon.Logo width={36} height={36} />
           <p className='text-1.5xl font-semibold text-gray-600'>Project</p>
           <p className='text-1.5xl font-medium text-gray-600'>Meet</p>
         </Link>
-      </div>
+      </header>
       <div className='flex flex-1 items-center justify-center lg:flex-col'>
         <Device />
         <div className='m-4 flex w-[448px] flex-col items-center font-googleSans'>

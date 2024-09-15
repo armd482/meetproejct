@@ -1,12 +1,17 @@
 'use client';
 
-import { useContext } from 'react';
-import { UserInfoContext } from '@/context/userInfoContext';
+import { useShallow } from 'zustand/react/shallow';
+import { useUserInfoStore } from '@/store/UserInfoStore';
 import Meetting from './Meeting';
 import Setting from './Setting';
 
 export default function Provider() {
-  const { name } = useContext(UserInfoContext);
+  const { name, color } = useUserInfoStore(
+    useShallow((state) => ({
+      name: state.name,
+      color: state.color,
+    })),
+  );
 
-  return name ? <Meetting /> : <Setting />;
+  return name && color ? <Meetting /> : <Setting />;
 }

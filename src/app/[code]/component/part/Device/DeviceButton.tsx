@@ -15,8 +15,10 @@ interface DeviceButtonIcon {
   deviceList: MediaDeviceInfo[];
   type: 'audioInput' | 'audioOutput' | 'videoInput';
   stream?: MediaStream | null;
-  onTrackChange: (device: MediaDeviceInfo, type: 'audioInput' | 'audioOutput' | 'videoInput') => void;
+  onTrackChange?: (device: MediaDeviceInfo, type: 'audioInput' | 'audioOutput' | 'videoInput') => Promise<void>;
   status: StreamStatusType;
+  color?: 'black' | 'white';
+  width?: number;
 }
 
 export default function DeviceButton({
@@ -27,12 +29,14 @@ export default function DeviceButton({
   stream,
   status,
   onTrackChange,
+  color = 'white',
+  width,
 }: DeviceButtonIcon) {
   const [isOpen, setIsOpen] = useState(false);
   const permission = useDeviceStore((state) => state.permission);
 
   const getDisabledStatus = () => {
-    if (status === 'rejected' || status === 'failed') {
+    if (status === 'rejected') {
       return true;
     }
 
@@ -73,7 +77,7 @@ export default function DeviceButton({
     setIsOpen((prev) => !prev);
   };
 
-  const handleCardClick = (device: MediaDeviceInfo) => {
+  const handleCardClick = async (device: MediaDeviceInfo) => {
     if (device.deviceId === currentDevice.id) {
       return;
     }
@@ -89,7 +93,9 @@ export default function DeviceButton({
       setAudioOutput({ name: device.label, id: device.deviceId });
     }
 
-    onTrackChange(device, type);
+    if (onTrackChange) {
+      await onTrackChange(device, type);
+    }
   };
 
   const getStatusText = () => {
@@ -100,22 +106,22 @@ export default function DeviceButton({
     }
 
     if (type === 'audioInput') {
-      if (status === 'failed' || !currentDevice.id) {
+      if (!currentDevice.id) {
         return '마이크를 찾을 수 없습니다';
       }
     }
 
     if (type === 'audioOutput') {
-      if (status === 'failed' || !currentDevice.id) {
+      if (!currentDevice.id) {
         return '스피커를 찾을 수 없습니다';
       }
     }
 
     if (type === 'videoInput') {
-      if (permission && !permission.video) {
+      if (permission && !permission.video && status !== 'failed') {
         return '권한 필요';
       }
-      if (status === 'failed' || !currentDevice.id) {
+      if (!currentDevice.id) {
         return '카메라를 찾을 수 없습니다';
       }
     }
@@ -128,19 +134,26 @@ export default function DeviceButton({
         type='button'
         onClick={handleButtonClick}
         disabled={isDisabled}
-        className={`flex h-[34px] items-center rounded-full border-[0.8px] border-solid ${isDisabled ? 'border-[#E7E8E8]' : 'border-white  hover:border-[#DADCE0] active:bg-[#F6FAFE]'} px-[10px]`}
+        className={`flex h-[34px] items-center rounded-full border-[0.8px] border-solid ${color === 'black' ? 'border-[#5F6368]' : isDisabled ? 'border-[#E7E8E8]' : 'border-white  hover:border-[#DADCE0] active:bg-[#F6FAFE]'} px-[10px]`}
       >
         <div className='mr-2 flex size-[18px] items-center justify-center'>{icon}</div>
-        <p className={`w-[105px] truncate text-sm text-left ${isDisabled ? 'text-[#B5B6B7]' : 'text-[#5f6368]'}`}>
+        <p
+          className={`truncate text-left text-sm ${color === 'black' ? 'text-white' : isDisabled ? 'text-[#B5B6B7]' : 'text-[#5f6368]'}`}
+          style={{ width: width ? `${width - 65}px` : '105px' }}
+        >
           {isDisabled ? disabledText : currentDevice.name}
         </p>
         <div className='w-[18px]'>
-          <Icon.Chevron width={12} height={12} fill={isDisabled ? '#B5B6B7' : '#5F6368'} />
+          <Icon.Chevron
+            width={12}
+            height={12}
+            fill={color === 'black' ? '#8AB4F8' : isDisabled ? '#B5B6B7' : '#5F6368'}
+          />
         </div>
       </button>
       {isOpen && (
         <div
-          className='absolute bottom-9 max-h-[609px] rounded-[4px] bg-white py-2 '
+          className={`absolute bottom-9 max-h-[609px] min-w-[320px] rounded-[4px] ${color === 'black' ? 'bg-[#37383B]' : 'bg-white'} py-2 `}
           style={{
             boxShadow: '0 3px 5px -1px rgba(0,0,0,.2),0 6px 10px 0 rgba(0,0,0,.14),0 1px 18px 0 rgba(0,0,0,.12)',
           }}
@@ -152,10 +165,11 @@ export default function DeviceButton({
                 device={device}
                 isChoosed={device.deviceId === currentDevice.id}
                 onClick={handleCardClick}
+                color={color}
               />
             ))}
           </div>
-          <DeviceSubButton type={type} volume={volume} />
+          <DeviceSubButton type={type} volume={volume} color={color} />
         </div>
       )}
     </div>

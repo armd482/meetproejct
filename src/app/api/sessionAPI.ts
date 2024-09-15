@@ -26,7 +26,7 @@ export const postCreateSession = async (sessionId: string) => {
   return result.id;
 };
 
-export const postToken = async (sessionId: string) => {
+export const postToken = async (sessionId: string, name: string, color: string) => {
   const response = await fetch(`${SERVER_URL}/openvidu/api/sessions/${sessionId}/connection`, {
     method: 'POST',
     cache: 'no-cache',
@@ -34,7 +34,7 @@ export const postToken = async (sessionId: string) => {
       Authorization: `Basic ${btoa(`OPENVIDUAPP:${SERVER_SECRET}`)}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ name: 'test' }),
+    body: JSON.stringify({ name, color }),
   });
 
   if (!response.ok) {

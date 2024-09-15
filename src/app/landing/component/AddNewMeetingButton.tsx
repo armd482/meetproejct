@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { getSessionId } from '@/lib/getRandomId';
-import { PostSessionId, DeleteSessionId } from '@/app/api/mongoAPI';
+import { postSessionId, deleteSessionId } from '@/app/api/mongoAPI';
 import { postCreateSession } from '@/app/api/sessionAPI';
 import * as Icon from '@/asset/icon';
 import { Alert } from '@/component';
@@ -21,7 +21,7 @@ export default function AddNewMeetingButton() {
     }
     try {
       const key = getSessionId();
-      await PostSessionId(key);
+      await postSessionId(key);
       return key;
     } catch (error) {
       return responseSessionId(count - 1);
@@ -36,7 +36,7 @@ export default function AddNewMeetingButton() {
         await postCreateSession(key);
         router.push(`/${key}`);
       } catch {
-        await DeleteSessionId(key);
+        await deleteSessionId(key);
         setIsFailed(true);
       }
     }
