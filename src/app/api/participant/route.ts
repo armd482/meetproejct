@@ -16,7 +16,6 @@ export async function POST(req: Request) {
     try {
       await db.collection('participant').insertOne({ _id: new ObjectId(), sessionId, userId, userName, color });
     } catch (error) {
-      console.log(error);
       const e = error as ErrorResponse;
       if (e.code === 121) {
         return NextResponse.json({ message: e.errmsg }, { status: 400 });

@@ -34,7 +34,8 @@ const useOpenvidu = (sessionId: string) => {
   const [OV, setOV] = useState<OpenVidu | null>(null);
   const [chatList, setChatList] = useState<ChatInfo[]>([]);
   const [screenSession, setScreenSession] = useState<OVSession | null>(null);
-  const [screenPublisher, setScreenPublisher] = useState<Publisher | null>(null);
+  const [screenPublisher, setScreenPublisher] = useState<[string, Publisher | Subscriber] | null>(null);
+  const [isMyScreenShare, setIsMyScreenShare] = useState<boolean>(false);
 
   const { id, name, color, setId } = useUserInfoStore(
     useShallow((state) => ({
@@ -81,8 +82,8 @@ const useOpenvidu = (sessionId: string) => {
       mediaStream.getTracks().forEach((track) => track.stop());
     }
 
-    if (screenPublisher?.stream.getMediaStream()) {
-      screenPublisher.stream
+    if (screenPublisher && screenPublisher[1].stream.getMediaStream()) {
+      screenPublisher[1].stream
         .getMediaStream()
         .getTracks()
         .forEach((track) => track.stop());
@@ -135,12 +136,18 @@ const useOpenvidu = (sessionId: string) => {
       setSubscribers(() => {
         const data: [string, Subscriber][] = [];
         newSession.remoteConnections.forEach((entry) => {
-          if (!entry.stream) {
+          if (!entry.stream || entry.stream.typeOfVideo === 'SCREEN') {
             return;
           }
           data.push([entry.connectionId, newSession.subscribe(entry.stream, undefined)]);
         });
         return data;
+      });
+
+      newSession.remoteConnections.forEach((entry) => {
+        if (entry.stream && entry.stream.typeOfVideo === 'SCREEN') {
+          setScreenPublisher([entry.connectionId, newSession.subscribe(entry.stream, undefined)]);
+        }
       });
 
       setParticipants(() => {
@@ -256,17 +263,18 @@ const useOpenvidu = (sessionId: string) => {
       audioSource: 'screen',
     });
 
+    setIsMyScreenShare(true);
+
     newScreenPublisher.once('accessAllowed', async () => {
-      await newSession.publish(newScreenPublisher);
-      setScreenPublisher(newScreenPublisher);
+      const mediaStream = newScreenPublisher.stream.getMediaStream();
+      mediaStream.getVideoTracks()[0].addEventListener('ended', () => {
+        newSession.disconnect();
+      });
+      newSession.publish(newScreenPublisher);
     });
 
-    newScreenPublisher.once('accessDenied', () => {
-      newSession.disconnect();
-      setScreenSession(null);
-      setScreenPublisher(null);
-    });
-  }, [color, name, sessionId]);
+    newScreenPublisher.once('accessDenied', stopShareScreen);
+  }, [color, name, sessionId, stopShareScreen]);
 
   useEffect(() => {
     window.addEventListener('beforeunload', leaveSession);
@@ -274,17 +282,6 @@ const useOpenvidu = (sessionId: string) => {
       window.removeEventListener('beforeunload', leaveSession);
     };
   }, [leaveSession]);
-
-  useEffect(() => {
-    if (!screenPublisher) {
-      return;
-    }
-    const videoTrack = screenPublisher.stream.getMediaStream().getVideoTracks()[0];
-    videoTrack.addEventListener('ended', stopShareScreen);
-    return () => {
-      videoTrack.removeEventListener('ended', stopShareScreen);
-    };
-  }, [screenPublisher, stopShareScreen]);
 
   useEffect(() => {
     const initialJoinSession = async () => {
@@ -314,6 +311,21 @@ const useOpenvidu = (sessionId: string) => {
         return;
       }
 
+      if (e.stream.typeOfVideo === 'SCREEN') {
+        if (!screenPublisher) {
+          setScreenPublisher([connectionId, session.subscribe(e.stream, undefined)]);
+          setParticipants((prev) => ({
+            ...prev,
+            [connectionId]: {
+              name: JSON.parse(data).clientData.name,
+              color: JSON.parse(data).clientData.color,
+              audio: e.stream.audioActive,
+              video: e.stream.videoActive,
+            },
+          }));
+        }
+        return;
+      }
       setParticipants((prev) => ({
         ...prev,
         [connectionId]: {
@@ -332,21 +344,29 @@ const useOpenvidu = (sessionId: string) => {
 
     const handleDestroyStream = (e: StreamEvent) => {
       const { connectionId } = e.stream.connection;
+      const isDisconnected = !UNPUBLISH.has(e.reason);
 
-      if (connectionId === id) {
+      if (connectionId === id || !isDisconnected) {
         return;
       }
 
-      const isDisconnected = !UNPUBLISH.has(e.reason);
-
-      if (isDisconnected) {
+      if (e.stream.typeOfVideo === 'SCREEN') {
+        setScreenPublisher(null);
+        setIsMyScreenShare(false);
         setParticipants((prev) => {
           const newParticipants = { ...prev };
           delete newParticipants[connectionId];
           return newParticipants;
         });
-        setSubscribers((prev) => prev.filter((subscriber) => subscriber[0] !== connectionId));
+        return;
       }
+
+      setParticipants((prev) => {
+        const newParticipants = { ...prev };
+        delete newParticipants[connectionId];
+        return newParticipants;
+      });
+      setSubscribers((prev) => prev.filter((subscriber) => subscriber[0] !== connectionId));
     };
 
     const handleStreamPropertyChanged = (event: StreamPropertyChangedEvent) => {
@@ -408,7 +428,7 @@ const useOpenvidu = (sessionId: string) => {
       session.off('streamPropertyChanged', handleStreamPropertyChanged);
       session.off('signal:chat', handleMessageRecive);
     };
-  }, [session, id]);
+  }, [session, id, screenPublisher]);
 
   return {
     publisher,
@@ -419,6 +439,7 @@ const useOpenvidu = (sessionId: string) => {
     stream,
     chatList,
     screenPublisher,
+    isMyScreenShare,
     leaveSession,
     changeDevice,
     handleUpdateStream,

@@ -1,16 +1,15 @@
 'use client';
 
-import { useOpenvidu } from '@/hook';
-import { useEffect, useRef, useContext, useState } from 'react';
+import { useEffect, useRef, useContext } from 'react';
 import { usePathname } from 'next/navigation';
-import { useDeviceStore } from '@/store/DeviceStore';
 import { useShallow } from 'zustand/react/shallow';
+
+import { useDeviceStore } from '@/store/DeviceStore';
 import { useUserInfoStore } from '@/store/UserInfoStore';
 import { ToggleContext } from '@/context/ToggleContext';
-import { ControlBar, InfoBar, Panel, Toggle, MeetInfoBar } from './component';
-import VideoStream from './component/VideoStream';
+import { useOpenvidu } from '@/hook';
 import { deleteParticipant, postParticipant } from '../api/mongoAPI';
-import OtherAudioStream from './component/OtherAudioStream';
+import { ControlBar, InfoBar, Panel, Toggle, MeetInfoBar, StreamGridList, StreamScreenList } from './component';
 
 export default function Meetting() {
   const pathname = usePathname();
@@ -21,7 +20,6 @@ export default function Meetting() {
   );
 
   const { handleToggleStatus } = useContext(ToggleContext);
-  const [maxRow, setMaxRow] = useState(Math.floor((window.innerWidth - 400) / 166));
 
   const { id, name, color } = useUserInfoStore(
     useShallow((state) => ({
@@ -47,10 +45,6 @@ export default function Meetting() {
   } = useOpenvidu(pathname.slice(1));
 
   const barRef = useRef<HTMLDivElement>(null);
-
-  const maxNum = maxRow <= 1 ? 1 : maxRow === 2 ? 4 : maxRow * (maxRow - 1);
-  const currentPageSubscribers = maxNum === 1 ? [] : subscribers.slice(0, maxNum - 2);
-  const otherSubscriber = maxNum === 1 ? subscribers : subscribers.slice(maxNum - 2);
 
   const userList = subscribers.map((entity) => {
     const { name: userName, color: userColor, audio, video } = participants[entity[0]];
@@ -87,45 +81,20 @@ export default function Meetting() {
     handleToggleStatus('screen', Boolean(screenPublisher));
   }, [screenPublisher, handleToggleStatus]);
 
-  useEffect(() => {
-    const handleMaxNumUpdate = () => {
-      const row = Math.max(Math.floor((window.innerWidth - 400) / 166), 2);
-      setMaxRow(row);
-    };
-    window.addEventListener('resize', handleMaxNumUpdate);
-
-    return () => {
-      window.removeEventListener('resize', handleMaxNumUpdate);
-    };
-  }, []);
-
   return (
     <div className='relative flex h-screen w-screen flex-col overflow-hidden bg-[#202124]'>
       <div className='relative flex flex-1 p-4' style={{ height: `calc(100vh - ${barRef.current?.clientHeight}px)` }}>
-        <div
-          className='relative grid size-full gap-4 border border-solid border-black'
-          style={{
-            gridTemplateColumns: `repeat(${currentPageSubscribers.length === 0 ? '1' : currentPageSubscribers.length + 1 < maxRow ? currentPageSubscribers.length + 1 : maxRow}, 1fr)`,
-          }}
-        >
-          {publisher && <VideoStream user={{ id, name, color, ...deviceEnable }} subscriber={publisher} muted />}
-          {currentPageSubscribers.map((entity) => (
-            <VideoStream key={entity[0]} user={{ id: entity[0], ...participants[entity[0]] }} subscriber={entity[1]} />
-          ))}
-          {subscribers.length >= maxNum - 1 &&
-            (otherSubscriber.length === 1 ? (
-              <VideoStream
-                user={{ id: otherSubscriber[0][0], ...participants[otherSubscriber[0][0]] }}
-                subscriber={otherSubscriber[0][1]}
-              />
-            ) : (
-              <OtherAudioStream
-                otherSubscriber={otherSubscriber}
-                name={participants[otherSubscriber[0][0]].name}
-                color={participants[otherSubscriber[0][0]].color}
-              />
-            ))}
-        </div>
+        {screenPublisher ? (
+          <StreamScreenList
+            screenPublisher={screenPublisher}
+            participants={participants}
+            subscribers={subscribers}
+            publisher={publisher}
+          />
+        ) : (
+          <StreamGridList subscribers={subscribers} publisher={publisher} participants={participants} />
+        )}
+
         <Panel
           userList={[
             {

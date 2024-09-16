@@ -30,7 +30,7 @@ export default function VideoStream({ user, subscriber, muted = false }: VideoSt
         videoRef.current.style.setProperty('transform', 'rotateY(0deg)');
       }
     }
-  }, [subscriber, audioOutput]);
+  }, [subscriber, audioOutput, isScreen]);
 
   const stream = subscriber.stream.getMediaStream();
 
