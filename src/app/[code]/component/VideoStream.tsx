@@ -30,7 +30,7 @@ export default function VideoStream({ user, subscriber, muted = false }: VideoSt
         videoRef.current.style.setProperty('transform', 'rotateY(0deg)');
       }
     }
-  }, [subscriber, audioOutput]);
+  }, [subscriber, audioOutput, isScreen]);
 
   const stream = subscriber.stream.getMediaStream();
 
@@ -41,7 +41,7 @@ export default function VideoStream({ user, subscriber, muted = false }: VideoSt
           ref={videoRef}
           autoPlay
           muted={muted}
-          className={`absolute top-0 left-0 size-full ${isScreen ? 'object-contain' : 'object-cover'}`}
+          className={`absolute left-0 top-0 size-full ${isScreen ? 'object-contain' : 'object-cover'}`}
         />
         {!user.video && (
           <div className='absolute left-0 top-0 z-20 size-full bg-[#3C4043]'>

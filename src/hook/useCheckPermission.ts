@@ -7,6 +7,7 @@ const useCheckPermission = (updateStreamStatus: (value: StreamStatusType) => voi
   const [isSupportedPermission, setIsSupportedPermission] = useState<null | boolean>(null);
   const { setPermission, setDeviceEnable } = useDeviceStore(
     useShallow((state) => ({
+      permission: state.permission,
       setPermission: state.setPermission,
       setDeviceEnable: state.setDeviceEnable,
     })),
@@ -65,9 +66,10 @@ const useCheckPermission = (updateStreamStatus: (value: StreamStatusType) => voi
   const checkPermission = useCallback(
     async (audio: boolean, video: boolean) => {
       try {
-        await navigator.mediaDevices.getUserMedia({ audio, video });
+        const stream = await navigator.mediaDevices.getUserMedia({ audio, video });
         setPermission({ audio, video });
         setDeviceEnable((prev) => ({ audio: audio && prev.audio, video: video && prev.video }));
+        stream.getTracks().forEach((track) => track.stop());
         return true;
       } catch (error) {
         const e = error as DOMException;
@@ -81,39 +83,48 @@ const useCheckPermission = (updateStreamStatus: (value: StreamStatusType) => voi
     [updateStreamStatus, setDeviceEnable, setPermission],
   );
 
-  const updatePermission = useCallback(async () => {
-    if (isSupportedPermission !== false) {
-      const newPermission = await checkPermissionQuery();
-      if (newPermission) {
-        setIsSupportedPermission(true);
+  const updatePermission = useCallback(
+    async (isInitial?: boolean) => {
+      if (isSupportedPermission !== false && !isInitial) {
+        const newPermission = await checkPermissionQuery();
+        if (newPermission) {
+          setIsSupportedPermission(true);
+        }
+        if (typeof newPermission !== 'boolean') {
+          return newPermission;
+        }
       }
-      if (typeof newPermission !== 'boolean') {
-        return newPermission;
+
+      if (await checkPermission(true, true)) {
+        checkPermissionQuery();
+        return { audio: true, video: true };
       }
-    }
 
-    if (await checkPermission(true, true)) {
-      return { audio: true, video: true };
-    }
+      if (await checkPermission(true, false)) {
+        checkPermissionQuery();
+        return { audio: true, video: false };
+      }
 
-    if (await checkPermission(true, false)) {
-      return { audio: true, video: false };
-    }
+      if (await checkPermission(false, true)) {
+        checkPermissionQuery();
+        return { audio: false, video: true };
+      }
 
-    if (await checkPermission(false, true)) {
-      return { audio: false, video: true };
-    }
+      setPermission({ audio: false, video: false });
+      setDeviceEnable({ audio: false, video: false });
 
-    setPermission({ audio: false, video: false });
-    setDeviceEnable({ audio: false, video: false });
+      checkPermissionQuery();
 
-    return { audio: false, video: false };
-  }, [isSupportedPermission, checkPermissionQuery, checkPermission, setPermission, setDeviceEnable]);
+      return { audio: false, video: false };
+    },
+    [isSupportedPermission, checkPermissionQuery, checkPermission, setPermission, setDeviceEnable],
+  );
 
   return {
     isSupportedPermission,
     updatePermission,
     addPermissionListener,
+    checkPermissionQuery,
   };
 };
 

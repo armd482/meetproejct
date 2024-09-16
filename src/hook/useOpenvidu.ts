@@ -63,18 +63,29 @@ const useOpenvidu = (sessionId: string) => {
     if (session) {
       session.connection.stream
         ?.getMediaStream()
-        .getTracks()
+        ?.getTracks()
         .forEach((track) => track.stop());
       session.disconnect();
     }
 
     if (screenSession) {
+      screenSession.connection.stream
+        ?.getMediaStream()
+        .getTracks()
+        .forEach((track) => track.stop());
       screenSession.disconnect();
     }
 
     if (publisher?.stream.getMediaStream()) {
       const mediaStream = publisher.stream.getMediaStream();
       mediaStream.getTracks().forEach((track) => track.stop());
+    }
+
+    if (screenPublisher?.stream.getMediaStream()) {
+      screenPublisher.stream
+        .getMediaStream()
+        .getTracks()
+        .forEach((track) => track.stop());
     }
 
     if (stream) {
@@ -86,7 +97,8 @@ const useOpenvidu = (sessionId: string) => {
     setParticipants({});
     setPublisher(null);
     setSubscribers([]);
-  }, [session, publisher, stream, screenSession]);
+    setScreenSession(null);
+  }, [session, publisher, stream, screenSession, screenPublisher]);
 
   const publishVideo = useCallback(
     async (newOV: OpenVidu, newSession: OVSession) => {

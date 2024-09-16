@@ -6,10 +6,10 @@ import { usePathname } from 'next/navigation';
 import { useDeviceStore } from '@/store/DeviceStore';
 import { useShallow } from 'zustand/react/shallow';
 import { useUserInfoStore } from '@/store/UserInfoStore';
+import { ToggleContext } from '@/context/ToggleContext';
 import { ControlBar, InfoBar, Panel, Toggle, MeetInfoBar } from './component';
 import VideoStream from './component/VideoStream';
 import { deleteParticipant, postParticipant } from '../api/mongoAPI';
-import { ToggleContext } from '@/context/ToggleContext';
 
 export default function Meetting() {
   const pathname = usePathname();
@@ -46,7 +46,17 @@ export default function Meetting() {
 
   const barRef = useRef<HTMLDivElement>(null);
 
-  const userList = subscribers.map((entity) => {
+  const testSub = [
+    ...subscribers,
+    ...subscribers,
+    ...subscribers,
+    ...subscribers,
+    ...subscribers,
+    ...subscribers,
+    ...subscribers,
+  ];
+
+  const userList = testSub.map((entity) => {
     const { name: userName, color: userColor, audio, video } = participants[entity[0]];
     return {
       id: entity[0],
@@ -79,7 +89,7 @@ export default function Meetting() {
 
   useEffect(() => {
     handleToggleStatus('screen', Boolean(screenPublisher));
-  }, [screenPublisher]);
+  }, [screenPublisher, handleToggleStatus]);
 
   return (
     <div className='relative flex h-screen w-screen flex-col overflow-hidden bg-[#202124]'>
@@ -91,8 +101,13 @@ export default function Meetting() {
           }}
         >
           {publisher && <VideoStream user={{ id, name, color, ...deviceEnable }} subscriber={publisher} muted />}
-          {subscribers.map((entity) => (
-            <VideoStream key={entity[0]} user={{ id: entity[0], ...participants[entity[0]] }} subscriber={entity[1]} />
+          {testSub.map((entity, i) => (
+            <VideoStream
+              // eslint-disable-next-line react/no-array-index-key
+              key={entity[0] + i}
+              user={{ id: entity[0], ...participants[entity[0]] }}
+              subscriber={entity[1]}
+            />
           ))}
         </div>
         <Panel

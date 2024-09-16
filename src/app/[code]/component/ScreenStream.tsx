@@ -22,7 +22,7 @@ export default function ScreenStream({ subscriber }: ScreenStreamProps) {
         <video
           ref={videoRef}
           autoPlay
-          className='absolute top-0 left-0 size-full rounded-lg bg-[#3C4043] object-scale-down max-h-full max-w-full min-h-0 min-w-0'
+          className='absolute left-0 top-0 size-full max-h-full min-h-0 min-w-0 max-w-full rounded-lg bg-[#3C4043] object-scale-down'
         />
       </div>
     </div>

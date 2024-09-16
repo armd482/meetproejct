@@ -65,7 +65,7 @@ const useDevice = () => {
     setStreamStatus(value);
   }, []);
 
-  const { isSupportedPermission, updatePermission, addPermissionListener } =
+  const { updatePermission, addPermissionListener, checkPermissionQuery } =
     useCheckPermission(handleUpdateStreamStatus);
 
   const toggleAudioInput = async () => {
@@ -96,7 +96,7 @@ const useDevice = () => {
   };
 
   const getStream = useCallback(async () => {
-    const newPermission = await updatePermission();
+    const newPermission = await updatePermission(true);
 
     try {
       const newStream = await navigator.mediaDevices.getUserMedia(
@@ -119,6 +119,7 @@ const useDevice = () => {
     if (stream) {
       stream.getTracks().forEach((track) => track.stop());
     }
+
     const startDate = new Date().getTime();
     const newStream = await getStream();
 
@@ -176,13 +177,16 @@ const useDevice = () => {
   }, []);
 
   useEffect(() => {
-    if (isSupportedPermission) {
-      addPermissionListener(handleUpdateStream);
-    }
-  }, [isSupportedPermission, addPermissionListener, handleUpdateStream]);
+    const checkDevicePermission = async () => {
+      if (!stream) {
+        return;
+      }
+      const isEnableCheckPermission = await checkPermissionQuery();
+      if (isEnableCheckPermission) {
+        await addPermissionListener(updatePermission);
+        return;
+      }
 
-  useEffect(() => {
-    if (!isSupportedPermission && stream) {
       const checkTrack = async () => {
         if (!stream.active) {
           if (timerRef.current) {
@@ -192,9 +196,10 @@ const useDevice = () => {
           updatePermission();
         }
       };
-
       timerRef.current = setInterval(checkTrack, 1000);
-    }
+    };
+
+    checkDevicePermission();
 
     return () => {
       if (timerRef.current) {
@@ -203,13 +208,13 @@ const useDevice = () => {
       }
     };
   }, [
-    isSupportedPermission,
     stream,
     addPermissionListener,
     updatePermission,
     setPermission,
     setDeviceEnable,
     handleUpdateStream,
+    checkPermissionQuery,
   ]);
 
   useEffect(() => {
