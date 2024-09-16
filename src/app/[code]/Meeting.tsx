@@ -36,6 +36,7 @@ export default function Meetting() {
     stream,
     chatList,
     screenPublisher,
+    isMyScreenShare,
     changeDevice,
     handleUpdateStream,
     sendMessage,
@@ -78,8 +79,12 @@ export default function Meetting() {
   }, [id, color, name, pathname]);
 
   useEffect(() => {
+    if (!isMyScreenShare && screenPublisher) {
+      handleToggleStatus('screen', 'disable');
+      return;
+    }
     handleToggleStatus('screen', Boolean(screenPublisher));
-  }, [screenPublisher, handleToggleStatus]);
+  }, [screenPublisher, isMyScreenShare, handleToggleStatus]);
 
   return (
     <div className='relative flex h-screen w-screen flex-col overflow-hidden bg-[#202124]'>

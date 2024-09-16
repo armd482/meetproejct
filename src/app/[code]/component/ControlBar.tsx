@@ -5,6 +5,7 @@ import * as Icon from '@/asset/icon';
 import { ToggleType } from '@/type/toggleType';
 import { useDeviceStore } from '@/store/DeviceStore';
 import { useShallow } from 'zustand/react/shallow';
+import { Alert } from '@/component';
 import { ControlButton, MenuButton, OptionButton, CallEndButton } from './part/ControlBar';
 import { PermissionModal } from './part/Device';
 
@@ -22,7 +23,8 @@ interface ControlButtonType {
   type: ToggleType;
   icon: ReactNode;
   clickedIcon: ReactNode;
-  onClick?: (value: boolean) => void;
+  disabledIcon?: ReactNode;
+  onClick?: (value: boolean | 'disable') => void;
 }
 
 const CONTROL_BUTTON_OFF_PROPS = { width: 24, height: 24, fill: '#06306D' };
@@ -35,7 +37,12 @@ export default function ControlBar({
   handleStopScreenShare,
   handleLeavSession,
 }: ControlBarProps) {
-  const handleScreenShareButtonClick = (value: boolean) => {
+  const [isOpenAlert, setIsOpenAlert] = useState(false);
+  const handleScreenShareButtonClick = (value: boolean | 'disable') => {
+    if (value === 'disable') {
+      setIsOpenAlert(true);
+      return;
+    }
     if (value) {
       handleScreenShare();
       return;
@@ -61,6 +68,7 @@ export default function ControlBar({
       type: 'screen',
       icon: <Icon.ScreenShare {...CONTROL_BUTTON_OFF_PROPS} />,
       clickedIcon: <Icon.ScreenShare {...CONTROL_BUTTON_ON_PROPS} />,
+      disabledIcon: <Icon.ScreenShare {...{ ...CONTROL_BUTTON_OFF_PROPS, fill: '##AFB5C4' }} />,
       onClick: handleScreenShareButtonClick,
     },
     {
@@ -70,7 +78,6 @@ export default function ControlBar({
       clickedIcon: <Icon.HandOn {...CONTROL_BUTTON_ON_PROPS} />,
     },
   ];
-
   const [isOpenModal, setIsOpenModal] = useState(false);
   const { permission } = useDeviceStore(
     useShallow((state) => ({
@@ -98,6 +105,10 @@ export default function ControlBar({
 
   const handleModalClose = () => {
     setIsOpenModal(false);
+  };
+
+  const handleAlertClose = () => {
+    setIsOpenAlert(false);
   };
 
   const handleButtonClick = (type: 'audio' | 'video') => {
@@ -144,6 +155,7 @@ export default function ControlBar({
         onClose={handleModalClose}
         onUpdateStream={handleUpdateStream}
       />
+      <Alert text='다른 사람이 화면 공유 중 입니다.' isOpen={isOpenAlert} onCloseAlert={handleAlertClose} />
     </div>
   );
 }

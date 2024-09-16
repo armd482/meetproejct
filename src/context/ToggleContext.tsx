@@ -4,7 +4,7 @@ import { createContext, PropsWithChildren, useCallback, useMemo, useState } from
 interface ToggleContextType {
   toggleStatus: ToggleStatusType;
   isVisibleToggle: boolean;
-  handleToggleStatus: (key: ToggleType, value?: boolean) => void;
+  handleToggleStatus: (key: ToggleType, value?: boolean | 'disable') => void;
   handleVisibleToggle: () => void;
 }
 
@@ -24,7 +24,7 @@ export function ToggleContextProvider({ children }: PropsWithChildren) {
   });
   const [isVisibleToggle, setIsVisibleTogle] = useState<boolean>(true);
 
-  const handleToggleStatus = useCallback((key: ToggleType, value?: boolean) => {
+  const handleToggleStatus = useCallback((key: ToggleType, value?: boolean | 'disable') => {
     setToggleStatus((prev) => ({ ...prev, [key]: value ?? !prev[key] }));
   }, []);
 
