@@ -1,7 +1,7 @@
 'use client';
 
 import { useOpenvidu } from '@/hook';
-import { useEffect, useRef, useContext } from 'react';
+import { useEffect, useRef, useContext, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useDeviceStore } from '@/store/DeviceStore';
 import { useShallow } from 'zustand/react/shallow';
@@ -10,6 +10,7 @@ import { ToggleContext } from '@/context/ToggleContext';
 import { ControlBar, InfoBar, Panel, Toggle, MeetInfoBar } from './component';
 import VideoStream from './component/VideoStream';
 import { deleteParticipant, postParticipant } from '../api/mongoAPI';
+import OtherAudioStream from './component/OtherAudioStream';
 
 export default function Meetting() {
   const pathname = usePathname();
@@ -20,6 +21,7 @@ export default function Meetting() {
   );
 
   const { handleToggleStatus } = useContext(ToggleContext);
+  const [maxRow, setMaxRow] = useState(Math.floor((window.innerWidth - 400) / 166));
 
   const { id, name, color } = useUserInfoStore(
     useShallow((state) => ({
@@ -46,17 +48,11 @@ export default function Meetting() {
 
   const barRef = useRef<HTMLDivElement>(null);
 
-  const testSub = [
-    ...subscribers,
-    ...subscribers,
-    ...subscribers,
-    ...subscribers,
-    ...subscribers,
-    ...subscribers,
-    ...subscribers,
-  ];
+  const maxNum = maxRow <= 1 ? 1 : maxRow === 2 ? 4 : maxRow * (maxRow - 1);
+  const currentPageSubscribers = maxNum === 1 ? [] : subscribers.slice(0, maxNum - 2);
+  const otherSubscriber = maxNum === 1 ? subscribers : subscribers.slice(maxNum - 2);
 
-  const userList = testSub.map((entity) => {
+  const userList = subscribers.map((entity) => {
     const { name: userName, color: userColor, audio, video } = participants[entity[0]];
     return {
       id: entity[0],
@@ -91,24 +87,44 @@ export default function Meetting() {
     handleToggleStatus('screen', Boolean(screenPublisher));
   }, [screenPublisher, handleToggleStatus]);
 
+  useEffect(() => {
+    const handleMaxNumUpdate = () => {
+      const row = Math.max(Math.floor((window.innerWidth - 400) / 166), 2);
+      setMaxRow(row);
+    };
+    window.addEventListener('resize', handleMaxNumUpdate);
+
+    return () => {
+      window.removeEventListener('resize', handleMaxNumUpdate);
+    };
+  }, []);
+
   return (
     <div className='relative flex h-screen w-screen flex-col overflow-hidden bg-[#202124]'>
       <div className='relative flex flex-1 p-4' style={{ height: `calc(100vh - ${barRef.current?.clientHeight}px)` }}>
         <div
           className='relative grid size-full gap-4 border border-solid border-black'
           style={{
-            gridTemplateColumns: `repeat(${Math.ceil(Math.sqrt(subscribers.length + 1))}, 1fr)`,
+            gridTemplateColumns: `repeat(${currentPageSubscribers.length === 0 ? '1' : currentPageSubscribers.length + 1 < maxRow ? currentPageSubscribers.length + 1 : maxRow}, 1fr)`,
           }}
         >
           {publisher && <VideoStream user={{ id, name, color, ...deviceEnable }} subscriber={publisher} muted />}
-          {testSub.map((entity, i) => (
-            <VideoStream
-              // eslint-disable-next-line react/no-array-index-key
-              key={entity[0] + i}
-              user={{ id: entity[0], ...participants[entity[0]] }}
-              subscriber={entity[1]}
-            />
+          {currentPageSubscribers.map((entity) => (
+            <VideoStream key={entity[0]} user={{ id: entity[0], ...participants[entity[0]] }} subscriber={entity[1]} />
           ))}
+          {subscribers.length >= maxNum - 1 &&
+            (otherSubscriber.length === 1 ? (
+              <VideoStream
+                user={{ id: otherSubscriber[0][0], ...participants[otherSubscriber[0][0]] }}
+                subscriber={otherSubscriber[0][1]}
+              />
+            ) : (
+              <OtherAudioStream
+                otherSubscriber={otherSubscriber}
+                name={participants[otherSubscriber[0][0]].name}
+                color={participants[otherSubscriber[0][0]].color}
+              />
+            ))}
         </div>
         <Panel
           userList={[
