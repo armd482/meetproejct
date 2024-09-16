@@ -212,6 +212,14 @@ const useDevice = () => {
     handleUpdateStream,
   ]);
 
+  useEffect(() => {
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, [stream]);
+
   return {
     stream,
     streamStatus,

@@ -20,25 +20,34 @@ interface VideoStreamProps {
 export default function VideoStream({ user, subscriber, muted = false }: VideoStreamProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const audioOutput = useDeviceStore((state) => state.audioOutput);
+  const isScreen = subscriber.stream.typeOfVideo === 'SCREEN';
 
   useEffect(() => {
     if (subscriber && videoRef.current) {
       subscriber.addVideoElement(videoRef.current);
       videoRef.current.setSinkId(audioOutput.id);
+      if (isScreen) {
+        videoRef.current.style.setProperty('transform', 'rotateY(0deg)');
+      }
     }
   }, [subscriber, audioOutput]);
 
   const stream = subscriber.stream.getMediaStream();
 
   return (
-    <div className='relative flex items-center'>
-      <div className=' relative flex w-full items-center justify-center overflow-hidden rounded-lg bg-[#3C4043]'>
-        <video ref={videoRef} autoPlay muted={muted} className='size-full rounded-lg bg-[#3C4043] object-fill' />
+    <div className='relative flex size-full items-center'>
+      <div className=' relative flex size-full items-center justify-center overflow-hidden rounded-lg bg-[#3C4043]'>
+        <video
+          ref={videoRef}
+          autoPlay
+          muted={muted}
+          className={`absolute top-0 left-0 size-full ${isScreen ? 'object-contain' : 'object-cover'}`}
+        />
         {!user.video && (
           <div className='absolute left-0 top-0 z-20 size-full bg-[#3C4043]'>
             <div
               className='absolute left-1/2 top-1/2 flex aspect-square h-2/5 -translate-x-1/2 -translate-y-1/2 items-center justify-center truncate rounded-full font-bold text-white'
-              style={{ backgroundColor: user.color, fontSize: '420%' }}
+              style={{ backgroundColor: user.color, fontSize: '150%' }}
             >
               {user.name}
             </div>

@@ -33,6 +33,8 @@ const useOpenvidu = (sessionId: string) => {
   const [participants, setParticipants] = useState<Record<string, UserInfo>>({});
   const [OV, setOV] = useState<OpenVidu | null>(null);
   const [chatList, setChatList] = useState<ChatInfo[]>([]);
+  const [screenSession, setScreenSession] = useState<OVSession | null>(null);
+  const [screenPublisher, setScreenPublisher] = useState<Publisher | null>(null);
 
   const { id, name, color, setId } = useUserInfoStore(
     useShallow((state) => ({
@@ -59,24 +61,35 @@ const useOpenvidu = (sessionId: string) => {
 
   const leaveSession = useCallback(() => {
     if (session) {
+      session.connection.stream
+        ?.getMediaStream()
+        .getTracks()
+        .forEach((track) => track.stop());
       session.disconnect();
     }
+
+    if (screenSession) {
+      screenSession.disconnect();
+    }
+
+    if (publisher?.stream.getMediaStream()) {
+      const mediaStream = publisher.stream.getMediaStream();
+      mediaStream.getTracks().forEach((track) => track.stop());
+    }
+
+    if (stream) {
+      stream.getTracks().forEach((track) => track.stop());
+    }
+
     setOV(null);
     setSession(null);
     setParticipants({});
     setPublisher(null);
     setSubscribers([]);
-  }, [session]);
+  }, [session, publisher, stream, screenSession]);
 
-  const joinSession = useCallback(async () => {
-    try {
-      const token = await postToken(sessionId, name, color);
-      const newOV = new OpenVidu();
-      newOV.enableProdMode();
-      setOV(newOV);
-      const newSession = newOV.initSession();
-      await newSession.connect(token, { clientData: { name, color } });
-      setSession(newSession);
+  const publishVideo = useCallback(
+    async (newOV: OpenVidu, newSession: OVSession) => {
       const publishConstraint = {
         audioSource: !permission || (permission && permission.audio) ? (audioInput.id ?? true) : false,
         videoSource: !permission || (permission && permission.video) ? (videoInput.id ?? true) : false,
@@ -93,6 +106,20 @@ const useOpenvidu = (sessionId: string) => {
       const newPublisher = newOV.initPublisher(undefined, publishConstraint);
       await newSession.publish(newPublisher);
       setPublisher(newPublisher);
+    },
+    [permission, audioInput, videoInput],
+  );
+
+  const joinSession = useCallback(async () => {
+    try {
+      const token = await postToken(sessionId, name, color);
+      const newOV = new OpenVidu();
+      newOV.enableProdMode();
+      setOV(newOV);
+      const newSession = newOV.initSession();
+      await newSession.connect(token, { clientData: { name, color } });
+      setSession(newSession);
+      publishVideo(newOV, newSession);
       setSubscribers(() => {
         const data: [string, Subscriber][] = [];
         newSession.remoteConnections.forEach((entry) => {
@@ -129,7 +156,7 @@ const useOpenvidu = (sessionId: string) => {
       leaveSession();
       router.push('/landing');
     }
-  }, [name, sessionId, color, audioInput, videoInput, permission, router, leaveSession, setId]);
+  }, [name, sessionId, color, router, leaveSession, setId, publishVideo]);
 
   const changeDevice = useCallback(
     async (type: 'audio' | 'video', value: boolean | string) => {
@@ -190,12 +217,62 @@ const useOpenvidu = (sessionId: string) => {
     [session, name, id],
   );
 
+  const stopShareScreen = useCallback(async () => {
+    if (!screenSession) {
+      return;
+    }
+    screenSession.disconnect();
+    setScreenSession(null);
+    setScreenPublisher(null);
+  }, [screenSession]);
+
+  const shareScreen = useCallback(async () => {
+    const token = await postToken(sessionId, name, color);
+    const newOV = new OpenVidu();
+
+    if (!token) {
+      return;
+    }
+
+    const newSession = newOV.initSession();
+    await newSession.connect(token, { clientData: { name, color } });
+
+    setScreenSession(newSession);
+
+    const newScreenPublisher = newOV.initPublisher(undefined, {
+      videoSource: 'screen',
+      audioSource: 'screen',
+    });
+
+    newScreenPublisher.once('accessAllowed', async () => {
+      await newSession.publish(newScreenPublisher);
+      setScreenPublisher(newScreenPublisher);
+    });
+
+    newScreenPublisher.once('accessDenied', () => {
+      newSession.disconnect();
+      setScreenSession(null);
+      setScreenPublisher(null);
+    });
+  }, [color, name, sessionId]);
+
   useEffect(() => {
     window.addEventListener('beforeunload', leaveSession);
     return () => {
       window.removeEventListener('beforeunload', leaveSession);
     };
   }, [leaveSession]);
+
+  useEffect(() => {
+    if (!screenPublisher) {
+      return;
+    }
+    const videoTrack = screenPublisher.stream.getMediaStream().getVideoTracks()[0];
+    videoTrack.addEventListener('ended', stopShareScreen);
+    return () => {
+      videoTrack.removeEventListener('ended', stopShareScreen);
+    };
+  }, [screenPublisher, stopShareScreen]);
 
   useEffect(() => {
     const initialJoinSession = async () => {
@@ -221,6 +298,10 @@ const useOpenvidu = (sessionId: string) => {
     const handleCreateStream = (e: StreamEvent) => {
       const { connectionId, data } = e.stream.connection;
 
+      if (connectionId === id) {
+        return;
+      }
+
       setParticipants((prev) => ({
         ...prev,
         [connectionId]: {
@@ -238,12 +319,13 @@ const useOpenvidu = (sessionId: string) => {
     };
 
     const handleDestroyStream = (e: StreamEvent) => {
-      if (e.stream.connection.connectionId === id) {
+      const { connectionId } = e.stream.connection;
+
+      if (connectionId === id) {
         return;
       }
 
       const isDisconnected = !UNPUBLISH.has(e.reason);
-      const { connectionId } = e.stream.connection;
 
       if (isDisconnected) {
         setParticipants((prev) => {
@@ -324,10 +406,13 @@ const useOpenvidu = (sessionId: string) => {
     OV,
     stream,
     chatList,
+    screenPublisher,
     leaveSession,
     changeDevice,
     handleUpdateStream,
     sendMessage,
+    shareScreen,
+    stopShareScreen,
   };
 };
 

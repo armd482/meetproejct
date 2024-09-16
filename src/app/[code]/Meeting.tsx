@@ -1,7 +1,7 @@
 'use client';
 
 import { useOpenvidu } from '@/hook';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useContext } from 'react';
 import { usePathname } from 'next/navigation';
 import { useDeviceStore } from '@/store/DeviceStore';
 import { useShallow } from 'zustand/react/shallow';
@@ -9,6 +9,7 @@ import { useUserInfoStore } from '@/store/UserInfoStore';
 import { ControlBar, InfoBar, Panel, Toggle, MeetInfoBar } from './component';
 import VideoStream from './component/VideoStream';
 import { deleteParticipant, postParticipant } from '../api/mongoAPI';
+import { ToggleContext } from '@/context/ToggleContext';
 
 export default function Meetting() {
   const pathname = usePathname();
@@ -18,6 +19,8 @@ export default function Meetting() {
     })),
   );
 
+  const { handleToggleStatus } = useContext(ToggleContext);
+
   const { id, name, color } = useUserInfoStore(
     useShallow((state) => ({
       id: state.id,
@@ -26,8 +29,20 @@ export default function Meetting() {
     })),
   );
 
-  const { subscribers, participants, publisher, stream, chatList, changeDevice, handleUpdateStream, sendMessage } =
-    useOpenvidu(pathname.slice(1));
+  const {
+    subscribers,
+    participants,
+    publisher,
+    stream,
+    chatList,
+    screenPublisher,
+    changeDevice,
+    handleUpdateStream,
+    sendMessage,
+    shareScreen,
+    stopShareScreen,
+    leaveSession,
+  } = useOpenvidu(pathname.slice(1));
 
   const barRef = useRef<HTMLDivElement>(null);
 
@@ -62,11 +77,15 @@ export default function Meetting() {
     };
   }, [id, color, name, pathname]);
 
+  useEffect(() => {
+    handleToggleStatus('screen', Boolean(screenPublisher));
+  }, [screenPublisher]);
+
   return (
     <div className='relative flex h-screen w-screen flex-col overflow-hidden bg-[#202124]'>
-      <div className='flex flex-1 p-4' style={{ height: `calc(100vh - ${barRef.current?.clientHeight}px)` }}>
+      <div className='relative flex flex-1 p-4' style={{ height: `calc(100vh - ${barRef.current?.clientHeight}px)` }}>
         <div
-          className='grid flex-1 gap-4 border border-solid border-black'
+          className='relative grid size-full gap-4 border border-solid border-black'
           style={{
             gridTemplateColumns: `repeat(${Math.ceil(Math.sqrt(subscribers.length + 1))}, 1fr)`,
           }}
@@ -96,7 +115,14 @@ export default function Meetting() {
         <Toggle />
         <div className='relative grid shrink-0 grid-cols-[1fr_auto_1fr] items-center bg-[#212121] p-4'>
           <MeetInfoBar />
-          <ControlBar changeDevice={changeDevice} stream={stream} handleUpdateStream={handleUpdateStream} />
+          <ControlBar
+            changeDevice={changeDevice}
+            stream={stream}
+            handleUpdateStream={handleUpdateStream}
+            handleScreenShare={shareScreen}
+            handleStopScreenShare={stopShareScreen}
+            handleLeavSession={leaveSession}
+          />
           <InfoBar />
         </div>
       </div>

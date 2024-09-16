@@ -12,6 +12,9 @@ interface ControlBarProps {
   stream: MediaStream | null;
   changeDevice: (type: 'audio' | 'video', value: boolean | string) => Promise<MediaStream | undefined>;
   handleUpdateStream: () => void;
+  handleScreenShare: () => void;
+  handleStopScreenShare: () => void;
+  handleLeavSession: () => void;
 }
 
 interface ControlButtonType {
@@ -19,39 +22,55 @@ interface ControlButtonType {
   type: ToggleType;
   icon: ReactNode;
   clickedIcon: ReactNode;
+  onClick?: (value: boolean) => void;
 }
 
 const CONTROL_BUTTON_OFF_PROPS = { width: 24, height: 24, fill: '#06306D' };
 const CONTROL_BUTTON_ON_PROPS = { width: 24, height: 24, fill: '#E3E3E3' };
+export default function ControlBar({
+  stream,
+  changeDevice,
+  handleUpdateStream,
+  handleScreenShare,
+  handleStopScreenShare,
+  handleLeavSession,
+}: ControlBarProps) {
+  const handleScreenShareButtonClick = (value: boolean) => {
+    if (value) {
+      handleScreenShare();
+      return;
+    }
+    handleStopScreenShare();
+  };
 
-const CONTROL_BUTTON: ControlButtonType[] = [
-  {
-    name: '자막 사용(c)',
-    type: 'caption',
-    icon: <Icon.Cc {...CONTROL_BUTTON_OFF_PROPS} />,
-    clickedIcon: <Icon.Cc {...CONTROL_BUTTON_ON_PROPS} />,
-  },
-  {
-    name: '반응 보내기',
-    type: 'emoji',
-    icon: <Icon.EmojiOff {...CONTROL_BUTTON_OFF_PROPS} />,
-    clickedIcon: <Icon.EmojiOn {...CONTROL_BUTTON_ON_PROPS} />,
-  },
-  {
-    name: '발표 시작',
-    type: 'screen',
-    icon: <Icon.ScreenShare {...CONTROL_BUTTON_OFF_PROPS} />,
-    clickedIcon: <Icon.ScreenShare {...CONTROL_BUTTON_ON_PROPS} />,
-  },
-  {
-    name: '손들기(ctrl + alt + h)',
-    type: 'handsUp',
-    icon: <Icon.HandOff {...CONTROL_BUTTON_OFF_PROPS} />,
-    clickedIcon: <Icon.HandOn {...CONTROL_BUTTON_ON_PROPS} />,
-  },
-];
+  const CONTROL_BUTTON: ControlButtonType[] = [
+    {
+      name: '자막 사용(c)',
+      type: 'caption',
+      icon: <Icon.Cc {...CONTROL_BUTTON_OFF_PROPS} />,
+      clickedIcon: <Icon.Cc {...CONTROL_BUTTON_ON_PROPS} />,
+    },
+    {
+      name: '반응 보내기',
+      type: 'emoji',
+      icon: <Icon.EmojiOff {...CONTROL_BUTTON_OFF_PROPS} />,
+      clickedIcon: <Icon.EmojiOn {...CONTROL_BUTTON_ON_PROPS} />,
+    },
+    {
+      name: '발표 시작',
+      type: 'screen',
+      icon: <Icon.ScreenShare {...CONTROL_BUTTON_OFF_PROPS} />,
+      clickedIcon: <Icon.ScreenShare {...CONTROL_BUTTON_ON_PROPS} />,
+      onClick: handleScreenShareButtonClick,
+    },
+    {
+      name: '손들기(ctrl + alt + h)',
+      type: 'handsUp',
+      icon: <Icon.HandOff {...CONTROL_BUTTON_OFF_PROPS} />,
+      clickedIcon: <Icon.HandOn {...CONTROL_BUTTON_ON_PROPS} />,
+    },
+  ];
 
-export default function ControlBar({ stream, changeDevice, handleUpdateStream }: ControlBarProps) {
   const [isOpenModal, setIsOpenModal] = useState(false);
   const { permission } = useDeviceStore(
     useShallow((state) => ({
@@ -118,7 +137,7 @@ export default function ControlBar({ stream, changeDevice, handleUpdateStream }:
         <ControlButton key={button.type} {...button} />
       ))}
       <MenuButton />
-      <CallEndButton />
+      <CallEndButton onClick={handleLeavSession} />
       <PermissionModal
         isOpenModal={isOpenModal}
         status='success'

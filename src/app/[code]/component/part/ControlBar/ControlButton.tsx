@@ -10,13 +10,17 @@ interface ControlButtonProps {
   clickedIcon: ReactNode;
   name: string;
   type: ToggleType;
+  onClick?: (value: boolean) => void;
 }
 
-export default function ControlButton({ icon, clickedIcon, name, type }: ControlButtonProps) {
+export default function ControlButton({ icon, clickedIcon, name, type, onClick }: ControlButtonProps) {
   const { toggleStatus, handleToggleStatus } = useContext(ToggleContext);
   const isClickedButton = toggleStatus[type];
 
   const handleButtonClick = () => {
+    if (onClick) {
+      onClick(!isClickedButton);
+    }
     handleToggleStatus(type);
   };
 
