@@ -68,7 +68,7 @@ export default function ControlBar({
       type: 'screen',
       icon: <Icon.ScreenShare {...CONTROL_BUTTON_OFF_PROPS} />,
       clickedIcon: <Icon.ScreenShare {...CONTROL_BUTTON_ON_PROPS} />,
-      disabledIcon: <Icon.ScreenShare {...{ ...CONTROL_BUTTON_OFF_PROPS, fill: '##AFB5C4' }} />,
+      disabledIcon: <Icon.ScreenShare {...{ ...CONTROL_BUTTON_OFF_PROPS, fill: '#AFB5C4' }} />,
       onClick: handleScreenShareButtonClick,
     },
     {

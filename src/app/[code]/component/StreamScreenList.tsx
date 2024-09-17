@@ -3,7 +3,7 @@ import { useShallow } from 'zustand/react/shallow';
 
 import { useDeviceStore } from '@/store/DeviceStore';
 import { useUserInfoStore } from '@/store/UserInfoStore';
-import { UserInfo } from '@/type/sessionType';
+import { EmojiInfo, UserInfo } from '@/type/sessionType';
 import { VideoStream, OtherAudioStream } from './part/Stream';
 
 interface StreamScreenListProps {
@@ -11,6 +11,7 @@ interface StreamScreenListProps {
   participants: Record<string, UserInfo>;
   publisher: Publisher | null;
   subscribers: [string, Subscriber][];
+  emojiList: EmojiInfo[];
 }
 
 export default function StreamScreenList({
@@ -18,6 +19,7 @@ export default function StreamScreenList({
   participants,
   publisher,
   subscribers,
+  emojiList,
 }: StreamScreenListProps) {
   const { id, name, color } = useUserInfoStore(
     useShallow((state) => ({
@@ -43,12 +45,18 @@ export default function StreamScreenList({
         <VideoStream
           user={{ id: screenPublisher[0], ...participants[screenPublisher[0]] }}
           subscriber={screenPublisher[1]}
+          emojiList={emojiList}
         />
       </div>
       <div className='grid h-full grid-rows-4 gap-4' style={{ width: 'min(25%, 208px)' }}>
         {publisher && <VideoStream user={{ id, name, color, ...deviceEnable }} subscriber={publisher} muted />}
         {currentSubscribers.map((entity) => (
-          <VideoStream key={entity[0]} user={{ id: entity[0], ...participants[entity[0]] }} subscriber={entity[1]} />
+          <VideoStream
+            key={entity[0]}
+            user={{ id: entity[0], ...participants[entity[0]] }}
+            subscriber={entity[1]}
+            emojiList={emojiList}
+          />
         ))}
         {isOverflow && (
           <OtherAudioStream

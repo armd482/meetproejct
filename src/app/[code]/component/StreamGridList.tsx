@@ -6,16 +6,17 @@ import { useShallow } from 'zustand/react/shallow';
 
 import { useUserInfoStore } from '@/store/UserInfoStore';
 import { useDeviceStore } from '@/store/DeviceStore';
-import { UserInfo } from '@/type/sessionType';
+import { UserInfo, EmojiInfo } from '@/type/sessionType';
 import { VideoStream, OtherAudioStream } from './part/Stream';
 
 interface StreamGridListProps {
   subscribers: [string, Subscriber][];
   publisher: Publisher | null;
   participants: Record<string, UserInfo>;
+  emojiList: EmojiInfo[];
 }
 
-export default function StreamGridList({ subscribers, publisher, participants }: StreamGridListProps) {
+export default function StreamGridList({ subscribers, publisher, participants, emojiList }: StreamGridListProps) {
   const [maxRow, setMaxRow] = useState(Math.floor((window.innerWidth - 400) / 166));
 
   const { id, name, color } = useUserInfoStore(
@@ -55,9 +56,16 @@ export default function StreamGridList({ subscribers, publisher, participants }:
         gridTemplateColumns: `repeat(${currentPageSubscribers.length === 0 ? '1' : currentPageSubscribers.length + 1 < maxRow ? currentPageSubscribers.length + 1 : maxRow}, 1fr)`,
       }}
     >
-      {publisher && <VideoStream user={{ id, name, color, ...deviceEnable }} subscriber={publisher} muted />}
+      {publisher && (
+        <VideoStream user={{ id, name, color, ...deviceEnable }} subscriber={publisher} muted emojiList={emojiList} />
+      )}
       {currentPageSubscribers.map((entity) => (
-        <VideoStream key={entity[0]} user={{ id: entity[0], ...participants[entity[0]] }} subscriber={entity[1]} />
+        <VideoStream
+          key={entity[0]}
+          user={{ id: entity[0], ...participants[entity[0]] }}
+          subscriber={entity[1]}
+          emojiList={emojiList}
+        />
       ))}
       {subscribers.length >= maxNum - 1 &&
         (otherSubscriber.length === 1 ? (

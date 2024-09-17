@@ -1,10 +1,14 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import Image, { StaticImageData } from 'next/image';
 import { Publisher, Subscriber } from 'openvidu-browser';
 import { Visualizer } from '@/component';
 import * as Icon from '@/asset/icon';
+import * as ImageSrc from '@/asset/image';
 import { useDeviceStore } from '@/store/DeviceStore';
+import { EmojiInfo } from '@/type/sessionType';
+import { EmojiType } from '@/type/toggleType';
 
 interface UserInfo extends Record<'id' | 'name' | 'color', string> {
   audio: boolean;
@@ -15,10 +19,24 @@ interface VideoStreamProps {
   user: UserInfo;
   subscriber: Subscriber | Publisher;
   muted?: boolean;
+  emojiList?: EmojiInfo[];
 }
 
-export default function VideoStream({ user, subscriber, muted = false }: VideoStreamProps) {
+const EMOJI_IMAGE: Record<EmojiType, StaticImageData> = {
+  clap: ImageSrc.clapEmoji,
+  curious: ImageSrc.curiousEmoji,
+  heart: ImageSrc.heartEmoji,
+  laughter: ImageSrc.laughterEmoji,
+  partyPoper: ImageSrc.partyPoperEmoji,
+  sad: ImageSrc.sadEmoji,
+  surprice: ImageSrc.surpriceEmoji,
+  thumbDown: ImageSrc.thumbDownEmoji,
+  thumbUp: ImageSrc.thumbUpEmoji,
+};
+
+export default function VideoStream({ user, subscriber, muted = false, emojiList }: VideoStreamProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [emojiIcon, setEmojiIcon] = useState<EmojiInfo | null>(null);
   const audioOutput = useDeviceStore((state) => state.audioOutput);
   const isScreen = subscriber.stream.typeOfVideo === 'SCREEN';
 
@@ -31,6 +49,14 @@ export default function VideoStream({ user, subscriber, muted = false }: VideoSt
       }
     }
   }, [subscriber, audioOutput, isScreen]);
+
+  useEffect(() => {
+    if (!emojiList) {
+      return;
+    }
+
+    setEmojiIcon(emojiList.findLast((emoji) => emoji.userId === user.id) ?? null);
+  }, [emojiList, user.id]);
 
   const stream = subscriber.stream.getMediaStream();
 
@@ -65,6 +91,11 @@ export default function VideoStream({ user, subscriber, muted = false }: VideoSt
         <div className='absolute bottom-2 left-2 z-30 w-full truncate font-googleSans text-sm text-white'>
           {user.name}
         </div>
+        {emojiIcon && (
+          <div className='absolute left-2 top-2 z-30 flex size-[26px] items-center justify-center rounded-full bg-[#34373A]'>
+            <Image alt={emojiIcon.emojiType} src={EMOJI_IMAGE[emojiIcon.emojiType]} width={16} height={16} />
+          </div>
+        )}
       </div>
     </div>
   );

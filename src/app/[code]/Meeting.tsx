@@ -9,7 +9,16 @@ import { useUserInfoStore } from '@/store/UserInfoStore';
 import { ToggleContext } from '@/context/ToggleContext';
 import { useOpenvidu } from '@/hook';
 import { deleteParticipant, postParticipant } from '../api/mongoAPI';
-import { ControlBar, InfoBar, Panel, Toggle, MeetInfoBar, StreamGridList, StreamScreenList } from './component';
+import {
+  ControlBar,
+  EmojiAnimation,
+  InfoBar,
+  Panel,
+  Toggle,
+  MeetInfoBar,
+  StreamGridList,
+  StreamScreenList,
+} from './component';
 
 export default function Meetting() {
   const pathname = usePathname();
@@ -37,14 +46,18 @@ export default function Meetting() {
     chatList,
     screenPublisher,
     isMyScreenShare,
+    emojiList,
     changeDevice,
     handleUpdateStream,
     sendMessage,
     shareScreen,
     stopShareScreen,
     leaveSession,
+    sendEmoji,
+    deleteEmoji,
   } = useOpenvidu(pathname.slice(1));
 
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
 
   const userList = subscribers.map((entity) => {
@@ -89,17 +102,32 @@ export default function Meetting() {
   return (
     <div className='relative flex h-screen w-screen flex-col overflow-hidden bg-[#202124]'>
       <div className='relative flex flex-1 p-4' style={{ height: `calc(100vh - ${barRef.current?.clientHeight}px)` }}>
-        {screenPublisher ? (
-          <StreamScreenList
-            screenPublisher={screenPublisher}
-            participants={participants}
-            subscribers={subscribers}
-            publisher={publisher}
-          />
-        ) : (
-          <StreamGridList subscribers={subscribers} publisher={publisher} participants={participants} />
-        )}
-
+        <div ref={wrapperRef} className='relative flex-1 overflow-hidden'>
+          {screenPublisher ? (
+            <StreamScreenList
+              screenPublisher={screenPublisher}
+              participants={participants}
+              subscribers={subscribers}
+              publisher={publisher}
+              emojiList={emojiList}
+            />
+          ) : (
+            <StreamGridList
+              subscribers={subscribers}
+              publisher={publisher}
+              participants={participants}
+              emojiList={emojiList}
+            />
+          )}
+          {emojiList.map((emoji) => (
+            <EmojiAnimation
+              key={emoji.id}
+              emoji={emoji}
+              maxWidth={wrapperRef.current?.clientWidth ?? 0}
+              deleteEmoji={deleteEmoji}
+            />
+          ))}
+        </div>
         <Panel
           userList={[
             {
@@ -117,7 +145,7 @@ export default function Meetting() {
         />
       </div>
       <div ref={barRef} className='relative w-full shrink-0 bg-[#202124] font-googleSans text-base text-white'>
-        <Toggle />
+        <Toggle onClickEmojiButton={sendEmoji} />
         <div className='relative grid shrink-0 grid-cols-[1fr_auto_1fr] items-center bg-[#212121] p-4'>
           <MeetInfoBar />
           <ControlBar

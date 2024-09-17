@@ -46,10 +46,30 @@ const config: Config = {
             transform: 'scaleX(0)',
           },
         },
+        'move-bottom-up': {
+          '0%': {
+            transform: 'translateY(100%)',
+            opacity: '1',
+          },
+
+          '70%': {
+            transform: 'translateY(-355%)',
+            opacity: '1',
+          },
+          '80%': {
+            transform: 'translateY(-420%)',
+            opacity: '0.8',
+          },
+          '100%': {
+            transform: 'translateY(-520%)',
+            opacity: '0',
+          },
+        },
       },
       animation: {
         'slide-in-left': 'slide-in-left 0.3s ease forwards',
         'slide-out-left': 'slide-out-left 0.3s ease forwards',
+        'move-bottom-up': 'move-bottom-up 3s linear forwards',
       },
       transformOrigin: {
         'top-right': '100% 0%',

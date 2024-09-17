@@ -14,10 +14,11 @@ import { postToken } from '@/app/api/sessionAPI';
 import { useDeviceStore } from '@/store/DeviceStore';
 import { useRouter } from 'next/navigation';
 import { getDevicePermission } from '@/lib/getDevicePermission';
-import { ChatInfo, UserInfo } from '@/type/sessionType';
+import { ChatInfo, EmojiInfo, UserInfo } from '@/type/sessionType';
 import { getBase60 } from '@/lib/getRandomId';
 import { timeDifferenceInMinutes } from '@/lib/getTimeDiff';
 import { useUserInfoStore } from '@/store/UserInfoStore';
+import { EmojiType } from '@/type/toggleType';
 import useDevice from './useDevice';
 
 const UNPUBLISH = new Set(['unpublish', 'forceUnpublishByUser', 'forceUnpublishByServer']);
@@ -36,6 +37,7 @@ const useOpenvidu = (sessionId: string) => {
   const [screenSession, setScreenSession] = useState<OVSession | null>(null);
   const [screenPublisher, setScreenPublisher] = useState<[string, Publisher | Subscriber] | null>(null);
   const [isMyScreenShare, setIsMyScreenShare] = useState<boolean>(false);
+  const [emojiList, setEmojiList] = useState<EmojiInfo[]>([]);
 
   const { id, name, color, setId } = useUserInfoStore(
     useShallow((state) => ({
@@ -276,6 +278,28 @@ const useOpenvidu = (sessionId: string) => {
     newScreenPublisher.once('accessDenied', stopShareScreen);
   }, [color, name, sessionId, stopShareScreen]);
 
+  const sendEmoji = useCallback(
+    (emojiType: EmojiType) => {
+      if (!session) {
+        return;
+      }
+      session.signal({
+        type: 'emoji',
+        data: JSON.stringify({
+          id: `${id}-${getBase60(new Date().getTime())}-emoji`,
+          userName: name,
+          userId: id,
+          emojiType,
+        }),
+      });
+    },
+    [id, name, session],
+  );
+
+  const deleteEmoji = useCallback((emojiId: string) => {
+    setEmojiList((prev) => prev.filter((emoji) => emoji.id !== emojiId));
+  }, []);
+
   useEffect(() => {
     window.addEventListener('beforeunload', leaveSession);
     return () => {
@@ -417,16 +441,27 @@ const useOpenvidu = (sessionId: string) => {
       }
     };
 
+    const handleEmojiRecive = (e: SignalEvent) => {
+      const { data } = e;
+      if (!data) {
+        return;
+      }
+      const newEmoji = JSON.parse(data) as Omit<EmojiInfo, 'date'>;
+      setEmojiList((prev) => [...prev, { ...newEmoji, date: new Date() }]);
+    };
+
     session.on('streamCreated', handleCreateStream);
     session.on('streamDestroyed', handleDestroyStream);
     session.on('streamPropertyChanged', handleStreamPropertyChanged);
     session.on('signal:chat', handleMessageRecive);
+    session.on('signal:emoji', handleEmojiRecive);
 
     return () => {
       session.off('streamCreated', handleCreateStream);
       session.off('streamDestroyed', handleDestroyStream);
       session.off('streamPropertyChanged', handleStreamPropertyChanged);
       session.off('signal:chat', handleMessageRecive);
+      session.off('signal:emoji', handleEmojiRecive);
     };
   }, [session, id, screenPublisher]);
 
@@ -440,12 +475,15 @@ const useOpenvidu = (sessionId: string) => {
     chatList,
     screenPublisher,
     isMyScreenShare,
+    emojiList,
     leaveSession,
     changeDevice,
     handleUpdateStream,
     sendMessage,
     shareScreen,
     stopShareScreen,
+    sendEmoji,
+    deleteEmoji,
   };
 };
 
