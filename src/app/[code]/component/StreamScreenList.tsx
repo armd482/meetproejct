@@ -12,6 +12,7 @@ interface StreamScreenListProps {
   publisher: Publisher | null;
   subscribers: [string, Subscriber][];
   emojiList: EmojiInfo[];
+  handsUpList: Record<string, boolean>;
 }
 
 export default function StreamScreenList({
@@ -20,6 +21,7 @@ export default function StreamScreenList({
   publisher,
   subscribers,
   emojiList,
+  handsUpList,
 }: StreamScreenListProps) {
   const { id, name, color } = useUserInfoStore(
     useShallow((state) => ({
@@ -46,6 +48,7 @@ export default function StreamScreenList({
           user={{ id: screenPublisher[0], ...participants[screenPublisher[0]] }}
           subscriber={screenPublisher[1]}
           emojiList={emojiList}
+          handsUpList={handsUpList}
         />
       </div>
       <div className='grid h-full grid-rows-4 gap-4' style={{ width: 'min(25%, 208px)' }}>
@@ -56,6 +59,7 @@ export default function StreamScreenList({
             user={{ id: entity[0], ...participants[entity[0]] }}
             subscriber={entity[1]}
             emojiList={emojiList}
+            handsUpList={handsUpList}
           />
         ))}
         {isOverflow && (

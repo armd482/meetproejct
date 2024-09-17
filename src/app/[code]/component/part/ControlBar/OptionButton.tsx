@@ -12,7 +12,7 @@ import DeviceList from './DeviceList';
 interface OptionButtonProps {
   type: 'audio' | 'video';
   onClickButton?: (type: 'audio' | 'video') => void;
-  onClickChevron: (isClicked: boolean) => void;
+  onClickChevron?: (isClicked: boolean) => void;
   isVisibleOption?: boolean;
   clickedIcon: ReactNode;
   icon: ReactNode;
@@ -65,7 +65,9 @@ export default function OptionButton({
 
   const handleChevronClick = () => {
     setIsClickedChevron((prev) => {
-      onClickChevron(!prev);
+      if (onClickChevron) {
+        onClickChevron(!prev);
+      }
       return !prev;
     });
   };

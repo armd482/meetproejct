@@ -14,6 +14,7 @@ export { default as EmojiOff } from './emojiOff.svg';
 export { default as EmojiOn } from './emojiOn.svg';
 export { default as HandOff } from './handOff.svg';
 export { default as HandOn } from './handOn.svg';
+export { default as HandsUp } from './handsUp.svg';
 export { default as Help } from './help.svg';
 export { default as HostCtrlOff } from './hostCtrlOff.svg';
 export { default as HostCtrlOn } from './hostCtrlOn.svg';

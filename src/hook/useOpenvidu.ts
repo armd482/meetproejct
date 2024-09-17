@@ -38,6 +38,8 @@ const useOpenvidu = (sessionId: string) => {
   const [screenPublisher, setScreenPublisher] = useState<[string, Publisher | Subscriber] | null>(null);
   const [isMyScreenShare, setIsMyScreenShare] = useState<boolean>(false);
   const [emojiList, setEmojiList] = useState<EmojiInfo[]>([]);
+  const [handsUpList, setHandsUpList] = useState<Record<string, boolean>>({});
+  const [isRaiseHand, setIsRaiseHand] = useState<boolean>(false);
 
   const { id, name, color, setId } = useUserInfoStore(
     useShallow((state) => ({
@@ -278,6 +280,24 @@ const useOpenvidu = (sessionId: string) => {
     newScreenPublisher.once('accessDenied', stopShareScreen);
   }, [color, name, sessionId, stopShareScreen]);
 
+  const sendHandsUp = useCallback(
+    (value: boolean) => {
+      if (!session) {
+        return;
+      }
+
+      setIsRaiseHand(value);
+      session.signal({
+        type: 'handsUp',
+        data: JSON.stringify({
+          userId: id,
+          value,
+        }),
+      });
+    },
+    [id, session],
+  );
+
   const sendEmoji = useCallback(
     (emojiType: EmojiType) => {
       if (!session) {
@@ -331,8 +351,16 @@ const useOpenvidu = (sessionId: string) => {
     const handleCreateStream = (e: StreamEvent) => {
       const { connectionId, data } = e.stream.connection;
 
-      if (connectionId === id) {
+      if (!session || connectionId === id) {
         return;
+      }
+
+      if (isRaiseHand) {
+        session.signal({
+          type: 'raiseHandUpdate',
+          data: JSON.stringify({ id }),
+          to: [e.stream.connection],
+        });
       }
 
       if (e.stream.typeOfVideo === 'SCREEN') {
@@ -450,11 +478,38 @@ const useOpenvidu = (sessionId: string) => {
       setEmojiList((prev) => [...prev, { ...newEmoji, date: new Date() }]);
     };
 
+    const handleHandsUpRecive = (e: SignalEvent) => {
+      const { data } = e;
+      if (!data) {
+        return;
+      }
+      const handsUpStatus = JSON.parse(data) as { userId: string; value: boolean };
+      setHandsUpList((prev) => {
+        if (handsUpStatus.value) {
+          return { ...prev, [handsUpStatus.userId]: handsUpStatus.value };
+        }
+        const prevData = { ...prev };
+        delete prevData[handsUpStatus.userId];
+        return prevData;
+      });
+    };
+
+    const handleHandsUpUpdateRecive = (e: SignalEvent) => {
+      const { data } = e;
+      if (!data) {
+        return;
+      }
+      const updateData = JSON.parse(data) as { id: string };
+      setHandsUpList((prev) => ({ ...prev, [updateData.id]: true }));
+    };
+
     session.on('streamCreated', handleCreateStream);
     session.on('streamDestroyed', handleDestroyStream);
     session.on('streamPropertyChanged', handleStreamPropertyChanged);
     session.on('signal:chat', handleMessageRecive);
     session.on('signal:emoji', handleEmojiRecive);
+    session.on('signal:handsUp', handleHandsUpRecive);
+    session.on('signal:raiseHandUpdate', handleHandsUpUpdateRecive);
 
     return () => {
       session.off('streamCreated', handleCreateStream);
@@ -462,8 +517,10 @@ const useOpenvidu = (sessionId: string) => {
       session.off('streamPropertyChanged', handleStreamPropertyChanged);
       session.off('signal:chat', handleMessageRecive);
       session.off('signal:emoji', handleEmojiRecive);
+      session.off('signal:handsUp', handleHandsUpRecive);
+      session.off('signal:raiseHandUpdate', handleHandsUpUpdateRecive);
     };
-  }, [session, id, screenPublisher]);
+  }, [session, id, screenPublisher, isRaiseHand]);
 
   return {
     publisher,
@@ -476,6 +533,7 @@ const useOpenvidu = (sessionId: string) => {
     screenPublisher,
     isMyScreenShare,
     emojiList,
+    handsUpList,
     leaveSession,
     changeDevice,
     handleUpdateStream,
@@ -484,6 +542,7 @@ const useOpenvidu = (sessionId: string) => {
     stopShareScreen,
     sendEmoji,
     deleteEmoji,
+    sendHandsUp,
   };
 };
 

@@ -16,6 +16,7 @@ interface ControlBarProps {
   handleScreenShare: () => void;
   handleStopScreenShare: () => void;
   handleLeavSession: () => void;
+  handleHandsUp: (value: boolean) => void;
 }
 
 interface ControlButtonType {
@@ -36,6 +37,7 @@ export default function ControlBar({
   handleScreenShare,
   handleStopScreenShare,
   handleLeavSession,
+  handleHandsUp,
 }: ControlBarProps) {
   const [isOpenAlert, setIsOpenAlert] = useState(false);
   const handleScreenShareButtonClick = (value: boolean | 'disable') => {
@@ -50,13 +52,20 @@ export default function ControlBar({
     handleStopScreenShare();
   };
 
+  const handleHandsUpButtonClick = (value: boolean | 'disable') => {
+    if (value === 'disable') {
+      return;
+    }
+    handleHandsUp(value);
+  };
+
   const CONTROL_BUTTON: ControlButtonType[] = [
-    {
+    /* {
       name: '자막 사용(c)',
       type: 'caption',
       icon: <Icon.Cc {...CONTROL_BUTTON_OFF_PROPS} />,
       clickedIcon: <Icon.Cc {...CONTROL_BUTTON_ON_PROPS} />,
-    },
+    }, */
     {
       name: '반응 보내기',
       type: 'emoji',
@@ -76,6 +85,7 @@ export default function ControlBar({
       type: 'handsUp',
       icon: <Icon.HandOff {...CONTROL_BUTTON_OFF_PROPS} />,
       clickedIcon: <Icon.HandOn {...CONTROL_BUTTON_ON_PROPS} />,
+      onClick: handleHandsUpButtonClick,
     },
   ];
   const [isOpenModal, setIsOpenModal] = useState(false);
@@ -86,22 +96,6 @@ export default function ControlBar({
       videoInput: state.videoInput,
     })),
   );
-
-  const handleMicChevronClick = (isClicked: boolean) => {
-    if (isClicked) {
-      console.log('Clicked');
-      return;
-    }
-    console.log('canceled');
-  };
-
-  const handleVideoChevronClick = (isClicked: boolean) => {
-    if (isClicked) {
-      console.log('Clicked');
-      return;
-    }
-    console.log('canceled');
-  };
 
   const handleModalClose = () => {
     setIsOpenModal(false);
@@ -126,7 +120,6 @@ export default function ControlBar({
       <OptionButton
         type='audio'
         onClickButton={handleButtonClick}
-        onClickChevron={handleMicChevronClick}
         icon={<Icon.MicOn width={20} height={20} fill='#E3E3E3' />}
         clickedIcon={<Icon.MicOff width={20} height={20} fill='#5F1312' />}
         name={{ chevron: '오디오 설정', icon: '마이크 끄기(ctrl + d)' }}
@@ -137,7 +130,6 @@ export default function ControlBar({
       <OptionButton
         type='video'
         onClickButton={handleButtonClick}
-        onClickChevron={handleVideoChevronClick}
         icon={<Icon.VideoOn width={26} height={26} fill='#E3E3E3' />}
         clickedIcon={<Icon.VideoOff width={24} height={24} fill='#5F1312' />}
         name={{ chevron: '영상 설정', icon: '마이크 끄기(ctrl + d)' }}

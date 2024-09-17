@@ -47,6 +47,7 @@ export default function Meetting() {
     screenPublisher,
     isMyScreenShare,
     emojiList,
+    handsUpList,
     changeDevice,
     handleUpdateStream,
     sendMessage,
@@ -55,6 +56,7 @@ export default function Meetting() {
     leaveSession,
     sendEmoji,
     deleteEmoji,
+    sendHandsUp,
   } = useOpenvidu(pathname.slice(1));
 
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -110,6 +112,7 @@ export default function Meetting() {
               subscribers={subscribers}
               publisher={publisher}
               emojiList={emojiList}
+              handsUpList={handsUpList}
             />
           ) : (
             <StreamGridList
@@ -117,6 +120,7 @@ export default function Meetting() {
               publisher={publisher}
               participants={participants}
               emojiList={emojiList}
+              handsUpList={handsUpList}
             />
           )}
           {emojiList.map((emoji) => (
@@ -155,6 +159,7 @@ export default function Meetting() {
             handleScreenShare={shareScreen}
             handleStopScreenShare={stopShareScreen}
             handleLeavSession={leaveSession}
+            handleHandsUp={sendHandsUp}
           />
           <InfoBar />
         </div>

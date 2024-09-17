@@ -14,9 +14,16 @@ interface StreamGridListProps {
   publisher: Publisher | null;
   participants: Record<string, UserInfo>;
   emojiList: EmojiInfo[];
+  handsUpList: Record<string, boolean>;
 }
 
-export default function StreamGridList({ subscribers, publisher, participants, emojiList }: StreamGridListProps) {
+export default function StreamGridList({
+  subscribers,
+  publisher,
+  participants,
+  emojiList,
+  handsUpList,
+}: StreamGridListProps) {
   const [maxRow, setMaxRow] = useState(Math.floor((window.innerWidth - 400) / 166));
 
   const { id, name, color } = useUserInfoStore(
@@ -57,7 +64,13 @@ export default function StreamGridList({ subscribers, publisher, participants, e
       }}
     >
       {publisher && (
-        <VideoStream user={{ id, name, color, ...deviceEnable }} subscriber={publisher} muted emojiList={emojiList} />
+        <VideoStream
+          user={{ id, name, color, ...deviceEnable }}
+          subscriber={publisher}
+          muted
+          emojiList={emojiList}
+          handsUpList={handsUpList}
+        />
       )}
       {currentPageSubscribers.map((entity) => (
         <VideoStream
@@ -65,6 +78,7 @@ export default function StreamGridList({ subscribers, publisher, participants, e
           user={{ id: entity[0], ...participants[entity[0]] }}
           subscriber={entity[1]}
           emojiList={emojiList}
+          handsUpList={handsUpList}
         />
       ))}
       {subscribers.length >= maxNum - 1 &&

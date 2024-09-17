@@ -20,6 +20,7 @@ interface VideoStreamProps {
   subscriber: Subscriber | Publisher;
   muted?: boolean;
   emojiList?: EmojiInfo[];
+  handsUpList?: Record<string, boolean>;
 }
 
 const EMOJI_IMAGE: Record<EmojiType, StaticImageData> = {
@@ -34,7 +35,7 @@ const EMOJI_IMAGE: Record<EmojiType, StaticImageData> = {
   thumbUp: ImageSrc.thumbUpEmoji,
 };
 
-export default function VideoStream({ user, subscriber, muted = false, emojiList }: VideoStreamProps) {
+export default function VideoStream({ user, subscriber, muted = false, emojiList, handsUpList }: VideoStreamProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [emojiIcon, setEmojiIcon] = useState<EmojiInfo | null>(null);
   const audioOutput = useDeviceStore((state) => state.audioOutput);
@@ -59,6 +60,7 @@ export default function VideoStream({ user, subscriber, muted = false, emojiList
   }, [emojiList, user.id]);
 
   const stream = subscriber.stream.getMediaStream();
+  console.log(handsUpList);
 
   return (
     <div className='relative flex size-full items-center'>
@@ -88,12 +90,21 @@ export default function VideoStream({ user, subscriber, muted = false, emojiList
             </div>
           )}
         </div>
-        <div className='absolute bottom-2 left-2 z-30 w-full truncate font-googleSans text-sm text-white'>
-          {user.name}
-        </div>
+
         {emojiIcon && (
           <div className='absolute left-2 top-2 z-30 flex size-[26px] items-center justify-center rounded-full bg-[#34373A]'>
             <Image alt={emojiIcon.emojiType} src={EMOJI_IMAGE[emojiIcon.emojiType]} width={16} height={16} />
+          </div>
+        )}
+
+        {handsUpList && handsUpList[user.id] ? (
+          <div className='absolute bottom-2 left-2 z-30 flex h-6 max-w-full items-center justify-center gap-2 rounded-full bg-white pl-2 pr-3 font-googleSans text-sm text-[#202124]'>
+            <Icon.HandsUp width={14} height={14} fill='#202124' />
+            <p className='truncate'>{user.name}</p>
+          </div>
+        ) : (
+          <div className='absolute bottom-2 left-2 z-30 w-full truncate font-googleSans text-sm text-white'>
+            {user.name}
           </div>
         )}
       </div>
