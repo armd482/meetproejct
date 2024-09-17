@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import {
   OpenVidu,
@@ -11,6 +11,7 @@ import {
   Subscriber,
 } from 'openvidu-browser';
 import { postToken } from '@/app/api/sessionAPI';
+import { deleteSessionId, deleteParticipant } from '@/app/api/mongoAPI';
 import { useDeviceStore } from '@/store/DeviceStore';
 import { useRouter } from 'next/navigation';
 import { getDevicePermission } from '@/lib/getDevicePermission';
@@ -26,6 +27,7 @@ const UNPUBLISH = new Set(['unpublish', 'forceUnpublishByUser', 'forceUnpublishB
 const useOpenvidu = (sessionId: string) => {
   const router = useRouter();
 
+  const isOnlyRef = useRef<boolean | null>(null);
   const [isInitial, setIsInitial] = useState(true);
 
   const [session, setSession] = useState<OVSession | null>(null);
@@ -64,7 +66,7 @@ const useOpenvidu = (sessionId: string) => {
 
   const { stream, handleUpdateStream } = useDevice();
 
-  const leaveSession = useCallback(() => {
+  const leaveSession = useCallback(async () => {
     if (session) {
       session.connection.stream
         ?.getMediaStream()
@@ -103,7 +105,8 @@ const useOpenvidu = (sessionId: string) => {
     setPublisher(null);
     setSubscribers([]);
     setScreenSession(null);
-  }, [session, publisher, stream, screenSession, screenPublisher]);
+    await deleteParticipant(sessionId, id);
+  }, [session, publisher, stream, screenSession, screenPublisher, sessionId, id]);
 
   const publishVideo = useCallback(
     async (newOV: OpenVidu, newSession: OVSession) => {
@@ -343,6 +346,21 @@ const useOpenvidu = (sessionId: string) => {
 
     initialJoinSession();
   }, [joinSession, isInitial, permission, setPermission, setDeviceEnable]);
+
+  useEffect(() => {
+    isOnlyRef.current = subscribers.length === 0;
+  }, [subscribers]);
+
+  useEffect(() => {
+    return () => {
+      const deleteSession = async () => {
+        if (session && isOnlyRef.current) {
+          await deleteSessionId(sessionId);
+        }
+      };
+      deleteSession();
+    };
+  }, [session, sessionId]);
 
   useEffect(() => {
     if (!session) {

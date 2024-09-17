@@ -60,8 +60,6 @@ export default function VideoStream({ user, subscriber, muted = false, emojiList
   }, [emojiList, user.id]);
 
   const stream = subscriber.stream.getMediaStream();
-  console.log(handsUpList);
-
   return (
     <div className='relative flex size-full items-center'>
       <div className=' relative flex size-full items-center justify-center overflow-hidden rounded-lg bg-[#3C4043]'>

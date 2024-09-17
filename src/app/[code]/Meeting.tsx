@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useContext } from 'react';
+import { useEffect, useRef, useContext, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useShallow } from 'zustand/react/shallow';
 
@@ -8,7 +8,7 @@ import { useDeviceStore } from '@/store/DeviceStore';
 import { useUserInfoStore } from '@/store/UserInfoStore';
 import { ToggleContext } from '@/context/ToggleContext';
 import { useOpenvidu } from '@/hook';
-import { deleteParticipant, postParticipant } from '../api/mongoAPI';
+import { postParticipant } from '../api/mongoAPI';
 import {
   ControlBar,
   EmojiAnimation,
@@ -61,6 +61,7 @@ export default function Meetting() {
 
   const wrapperRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
+  const [isInitial, setIsInitial] = useState(true);
 
   const userList = subscribers.map((entity) => {
     const { name: userName, color: userColor, audio, video } = participants[entity[0]];
@@ -76,22 +77,14 @@ export default function Meetting() {
 
   useEffect(() => {
     const registParticipant = async () => {
-      if (id && name && color) {
+      if (id && name && color && pathname && isInitial) {
+        setIsInitial(false);
         await postParticipant(pathname.slice(1), id, name, color);
       }
     };
 
-    const deleteDB = async () => {
-      if (id) {
-        await deleteParticipant(pathname.slice(1), id);
-      }
-    };
-
     registParticipant();
-    return () => {
-      deleteDB();
-    };
-  }, [id, color, name, pathname]);
+  }, [id, color, name, pathname, isInitial]);
 
   useEffect(() => {
     if (!isMyScreenShare && screenPublisher) {
