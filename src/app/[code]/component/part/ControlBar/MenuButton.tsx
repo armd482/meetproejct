@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import * as Icon from '@/asset/icon';
 import { ButtonTag } from '@/component';
 import MenuCard from './MenuCard';
@@ -8,9 +8,60 @@ import MenuCard from './MenuCard';
 export default function MenuButton() {
   const [isClickedButton, setIsClickedButton] = useState(false);
 
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+
+  const checkFullscreen = () => {
+    console.log(document.fullscreenElement);
+    return document.fullscreenElement !== null;
+  };
+
+  const enterFullscreen = () => {
+    const elem = document.documentElement;
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen();
+    }
+  };
+
+  const exitFullscreen = () => {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    }
+  };
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(Boolean(checkFullscreen()));
+      console.log(checkFullscreen());
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('msfullscreenchange', handleFullscreenChange);
+
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('msfullscreenchange', handleFullscreenChange);
+    };
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (isFullscreen) {
+      exitFullscreen();
+    } else {
+      enterFullscreen();
+    }
+    setIsClickedButton((prev) => !prev);
+  };
+
   const handleButtonClick = () => {
     setIsClickedButton((prev) => !prev);
   };
+
+  console.log(isFullscreen);
+
   return (
     <div className='relative'>
       <ButtonTag name='옵션 더보기'>
@@ -23,11 +74,18 @@ export default function MenuButton() {
         </button>
       </ButtonTag>
       {isClickedButton && (
-        <div className='absolute -top-4 left-0 h-52 w-[324px] -translate-y-full rounded-xl bg-[#1E1F20] py-2'>
-          <MenuCard icon={<Icon.FullScreen width={24} height={24} fill='#C4C7C5' />} name='전체화면' />
-          <MenuCard icon={<Icon.FullScreen width={24} height={24} fill='#C4C7C5' />} name='전체화면' />
-          <MenuCard icon={<Icon.FullScreen width={24} height={24} fill='#C4C7C5' />} name='전체화면' />
-          <MenuCard icon={<Icon.FullScreen width={24} height={24} fill='#C4C7C5' />} name='전체화면' />
+        <div className='absolute -top-4 left-0 w-[324px] -translate-y-full rounded-xl bg-[#1E1F20] py-2'>
+          <MenuCard
+            icon={
+              isFullscreen ? (
+                <Icon.FullScreenOff width={24} height={24} fill='#C4C7C5' />
+              ) : (
+                <Icon.FullScreen width={24} height={24} fill='#C4C7C5' />
+              )
+            }
+            onClick={toggleFullscreen}
+            name={isFullscreen ? '전체화면 종료' : '전체화면'}
+          />
         </div>
       )}
     </div>
