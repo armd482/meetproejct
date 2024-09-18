@@ -1,9 +1,8 @@
 import { useDeviceStore } from '@/store/DeviceStore';
-import { StreamStatusType } from '@/type/streamType';
 import { useCallback, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
-const useCheckPermission = (updateStreamStatus: (value: StreamStatusType) => void) => {
+const useCheckPermission = () => {
   const [isSupportedPermission, setIsSupportedPermission] = useState<null | boolean>(null);
   const { setPermission, setDeviceEnable } = useDeviceStore(
     useShallow((state) => ({
@@ -34,6 +33,7 @@ const useCheckPermission = (updateStreamStatus: (value: StreamStatusType) => voi
       const newPermission = {
         audio: Boolean(audioPermission.state === 'granted'),
         video: Boolean(videoPermission.state === 'granted'),
+        isFailed: false,
       };
       setPermission(newPermission);
       return newPermission;
@@ -76,11 +76,10 @@ const useCheckPermission = (updateStreamStatus: (value: StreamStatusType) => voi
         if (e.name === 'NotAllowedError') {
           return false;
         }
-        updateStreamStatus('failed');
-        return false;
+        return 'failed';
       }
     },
-    [updateStreamStatus, setDeviceEnable, setPermission],
+    [setDeviceEnable, setPermission],
   );
 
   const updatePermission = useCallback(
@@ -95,27 +94,41 @@ const useCheckPermission = (updateStreamStatus: (value: StreamStatusType) => voi
         }
       }
 
-      if (await checkPermission(true, true)) {
-        checkPermissionQuery();
-        return { audio: true, video: true };
+      let isFailed = false;
+
+      const ATVT = await checkPermission(true, true);
+
+      if (ATVT) {
+        if (ATVT !== 'failed') {
+          setPermission({ audio: true, video: true });
+          return { audio: true, video: true, isFailed };
+        }
+        isFailed = true;
       }
 
-      if (await checkPermission(true, false)) {
-        checkPermissionQuery();
-        return { audio: true, video: false };
+      const ATVF = await checkPermission(true, false);
+
+      if (ATVF) {
+        if (ATVF !== 'failed') {
+          setPermission({ audio: true, video: false });
+          return { audio: true, video: false, isFailed };
+        }
+        isFailed = true;
       }
 
-      if (await checkPermission(false, true)) {
-        checkPermissionQuery();
-        return { audio: false, video: true };
-      }
+      const AFVT = await checkPermission(false, true);
 
+      if (AFVT) {
+        if (AFVT !== 'failed') {
+          setPermission({ audio: false, video: true });
+          return { audio: false, video: true, isFailed };
+        }
+        isFailed = true;
+      }
       setPermission({ audio: false, video: false });
       setDeviceEnable({ audio: false, video: false });
 
-      checkPermissionQuery();
-
-      return { audio: false, video: false };
+      return { audio: false, video: false, isFailed };
     },
     [isSupportedPermission, checkPermissionQuery, checkPermission, setPermission, setDeviceEnable],
   );

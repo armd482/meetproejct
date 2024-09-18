@@ -11,7 +11,7 @@ const getDeviceConstraint = (permission: boolean, id: string) => {
 };
 
 export const getStreamConstraint = (
-  permission: Record<'audio' | 'video', boolean>,
+  permission: Record<'audio' | 'video' | 'isFailed', boolean>,
   id: Record<'audio' | 'video', string>,
 ) => {
   const audio = getDeviceConstraint(permission.audio, id.audio);

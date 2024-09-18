@@ -48,6 +48,7 @@ export default function Meetting() {
     isMyScreenShare,
     emojiList,
     handsUpList,
+    streamStatus,
     changeDevice,
     handleUpdateStream,
     sendMessage,
@@ -148,6 +149,7 @@ export default function Meetting() {
           <ControlBar
             changeDevice={changeDevice}
             stream={stream}
+            streamStatus={streamStatus}
             handleUpdateStream={handleUpdateStream}
             handleScreenShare={shareScreen}
             handleStopScreenShare={stopShareScreen}

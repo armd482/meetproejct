@@ -12,6 +12,7 @@ export { default as Declaration } from './declaration.svg';
 export { default as Delete } from './delete.svg';
 export { default as EmojiOff } from './emojiOff.svg';
 export { default as EmojiOn } from './emojiOn.svg';
+export { default as FullScreen } from './fullScreen.svg';
 export { default as HandOff } from './handOff.svg';
 export { default as HandOn } from './handOn.svg';
 export { default as HandsUp } from './handsUp.svg';

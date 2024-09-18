@@ -64,7 +64,7 @@ const useOpenvidu = (sessionId: string) => {
     })),
   );
 
-  const { stream, handleUpdateStream } = useDevice();
+  const { stream, streamStatus, handleUpdateStream } = useDevice();
 
   const leaveSession = useCallback(async () => {
     if (session) {
@@ -110,9 +110,10 @@ const useOpenvidu = (sessionId: string) => {
 
   const publishVideo = useCallback(
     async (newOV: OpenVidu, newSession: OVSession) => {
+      console.log(permission);
       const publishConstraint = {
-        audioSource: !permission || (permission && permission.audio) ? (audioInput.id ?? true) : false,
-        videoSource: !permission || (permission && permission.video) ? (videoInput.id ?? true) : false,
+        audioSource: permission && permission.audio ? (audioInput.id ? audioInput.id : true) : false,
+        videoSource: permission && permission.video ? (videoInput.id ? videoInput.id : true) : false,
         publishAudio: true,
         publishVideo: true,
         filter: {
@@ -190,6 +191,7 @@ const useOpenvidu = (sessionId: string) => {
         return;
       }
 
+      console.log(publisher);
       if (typeof value === 'boolean') {
         setDeviceEnable((prev) => ({ ...prev, [type === 'audio' ? 'audio' : 'video']: value }));
         if (type === 'audio') {
@@ -332,20 +334,31 @@ const useOpenvidu = (sessionId: string) => {
 
   useEffect(() => {
     const initialJoinSession = async () => {
-      if (isInitial) {
+      if (isInitial && stream) {
         setIsInitial(false);
-        const newPermission = await getDevicePermission();
-        setPermission(newPermission);
-        setDeviceEnable((prev) => ({
-          audio: prev.audio && newPermission.audio,
-          video: prev.video && newPermission.video,
-        }));
         await joinSession();
       }
     };
 
     initialJoinSession();
-  }, [joinSession, isInitial, permission, setPermission, setDeviceEnable]);
+  }, [joinSession, isInitial, permission, stream]);
+
+  useEffect(() => {
+    const updateTrack = async () => {
+      if (publisher && stream) {
+        const audioTrack = stream.getAudioTracks()[0];
+        const videoTrack = stream.getVideoTracks()[0];
+
+        if (audioTrack && publisher) {
+          await publisher.replaceTrack(audioTrack);
+        }
+        if (videoTrack && publisher) {
+          await publisher.replaceTrack(videoTrack);
+        }
+      }
+    };
+    updateTrack();
+  }, [stream, publisher]);
 
   useEffect(() => {
     isOnlyRef.current = subscribers.length === 0;
@@ -552,6 +565,7 @@ const useOpenvidu = (sessionId: string) => {
     isMyScreenShare,
     emojiList,
     handsUpList,
+    streamStatus,
     leaveSession,
     changeDevice,
     handleUpdateStream,

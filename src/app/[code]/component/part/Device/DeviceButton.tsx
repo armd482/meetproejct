@@ -37,18 +37,25 @@ export default function DeviceButton({
 
   const getDisabledStatus = () => {
     if (status === 'rejected') {
-      return true;
+      return 'permission';
+    }
+
+    if (!currentDevice) {
+      return 'failed';
     }
 
     if (type === 'audioInput' || type === 'audioOutput') {
       if (permission && !permission.audio) {
-        return true;
+        return 'permission';
       }
     }
 
     if (type === 'videoInput') {
       if (permission && !permission.video) {
-        return true;
+        return 'permission';
+      }
+      if (status === 'failed') {
+        return 'failed';
       }
     }
 
@@ -99,32 +106,27 @@ export default function DeviceButton({
   };
 
   const getStatusText = () => {
-    if (type === 'audioInput' || type === 'audioOutput') {
-      if ((permission && !permission.audio) || status === 'rejected') {
-        return '권한 필요';
-      }
+    if (isDisabled === 'permission') {
+      return '권한 필요';
     }
-
     if (type === 'audioInput') {
-      if (!currentDevice.id) {
+      if (isDisabled === 'failed') {
         return '마이크를 찾을 수 없습니다';
       }
     }
 
     if (type === 'audioOutput') {
-      if (!currentDevice.id) {
+      if (isDisabled === 'failed') {
         return '스피커를 찾을 수 없습니다';
       }
     }
 
     if (type === 'videoInput') {
-      if (permission && !permission.video && status !== 'failed') {
-        return '권한 필요';
-      }
-      if (!currentDevice.id) {
+      if (isDisabled === 'failed') {
         return '카메라를 찾을 수 없습니다';
       }
     }
+    return '';
   };
   const disabledText = getStatusText();
 
@@ -133,7 +135,7 @@ export default function DeviceButton({
       <button
         type='button'
         onClick={handleButtonClick}
-        disabled={isDisabled}
+        disabled={isDisabled !== false}
         className={`flex h-[34px] items-center rounded-full border-[0.8px] border-solid ${color === 'black' ? 'border-[#5F6368]' : isDisabled ? 'border-[#E7E8E8]' : 'border-white  hover:border-[#DADCE0] active:bg-[#F6FAFE]'} px-[10px]`}
       >
         <div className='mr-2 flex size-[18px] items-center justify-center'>{icon}</div>

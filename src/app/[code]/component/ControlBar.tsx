@@ -6,11 +6,13 @@ import { ToggleType } from '@/type/toggleType';
 import { useDeviceStore } from '@/store/DeviceStore';
 import { useShallow } from 'zustand/react/shallow';
 import { Alert } from '@/component';
+import { StreamStatusType } from '@/type/streamType';
 import { ControlButton, MenuButton, OptionButton, CallEndButton } from './part/ControlBar';
 import { PermissionModal } from './part/Device';
 
 interface ControlBarProps {
   stream: MediaStream | null;
+  streamStatus: StreamStatusType;
   changeDevice: (type: 'audio' | 'video', value: boolean | string) => Promise<MediaStream | undefined>;
   handleUpdateStream: () => void;
   handleScreenShare: () => void;
@@ -30,8 +32,10 @@ interface ControlButtonType {
 
 const CONTROL_BUTTON_OFF_PROPS = { width: 24, height: 24, fill: '#06306D' };
 const CONTROL_BUTTON_ON_PROPS = { width: 24, height: 24, fill: '#E3E3E3' };
+
 export default function ControlBar({
   stream,
+  streamStatus,
   changeDevice,
   handleUpdateStream,
   handleScreenShare,
@@ -116,14 +120,14 @@ export default function ControlBar({
   };
 
   return (
-    <div className='z-10 flex h-12 items-center gap-2 bg-[#212121]'>
+    <div className='z-30 flex h-12 items-center gap-2 bg-[#212121]'>
       <OptionButton
         type='audio'
         onClickButton={handleButtonClick}
         icon={<Icon.MicOn width={20} height={20} fill='#E3E3E3' />}
         clickedIcon={<Icon.MicOff width={20} height={20} fill='#5F1312' />}
         name={{ chevron: '오디오 설정', icon: '마이크 끄기(ctrl + d)' }}
-        status='success'
+        status={streamStatus}
         stream={stream}
         changeDevice={changeDevice}
       />
@@ -133,7 +137,7 @@ export default function ControlBar({
         icon={<Icon.VideoOn width={26} height={26} fill='#E3E3E3' />}
         clickedIcon={<Icon.VideoOff width={24} height={24} fill='#5F1312' />}
         name={{ chevron: '영상 설정', icon: '마이크 끄기(ctrl + d)' }}
-        status='success'
+        status={streamStatus}
         changeDevice={changeDevice}
       />
       {CONTROL_BUTTON.map((button) => (

@@ -34,10 +34,12 @@ export default function OptionButton({
   status,
   changeDevice,
 }: OptionButtonProps) {
-  const { deviceEnable, permission } = useDeviceStore(
+  const { deviceEnable, permission, audioInput, videoInput } = useDeviceStore(
     useShallow((state) => ({
       deviceEnable: state.deviceEnable,
       permission: state.permission,
+      audioInput: state.audioInput,
+      videoInput: state.videoInput,
     })),
   );
 
@@ -45,9 +47,10 @@ export default function OptionButton({
   const [isClickedChevron, setIsClickedChevron] = useState(false);
   const [currentHover, setCurrentHover] = useState<'chevron' | 'icon'>('icon');
 
-  const isDisabled = !(type === 'audio'
-    ? Boolean(permission && permission.audio)
-    : Boolean(permission && permission.video));
+  const audioDisabled = !audioInput.id;
+  const videoDisabled = !videoInput.id || status === 'rejected' || (permission && !permission.video);
+
+  const isDisabled = type === 'audio' ? audioDisabled : videoDisabled;
 
   const { targetRef } = useOutsideClick<HTMLDivElement>(() => {
     setIsClickedChevron(false);
@@ -88,7 +91,7 @@ export default function OptionButton({
   }, [isVisibleOption]);
 
   return (
-    <div ref={targetRef}>
+    <div ref={targetRef} className='z-30'>
       <ButtonTag
         name={name[currentHover]}
         align={name.chevron !== '영상 설정' || currentHover !== 'chevron' ? 'left' : 'center'}

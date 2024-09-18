@@ -38,7 +38,7 @@ export default function Device() {
   const { stream, streamStatus, toggleVideoInput, toggleAudioInput, handleUpdateStream } = useDevice();
 
   const [isOpenModal, setIsOpenModal] = useState(false);
-  const audioDisabled = !audioInput.id || streamStatus === 'rejected' || (permission && !permission.audio);
+  const audioDisabled = !audioInput.id;
   const videoDisabled = !videoInput.id || streamStatus === 'rejected' || (permission && !permission.video);
 
   useEffect(() => {
@@ -66,7 +66,7 @@ export default function Device() {
   };
 
   const handleTrackChange = async (device: MediaDeviceInfo, type: 'audioInput' | 'videoInput' | 'audioOutput') => {
-    setTrackChage(stream, videoRef, device, type, audioInput.id, videoInput.id, permission);
+    setTrackChage(stream, videoRef, device, type);
   };
 
   const handleVideoButtonClick = () => {
@@ -99,7 +99,7 @@ export default function Device() {
         )}
 
         <div className='absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-6 px-3'>
-          {(audioInput.id || (permission && !permission.audio)) && (
+          {streamStatus !== null && (
             <button
               type='button'
               onClick={handleMicButton}
@@ -110,7 +110,7 @@ export default function Device() {
               ) : (
                 <Icon.MicOff width={28} height={28} fill='#ffffff' />
               )}
-              {audioDisabled && (
+              {audioDisabled && streamStatus !== null && (
                 <div className='absolute right-0 top-0 size-3 rounded-full bg-white'>
                   <Icon.Warn width={20} height={20} fill='#FA7B17' className='relative -left-1 -top-1' />
                 </div>
@@ -118,7 +118,7 @@ export default function Device() {
             </button>
           )}
 
-          {(videoInput.id || (permission && !permission.video)) && (
+          {streamStatus !== null && (
             <button
               type='button'
               onClick={handleVideoButton}
@@ -129,7 +129,7 @@ export default function Device() {
               ) : (
                 <Icon.VideoOff width={24} height={24} fill='#ffffff' />
               )}
-              {videoDisabled && (
+              {videoDisabled && streamStatus !== null && (
                 <div className='absolute right-0 top-0 size-3 rounded-full bg-white'>
                   <Icon.Warn width={20} height={20} fill='#FA7B17' className='relative -left-1 -top-1' />
                 </div>
@@ -138,62 +138,74 @@ export default function Device() {
           )}
         </div>
       </div>
-      <div className='mt-4 flex w-full items-center gap-1 lg:hidden'>
-        <DeviceButton
-          icon={
-            <Icon.MicOn
-              width={14}
-              height={14}
-              fill={
-                streamStatus === 'failed' || streamStatus === 'rejected' || (permission && !permission.audio)
-                  ? '#B5B6B7'
-                  : '#5F6368'
-              }
-            />
-          }
-          currentDevice={audioInput}
-          deviceList={audioInputList}
-          type='audioInput'
-          onTrackChange={handleTrackChange}
-          stream={stream}
-          status={streamStatus}
-        />
-        <DeviceButton
-          icon={
-            <Icon.Sound
-              width={14}
-              height={14}
-              fill={
-                streamStatus === 'failed' || streamStatus === 'rejected' || (permission && !permission.audio)
-                  ? '#B5B6B7'
-                  : '#5F6368'
-              }
-            />
-          }
-          currentDevice={audioOutput}
-          deviceList={audioOutputList}
-          type='audioOutput'
-          onTrackChange={handleTrackChange}
-          status={streamStatus}
-        />
-        <DeviceButton
-          icon={
-            <Icon.VideoOn
-              width={14}
-              height={14}
-              fill={
-                streamStatus === 'failed' || streamStatus === 'rejected' || (permission && !permission.video)
-                  ? '#B5B6B7'
-                  : '#5F6368'
-              }
-            />
-          }
-          currentDevice={videoInput}
-          deviceList={videoInputList}
-          type='videoInput'
-          onTrackChange={handleTrackChange}
-          status={streamStatus}
-        />
+      <div className='mt-4 flex h-9 w-full items-center gap-1 lg:hidden'>
+        {streamStatus !== null && (
+          <DeviceButton
+            icon={
+              <Icon.MicOn
+                width={14}
+                height={14}
+                fill={
+                  (streamStatus === 'failed' && !audioInput.id) ||
+                  streamStatus === 'rejected' ||
+                  (permission && !permission.audio)
+                    ? '#B5B6B7'
+                    : '#5F6368'
+                }
+              />
+            }
+            currentDevice={audioInput}
+            deviceList={audioInputList}
+            type='audioInput'
+            onTrackChange={handleTrackChange}
+            stream={stream}
+            status={streamStatus}
+          />
+        )}
+
+        {streamStatus !== null && (
+          <DeviceButton
+            icon={
+              <Icon.Sound
+                width={14}
+                height={14}
+                fill={
+                  (streamStatus === 'failed' && !audioOutput.id) ||
+                  streamStatus === 'rejected' ||
+                  (permission && !permission.audio)
+                    ? '#B5B6B7'
+                    : '#5F6368'
+                }
+              />
+            }
+            currentDevice={audioOutput}
+            deviceList={audioOutputList}
+            type='audioOutput'
+            onTrackChange={handleTrackChange}
+            status={streamStatus}
+          />
+        )}
+
+        {streamStatus !== null && (
+          <DeviceButton
+            icon={
+              <Icon.VideoOn
+                width={14}
+                height={14}
+                fill={
+                  streamStatus === 'failed' || streamStatus === 'rejected' || (permission && !permission.video)
+                    ? '#B5B6B7'
+                    : '#5F6368'
+                }
+              />
+            }
+            currentDevice={videoInput}
+            deviceList={videoInputList}
+            type='videoInput'
+            onTrackChange={handleTrackChange}
+            status={streamStatus}
+          />
+        )}
       </div>
       <PermissionModal
         isOpenModal={isOpenModal}
