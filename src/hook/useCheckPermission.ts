@@ -1,12 +1,12 @@
 import { useDeviceStore } from '@/store/DeviceStore';
-import { StreamStatusType } from '@/type/streamType';
 import { useCallback, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
-const useCheckPermission = (updateStreamStatus: (value: StreamStatusType) => void) => {
+const useCheckPermission = () => {
   const [isSupportedPermission, setIsSupportedPermission] = useState<null | boolean>(null);
   const { setPermission, setDeviceEnable } = useDeviceStore(
     useShallow((state) => ({
+      permission: state.permission,
       setPermission: state.setPermission,
       setDeviceEnable: state.setDeviceEnable,
     })),
@@ -33,6 +33,7 @@ const useCheckPermission = (updateStreamStatus: (value: StreamStatusType) => voi
       const newPermission = {
         audio: Boolean(audioPermission.state === 'granted'),
         video: Boolean(videoPermission.state === 'granted'),
+        isFailed: false,
       };
       setPermission(newPermission);
       return newPermission;
@@ -65,55 +66,78 @@ const useCheckPermission = (updateStreamStatus: (value: StreamStatusType) => voi
   const checkPermission = useCallback(
     async (audio: boolean, video: boolean) => {
       try {
-        await navigator.mediaDevices.getUserMedia({ audio, video });
+        const stream = await navigator.mediaDevices.getUserMedia({ audio, video });
         setPermission({ audio, video });
         setDeviceEnable((prev) => ({ audio: audio && prev.audio, video: video && prev.video }));
+        stream.getTracks().forEach((track) => track.stop());
         return true;
       } catch (error) {
         const e = error as DOMException;
         if (e.name === 'NotAllowedError') {
           return false;
         }
-        updateStreamStatus('failed');
-        return false;
+        return 'failed';
       }
     },
-    [updateStreamStatus, setDeviceEnable, setPermission],
+    [setDeviceEnable, setPermission],
   );
 
-  const updatePermission = useCallback(async () => {
-    if (isSupportedPermission !== false) {
-      const newPermission = await checkPermissionQuery();
-      if (newPermission) {
-        setIsSupportedPermission(true);
+  const updatePermission = useCallback(
+    async (isInitial?: boolean) => {
+      if (isSupportedPermission !== false && !isInitial) {
+        const newPermission = await checkPermissionQuery();
+        if (newPermission) {
+          setIsSupportedPermission(true);
+        }
+        if (typeof newPermission !== 'boolean') {
+          return newPermission;
+        }
       }
-      if (typeof newPermission !== 'boolean') {
-        return newPermission;
+
+      let isFailed = false;
+
+      const ATVT = await checkPermission(true, true);
+
+      if (ATVT) {
+        if (ATVT !== 'failed') {
+          setPermission({ audio: true, video: true });
+          return { audio: true, video: true, isFailed };
+        }
+        isFailed = true;
       }
-    }
 
-    if (await checkPermission(true, true)) {
-      return { audio: true, video: true };
-    }
+      const ATVF = await checkPermission(true, false);
 
-    if (await checkPermission(true, false)) {
-      return { audio: true, video: false };
-    }
+      if (ATVF) {
+        if (ATVF !== 'failed') {
+          setPermission({ audio: true, video: false });
+          return { audio: true, video: false, isFailed };
+        }
+        isFailed = true;
+      }
 
-    if (await checkPermission(false, true)) {
-      return { audio: false, video: true };
-    }
+      const AFVT = await checkPermission(false, true);
 
-    setPermission({ audio: false, video: false });
-    setDeviceEnable({ audio: false, video: false });
+      if (AFVT) {
+        if (AFVT !== 'failed') {
+          setPermission({ audio: false, video: true });
+          return { audio: false, video: true, isFailed };
+        }
+        isFailed = true;
+      }
+      setPermission({ audio: false, video: false });
+      setDeviceEnable({ audio: false, video: false });
 
-    return { audio: false, video: false };
-  }, [isSupportedPermission, checkPermissionQuery, checkPermission, setPermission, setDeviceEnable]);
+      return { audio: false, video: false, isFailed };
+    },
+    [isSupportedPermission, checkPermissionQuery, checkPermission, setPermission, setDeviceEnable],
+  );
 
   return {
     isSupportedPermission,
     updatePermission,
     addPermissionListener,
+    checkPermissionQuery,
   };
 };
 

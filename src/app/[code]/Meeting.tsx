@@ -1,14 +1,24 @@
 'use client';
 
-import { useOpenvidu } from '@/hook';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useContext, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { useDeviceStore } from '@/store/DeviceStore';
 import { useShallow } from 'zustand/react/shallow';
+
+import { useDeviceStore } from '@/store/DeviceStore';
 import { useUserInfoStore } from '@/store/UserInfoStore';
-import { ControlBar, InfoBar, Panel, Toggle, MeetInfoBar } from './component';
-import VideoStream from './component/VideoStream';
-import { deleteParticipant, postParticipant } from '../api/mongoAPI';
+import { ToggleContext } from '@/context/ToggleContext';
+import { useOpenvidu } from '@/hook';
+import { postParticipant } from '../api/mongoAPI';
+import {
+  ControlBar,
+  EmojiAnimation,
+  InfoBar,
+  Panel,
+  Toggle,
+  MeetInfoBar,
+  StreamGridList,
+  StreamScreenList,
+} from './component';
 
 export default function Meetting() {
   const pathname = usePathname();
@@ -18,6 +28,8 @@ export default function Meetting() {
     })),
   );
 
+  const { handleToggleStatus } = useContext(ToggleContext);
+
   const { id, name, color } = useUserInfoStore(
     useShallow((state) => ({
       id: state.id,
@@ -26,10 +38,31 @@ export default function Meetting() {
     })),
   );
 
-  const { subscribers, participants, publisher, stream, chatList, changeDevice, handleUpdateStream, sendMessage } =
-    useOpenvidu(pathname.slice(1));
+  const {
+    subscribers,
+    participants,
+    publisher,
+    stream,
+    chatList,
+    screenPublisher,
+    isMyScreenShare,
+    emojiList,
+    handsUpList,
+    streamStatus,
+    changeDevice,
+    handleUpdateStream,
+    sendMessage,
+    shareScreen,
+    stopShareScreen,
+    leaveSession,
+    sendEmoji,
+    deleteEmoji,
+    sendHandsUp,
+  } = useOpenvidu(pathname.slice(1));
 
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
+  const [isInitial, setIsInitial] = useState(true);
 
   const userList = subscribers.map((entity) => {
     const { name: userName, color: userColor, audio, video } = participants[entity[0]];
@@ -45,35 +78,52 @@ export default function Meetting() {
 
   useEffect(() => {
     const registParticipant = async () => {
-      if (id && name && color) {
+      if (id && name && color && pathname && isInitial) {
+        setIsInitial(false);
         await postParticipant(pathname.slice(1), id, name, color);
       }
     };
 
-    const deleteDB = async () => {
-      if (id) {
-        await deleteParticipant(pathname.slice(1), id);
-      }
-    };
-
     registParticipant();
-    return () => {
-      deleteDB();
-    };
-  }, [id, color, name, pathname]);
+  }, [id, color, name, pathname, isInitial]);
+
+  useEffect(() => {
+    if (!isMyScreenShare && screenPublisher) {
+      handleToggleStatus('screen', 'disable');
+      return;
+    }
+    handleToggleStatus('screen', Boolean(screenPublisher));
+  }, [screenPublisher, isMyScreenShare, handleToggleStatus]);
 
   return (
     <div className='relative flex h-screen w-screen flex-col overflow-hidden bg-[#202124]'>
-      <div className='flex flex-1 p-4' style={{ height: `calc(100vh - ${barRef.current?.clientHeight}px)` }}>
-        <div
-          className='grid flex-1 gap-4 border border-solid border-black'
-          style={{
-            gridTemplateColumns: `repeat(${Math.ceil(Math.sqrt(subscribers.length + 1))}, 1fr)`,
-          }}
-        >
-          {publisher && <VideoStream user={{ id, name, color, ...deviceEnable }} subscriber={publisher} muted />}
-          {subscribers.map((entity) => (
-            <VideoStream key={entity[0]} user={{ id: entity[0], ...participants[entity[0]] }} subscriber={entity[1]} />
+      <div className='relative flex flex-1 p-4' style={{ height: `calc(100vh - ${barRef.current?.clientHeight}px)` }}>
+        <div ref={wrapperRef} className='relative flex-1 overflow-hidden'>
+          {screenPublisher ? (
+            <StreamScreenList
+              screenPublisher={screenPublisher}
+              participants={participants}
+              subscribers={subscribers}
+              publisher={publisher}
+              emojiList={emojiList}
+              handsUpList={handsUpList}
+            />
+          ) : (
+            <StreamGridList
+              subscribers={subscribers}
+              publisher={publisher}
+              participants={participants}
+              emojiList={emojiList}
+              handsUpList={handsUpList}
+            />
+          )}
+          {emojiList.map((emoji) => (
+            <EmojiAnimation
+              key={emoji.id}
+              emoji={emoji}
+              maxWidth={wrapperRef.current?.clientWidth ?? 0}
+              deleteEmoji={deleteEmoji}
+            />
           ))}
         </div>
         <Panel
@@ -93,10 +143,19 @@ export default function Meetting() {
         />
       </div>
       <div ref={barRef} className='relative w-full shrink-0 bg-[#202124] font-googleSans text-base text-white'>
-        <Toggle />
+        <Toggle onClickEmojiButton={sendEmoji} />
         <div className='relative grid shrink-0 grid-cols-[1fr_auto_1fr] items-center bg-[#212121] p-4'>
           <MeetInfoBar />
-          <ControlBar changeDevice={changeDevice} stream={stream} handleUpdateStream={handleUpdateStream} />
+          <ControlBar
+            changeDevice={changeDevice}
+            stream={stream}
+            streamStatus={streamStatus}
+            handleUpdateStream={handleUpdateStream}
+            handleScreenShare={shareScreen}
+            handleStopScreenShare={stopShareScreen}
+            handleLeavSession={leaveSession}
+            handleHandsUp={sendHandsUp}
+          />
           <InfoBar />
         </div>
       </div>

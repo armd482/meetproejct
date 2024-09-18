@@ -45,7 +45,7 @@ const BUTTON_LIST: ButtonType[] = [
     clickedIcon: <Icon.ChatOn {...ICON_ON_PROPS} />,
     name: '모든 사용자와 채팅',
   },
-  {
+  /* {
     type: 'ACTIVE',
     icon: <Icon.ActiveOff {...ICON_OFF_PROPS} />,
     clickedIcon: <Icon.ActiveOn {...ICON_ON_PROPS} />,
@@ -57,7 +57,7 @@ const BUTTON_LIST: ButtonType[] = [
     clickedIcon: <Icon.HostCtrlOn {...ICON_ON_PROPS} />,
     name: '호스트 제어 기능',
     align: 'right',
-  },
+  }, */
 ];
 
 export default function InfoBar() {

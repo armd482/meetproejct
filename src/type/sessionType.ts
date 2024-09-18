@@ -1,3 +1,5 @@
+import { EmojiType } from './toggleType';
+
 export interface UserInfo {
   name: string;
   color: string;
@@ -12,6 +14,14 @@ export interface ChatInfo {
   date: string;
   content: string;
   header?: boolean;
+}
+
+export interface EmojiInfo {
+  id: string;
+  userName: string;
+  userId: string;
+  date: Date;
+  emojiType: EmojiType;
 }
 
 interface RecordingPropertiesType {

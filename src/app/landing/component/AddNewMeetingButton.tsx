@@ -40,6 +40,7 @@ export default function AddNewMeetingButton() {
         setIsFailed(true);
       }
     }
+    setIsClicked(false);
   };
 
   const handleCloseAlert = () => {

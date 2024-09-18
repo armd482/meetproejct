@@ -4,10 +4,14 @@ import { useRouter } from 'next/navigation';
 import * as Icon from '@/asset/icon';
 import { ButtonTag } from '@/component';
 
-export default function CallEndButton() {
+interface CallEndButtonProps {
+  onClick: () => void;
+}
+
+export default function CallEndButton({ onClick }: CallEndButtonProps) {
   const router = useRouter();
   const handleButtonClick = () => {
-    /* session leave */
+    onClick();
     router.push('/landing');
   };
   return (
