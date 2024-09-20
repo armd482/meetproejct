@@ -110,7 +110,6 @@ const useOpenvidu = (sessionId: string) => {
 
   const publishVideo = useCallback(
     async (newOV: OpenVidu, newSession: OVSession) => {
-      console.log(permission);
       const publishConstraint = {
         audioSource: permission && permission.audio ? (audioInput.id ? audioInput.id : true) : false,
         videoSource: permission && permission.video ? (videoInput.id ? videoInput.id : true) : false,
@@ -191,7 +190,6 @@ const useOpenvidu = (sessionId: string) => {
         return;
       }
 
-      console.log(publisher);
       if (typeof value === 'boolean') {
         setDeviceEnable((prev) => ({ ...prev, [type === 'audio' ? 'audio' : 'video']: value }));
         if (type === 'audio') {
