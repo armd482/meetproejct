@@ -44,6 +44,8 @@ export default function StreamGridList({
   const currentPageSubscribers = maxNum === 1 ? [] : subscribers.slice(0, maxNum - 2);
   const otherSubscriber = maxNum === 1 ? subscribers : subscribers.slice(maxNum - 2);
 
+  const rowNum = currentPageSubscribers.length + 1 < maxRow ? currentPageSubscribers.length + 1 : maxRow;
+
   useEffect(() => {
     const handleMaxNumUpdate = () => {
       const row = Math.max(Math.floor((window.innerWidth - 400) / 166), 2);
@@ -60,7 +62,7 @@ export default function StreamGridList({
     <div
       className='relative grid size-full gap-4 border border-solid border-black'
       style={{
-        gridTemplateColumns: `repeat(${currentPageSubscribers.length === 0 ? '1' : currentPageSubscribers.length + 1 < maxRow ? currentPageSubscribers.length + 1 : maxRow}, 1fr)`,
+        gridTemplateColumns: `repeat(${currentPageSubscribers.length === 0 ? '1' : Math.min(rowNum, Math.ceil(Math.sqrt(1 + 4 * currentPageSubscribers.length) / 2))}, 1fr)`,
       }}
     >
       {publisher && (

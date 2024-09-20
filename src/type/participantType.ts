@@ -2,6 +2,7 @@ export interface ParticipantDataType {
   _id: string;
   userName: string;
   sessionId: string;
+  color: string;
 }
 
 export interface UserListType {

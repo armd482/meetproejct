@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import * as Icon from '@/asset/icon';
-import { Device, NameForm } from './component';
+import { Device, EntirePeople, NameForm } from './component';
 
 export default function Setting() {
   return (
@@ -17,6 +17,7 @@ export default function Setting() {
         <div className='m-4 flex w-[448px] flex-col items-center font-googleSans'>
           <p className='text-2xl'>이름이 무엇인가요?</p>
           <NameForm />
+          <EntirePeople />
         </div>
       </div>
       <footer className='flex items-center justify-center p-2 text-center text-xs text-[#5F6368]'>
