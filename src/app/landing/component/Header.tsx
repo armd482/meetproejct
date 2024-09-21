@@ -100,7 +100,7 @@ export default function Header() {
                   className='flex size-[104px] items-center justify-center overflow-hidden rounded-full text-3xl font-bold text-white'
                   style={{ backgroundColor: color }}
                 >
-                  {name}
+                  {name.slice(3)}
                 </div>
                 <div className='text-wrap text-center text-2xl font-medium'>안녕하세요, {name}님.</div>
                 <button

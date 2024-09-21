@@ -16,7 +16,6 @@ export default function EntirePeople() {
       }
       const userData = await getParticipant(sessionId);
       setData(userData);
-      console.log(userData);
     };
     getData();
   }, [sessionId]);
@@ -33,7 +32,7 @@ export default function EntirePeople() {
               className='flex size-6 items-center justify-center truncate rounded-full text-sm font-bold text-white'
               style={{ backgroundColor: user.color }}
             >
-              {user.userName}
+              {user.userName.slice(3)}
             </div>
           </div>
         ))}

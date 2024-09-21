@@ -58,7 +58,7 @@ export default function OtherAudioStream({ otherSubscriber, color, name }: Other
           className='absolute left-1/2 top-1/2 flex aspect-square h-2/5 -translate-x-1/2 -translate-y-1/2 items-center justify-center truncate rounded-full font-bold text-white'
           style={{ backgroundColor: color, fontSize: '150%' }}
         >
-          {name}
+          {name.slice(3)}
         </div>
         <p className='absolute bottom-3 left-1/2 -translate-x-1/2 text-white' style={{ fontSize: '100%' }}>
           {`외 ${otherSubscriber.length - 1}명`}

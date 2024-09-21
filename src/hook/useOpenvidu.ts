@@ -11,7 +11,7 @@ import {
   Subscriber,
 } from 'openvidu-browser';
 import { postToken } from '@/app/api/sessionAPI';
-import { deleteSessionId, deleteParticipant } from '@/app/api/mongoAPI';
+import { deleteSessionId, deleteParticipant, postParticipant } from '@/app/api/mongoAPI';
 import { useDeviceStore } from '@/store/DeviceStore';
 import { useRouter } from 'next/navigation';
 import { getDevicePermission } from '@/lib/getDevicePermission';
@@ -177,6 +177,7 @@ const useOpenvidu = (sessionId: string) => {
         connection: { connectionId },
       } = newSession;
       setId(connectionId);
+      await postParticipant(sessionId, connectionId, name, color);
     } catch {
       alert('이미 닫힌 회의실입니다');
       leaveSession();
