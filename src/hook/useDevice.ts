@@ -9,7 +9,7 @@ import { getStreamConstraint } from '@/lib/getStreamConstraint';
 import useCurrentDevice from './useCurrentDevice';
 import useCheckPermission from './useCheckPermission';
 
-const useDevice = (deviceUpdate?: () => void) => {
+const useDevice = () => {
   const {
     deviceEnable,
     audioInput,
@@ -176,7 +176,7 @@ const useDevice = (deviceUpdate?: () => void) => {
     return () => {
       navigator.mediaDevices.ondevicechange = null;
     };
-  }, []);
+  }, [setDeviceEnable]);
 
   useEffect(() => {
     const checkDevicePermission = async () => {

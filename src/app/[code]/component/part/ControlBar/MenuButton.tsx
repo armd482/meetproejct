@@ -11,7 +11,6 @@ export default function MenuButton() {
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
 
   const checkFullscreen = () => {
-    console.log(document.fullscreenElement);
     return document.fullscreenElement !== null;
   };
 
@@ -31,7 +30,6 @@ export default function MenuButton() {
   useEffect(() => {
     const handleFullscreenChange = () => {
       setIsFullscreen(Boolean(checkFullscreen()));
-      console.log(checkFullscreen());
     };
 
     document.addEventListener('fullscreenchange', handleFullscreenChange);
@@ -59,8 +57,6 @@ export default function MenuButton() {
   const handleButtonClick = () => {
     setIsClickedButton((prev) => !prev);
   };
-
-  console.log(isFullscreen);
 
   return (
     <div className='relative'>

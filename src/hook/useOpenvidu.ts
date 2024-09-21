@@ -11,7 +11,7 @@ import {
   Subscriber,
 } from 'openvidu-browser';
 import { postToken } from '@/app/api/sessionAPI';
-import { deleteSessionId, deleteParticipant } from '@/app/api/mongoAPI';
+import { deleteSessionId, deleteParticipant, postParticipant } from '@/app/api/mongoAPI';
 import { useDeviceStore } from '@/store/DeviceStore';
 import { useRouter } from 'next/navigation';
 import { getDevicePermission } from '@/lib/getDevicePermission';
@@ -110,7 +110,6 @@ const useOpenvidu = (sessionId: string) => {
 
   const publishVideo = useCallback(
     async (newOV: OpenVidu, newSession: OVSession) => {
-      console.log(permission);
       const publishConstraint = {
         audioSource: permission && permission.audio ? (audioInput.id ? audioInput.id : true) : false,
         videoSource: permission && permission.video ? (videoInput.id ? videoInput.id : true) : false,
@@ -178,6 +177,7 @@ const useOpenvidu = (sessionId: string) => {
         connection: { connectionId },
       } = newSession;
       setId(connectionId);
+      await postParticipant(sessionId, connectionId, name, color);
     } catch {
       alert('이미 닫힌 회의실입니다');
       leaveSession();
@@ -191,7 +191,6 @@ const useOpenvidu = (sessionId: string) => {
         return;
       }
 
-      console.log(publisher);
       if (typeof value === 'boolean') {
         setDeviceEnable((prev) => ({ ...prev, [type === 'audio' ? 'audio' : 'video']: value }));
         if (type === 'audio') {
