@@ -7,7 +7,7 @@ import { checkKey } from '@/lib/checkKey';
 
 export default function ParticipateMeetingForm() {
   const router = useRouter();
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState<string>('');
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
@@ -15,6 +15,9 @@ export default function ParticipateMeetingForm() {
 
   const handleFormSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!value) {
+      return;
+    }
     const result = await checkKey(value);
     if (result) {
       router.push(`/${result}`);
