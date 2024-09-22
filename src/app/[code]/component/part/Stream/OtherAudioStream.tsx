@@ -1,4 +1,4 @@
-import { Subscriber } from 'openvidu-browser';
+import { Subscriber } from 'openvidu-custom-armd482';
 import { useEffect, useRef } from 'react';
 
 interface OtherAudioStreamProps {

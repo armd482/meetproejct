@@ -11,7 +11,7 @@
   "dependencies": {
     "mongodb": "^6.8.0",
     "next": "14.2.6",
-    "openvidu-browser": "^2.30.1",
+    "openvidu-custom-armd482": "^1.0.1",
     "react": "^18",
     "react-dom": "^18",
     "zustand": "^4.5.5"

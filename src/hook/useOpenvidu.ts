@@ -9,7 +9,7 @@ import {
   StreamEvent,
   StreamPropertyChangedEvent,
   Subscriber,
-} from 'openvidu-browser';
+} from 'openvidu-custom-armd482';
 import { postToken } from '@/app/api/sessionAPI';
 import { deleteSessionId, deleteParticipant, postParticipant } from '@/app/api/mongoAPI';
 import { useDeviceStore } from '@/store/DeviceStore';

@@ -1,4 +1,4 @@
-import { Publisher, Subscriber } from 'openvidu-browser';
+import { Publisher, Subscriber } from 'openvidu-custom-armd482';
 import { useShallow } from 'zustand/react/shallow';
 
 import { useDeviceStore } from '@/store/DeviceStore';

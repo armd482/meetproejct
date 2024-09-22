@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Image, { StaticImageData } from 'next/image';
-import { Publisher, Subscriber } from 'openvidu-browser';
+import { Publisher, Subscriber } from 'openvidu-custom-armd482';
 import { Visualizer } from '@/component';
 import * as Icon from '@/asset/icon';
 import * as ImageSrc from '@/asset/image';
