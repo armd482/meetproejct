@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Publisher, Subscriber } from 'openvidu-browser';
+import { Publisher, Subscriber } from 'openvidu-custom-armd482';
 import { useShallow } from 'zustand/react/shallow';
 
 import { useUserInfoStore } from '@/store/UserInfoStore';
