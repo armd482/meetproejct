@@ -1,7 +1,7 @@
 import { CreateSessionDataType, ConnectSessionType } from '@/type/sessionType';
 
-const SERVER_URL = 'http://localhost:4443';
-const SERVER_SECRET = 'MY_SECRET';
+const SERVER_URL = process.env.NEXT_PUBLIC_OPENVIDU_URL;
+const SERVER_SECRET = process.env.NEXT_PUBLIC_OPENVIDU_SECRET;
 
 export const postCreateSession = async (sessionId: string) => {
   const response = await fetch(`${SERVER_URL}/openvidu/api/sessions`, {

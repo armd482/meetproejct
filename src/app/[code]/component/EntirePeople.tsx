@@ -32,7 +32,7 @@ export default function EntirePeople() {
               className='flex size-6 items-center justify-center truncate rounded-full text-sm font-bold text-white'
               style={{ backgroundColor: user.color }}
             >
-              {user.userName.slice(3)}
+              {user.userName.slice(0, 3)}
             </div>
           </div>
         ))}
