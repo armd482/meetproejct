@@ -1,8 +1,7 @@
 import { ParticipantDataType } from '@/type/participantType';
 
-export const postSessionId = async (sessionId: string, origin?: string) => {
-  const url = origin ? `${origin}/api/sessionId` : '/api/sessionId';
-  const response = await fetch(url, {
+export const postSessionId = async (sessionId: string) => {
+  const response = await fetch('/api/sessionId', {
     method: 'POST',
     body: JSON.stringify({ sessionId }),
   });
@@ -12,9 +11,8 @@ export const postSessionId = async (sessionId: string, origin?: string) => {
   }
 };
 
-export const deleteSessionId = async (sessionId: string, origin?: string) => {
-  const url = origin ? `${origin}/api/sessionId?sessionId=${sessionId}` : `/api/sessionId?sessionId=${sessionId}`;
-  const response = await fetch(url, {
+export const deleteSessionId = async (sessionId: string) => {
+  const response = await fetch(`/api/sessionId?sessionId=${sessionId}`, {
     method: 'DELETE',
   });
   if (!response.ok) {
@@ -23,9 +21,8 @@ export const deleteSessionId = async (sessionId: string, origin?: string) => {
   }
 };
 
-export const getParticipant = async (sessionId: string, origin?: string): Promise<ParticipantDataType[]> => {
-  const url = origin ? `${origin}/api/participant?sessionId=${sessionId}` : `/api/participant?sessionId=${sessionId}`;
-  const response = await fetch(url, {
+export const getParticipant = async (sessionId: string): Promise<ParticipantDataType[]> => {
+  const response = await fetch(`/api/participant?sessionId=${sessionId}`, {
     method: 'GET',
     cache: 'no-cache',
   });
@@ -37,15 +34,8 @@ export const getParticipant = async (sessionId: string, origin?: string): Promis
   return data;
 };
 
-export const postParticipant = async (
-  sessionId: string,
-  userId: string,
-  userName: string,
-  color: string,
-  origin?: string,
-) => {
-  const url = origin ? `${origin}/api/participant` : '/api/participant';
-  const response = await fetch(url, {
+export const postParticipant = async (sessionId: string, userId: string, userName: string, color: string) => {
+  const response = await fetch('/api/participant', {
     method: 'POST',
     body: JSON.stringify({ sessionId, userId, userName, color }),
   });
@@ -55,9 +45,8 @@ export const postParticipant = async (
   }
 };
 
-export const deleteParticipant = async (sessionId: string, userId: string, origin?: string) => {
-  const url = origin ? `${origin}/api/participant` : '/api/participant';
-  const response = await fetch(url, {
+export const deleteParticipant = async (sessionId: string, userId: string) => {
+  const response = await fetch('/api/participant', {
     method: 'DELETE',
     body: JSON.stringify({ sessionId, userId }),
   });
@@ -67,11 +56,8 @@ export const deleteParticipant = async (sessionId: string, userId: string, origi
   }
 };
 
-export const postCheckSessionId = async (sessionId: string, origin?: string) => {
-  const url = origin
-    ? `${origin}/api/sessionId/check?sessionId=${sessionId}`
-    : `/api/sessionId/check?sessionId=${sessionId}`;
-  const response = await fetch(url, {
+export const postCheckSessionId = async (sessionId: string) => {
+  const response = await fetch(`/api/sessionId/check?sessionId=${sessionId}`, {
     method: 'POST',
     cache: 'no-cache',
   });

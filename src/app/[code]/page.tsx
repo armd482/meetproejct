@@ -1,18 +1,34 @@
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { postCheckSessionId } from '../api/mongoAPI';
+import { connectDB } from '@/lib/connectDB';
 import Provider from './Provider';
 
 export default async function Page() {
   const headerList = headers();
   const domain = headerList.get('x-pathname');
-  const origin = headerList.get('x-origin');
 
-  if (!domain || !origin) {
+  if (!domain) {
     redirect('/landing');
   }
 
-  const isValidSessionId = await postCheckSessionId(domain.slice(1), origin);
+  const checkSessionId = async () => {
+    const sessionId = domain.slice(1);
+    if (!sessionId) {
+      return false;
+    }
+    try {
+      const db = (await connectDB).db('session');
+      const result = await db.collection('session').findOne({ sessionId });
+      if (!result) {
+        return false;
+      }
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const isValidSessionId = await checkSessionId();
 
   if (!isValidSessionId) {
     redirect('/landing');
