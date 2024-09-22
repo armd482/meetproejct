@@ -1,3 +1,5 @@
+'use clinet';
+
 import { useLayoutEffect, useState } from 'react';
 import { ParticipantDataType } from '@/type/participantType';
 import { getParticipant } from '@/app/api/mongoAPI';
