@@ -1,36 +1,22 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Meet Project
 
-## Getting Started
+<p align="center">
+  <img src='https://github.com/user-attachments/assets/3fb00868-65d8-492e-8213-1451b50d8639' width="750" height="120"/>
+</p>
 
-First, run the development server:
+#### 개발 기간: 2024.08.26~ </br>
+#### URL: https://www.meetproject.shop
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 프로젝트 소개
+이 프로젝트는 Google Meet를 참고한 클론 코딩 프로젝트입니다.<br>
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- openvidu를 이용한 session 생성 및 참가를 관리합니다. EC2를 통해 배포하였습니다
+- mongoDB를 이용한 sessionId와 참가자 정보를 관리합니다.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## 구현 목표
+구현 목표는 최소한으로 다음과 같이 계획하였습니다<br>
+- 사용자가 사용 가능한 장치 정보 모두 불러오기
+- 사용자가 선택한 장치로 입력/출력
+- 세션 생성 및 참가/퇴장
+- 화면 공유
+- 채팅
