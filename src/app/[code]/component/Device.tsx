@@ -103,9 +103,9 @@ export default function Device() {
             <button
               type='button'
               onClick={handleMicButton}
-              className={`relative flex items-center justify-center border border-solid ${deviceEnable.audio ? 'border-white' : 'border-[#EA4335] bg-[#EA4335]'} size-14 rounded-full`}
+              className={`relative flex items-center justify-center border border-solid ${deviceEnable.audio && permission?.audio ? 'border-white' : 'border-[#EA4335] bg-[#EA4335]'} size-14 rounded-full`}
             >
-              {deviceEnable.audio ? (
+              {deviceEnable.audio && permission?.audio ? (
                 <Icon.MicOn width={24} height={24} fill='#ffffff' />
               ) : (
                 <Icon.MicOff width={28} height={28} fill='#ffffff' />
@@ -122,9 +122,9 @@ export default function Device() {
             <button
               type='button'
               onClick={handleVideoButton}
-              className={`relative flex items-center justify-center border border-solid ${deviceEnable.video ? 'border-white' : 'border-[#EA4335] bg-[#EA4335]'} size-14 rounded-full`}
+              className={`relative flex items-center justify-center border border-solid ${deviceEnable.video && permission?.video ? 'border-white' : 'border-[#EA4335] bg-[#EA4335]'} size-14 rounded-full`}
             >
-              {deviceEnable.video ? (
+              {deviceEnable.video && permission?.video ? (
                 <Icon.VideoOn width={24} height={24} fill='#ffffff' />
               ) : (
                 <Icon.VideoOff width={24} height={24} fill='#ffffff' />

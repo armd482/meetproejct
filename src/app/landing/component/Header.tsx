@@ -6,6 +6,7 @@ import { useUserInfoStore } from '@/store/UserInfoStore';
 import { useState } from 'react';
 import { useOutsideClick } from '@/hook';
 import { useShallow } from 'zustand/react/shallow';
+import { Setting } from '@/component';
 import { CurrentDate, IconButton } from './part/Header';
 
 const ICON_PROPS = {
@@ -13,21 +14,6 @@ const ICON_PROPS = {
   height: 24,
   fill: '#5f6368',
 };
-
-const BUTTON_LIST = [
-  {
-    name: '지원',
-    icon: <Icon.Help {...ICON_PROPS} />,
-  },
-  {
-    name: '문제 신고',
-    icon: <Icon.Declaration {...ICON_PROPS} />,
-  },
-  {
-    name: '설정',
-    icon: <Icon.Setting {...ICON_PROPS} />,
-  },
-];
 
 export default function Header() {
   const { name, color, setName, setColor, setId } = useUserInfoStore(
@@ -40,6 +26,7 @@ export default function Header() {
     })),
   );
 
+  const [isClickedSetting, setIsClickedSetting] = useState(false);
   const [isClickedName, setIsClickedName] = useState(false);
 
   const handleCloseInfo = () => {
@@ -54,6 +41,30 @@ export default function Header() {
   };
   const { targetRef } = useOutsideClick<HTMLDivElement>(handleCloseInfo);
 
+  const handleSettingClick = () => {
+    setIsClickedSetting((prev) => !prev);
+  };
+
+  const handleCloseSetting = () => {
+    setIsClickedSetting(false);
+  };
+
+  const BUTTON_LIST = [
+    {
+      name: '지원',
+      icon: <Icon.Help {...ICON_PROPS} />,
+    },
+    {
+      name: '문제 신고',
+      icon: <Icon.Declaration {...ICON_PROPS} />,
+    },
+    {
+      name: '설정',
+      icon: <Icon.Setting {...ICON_PROPS} />,
+      onClick: handleSettingClick,
+    },
+  ];
+
   return (
     <div className='relative h-16'>
       <Link
@@ -67,7 +78,7 @@ export default function Header() {
       <div className='absolute right-5 top-1/2 z-10 flex -translate-y-1/2 items-center whitespace-nowrap bg-white'>
         <CurrentDate />
         {BUTTON_LIST.map((button) => (
-          <IconButton key={button.name} name={button.name}>
+          <IconButton key={button.name} name={button.name} onClick={button.onClick}>
             {button.icon}
           </IconButton>
         ))}
@@ -116,6 +127,7 @@ export default function Header() {
           </div>
         )}
       </div>
+      <Setting isOpen={isClickedSetting} onClose={handleCloseSetting} />
     </div>
   );
 }

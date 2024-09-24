@@ -37,6 +37,7 @@ export { default as ScreenShare } from './screenShare.svg';
 export { default as Search } from './search.svg';
 export { default as Setting } from './setting.svg';
 export { default as Sound } from './sound.svg';
+export { default as Speaker } from './speaker.svg';
 export { default as Submit } from './submit.svg';
 export { default as VideoOff } from './videoOff.svg';
 export { default as VideoOn } from './videoOn.svg';

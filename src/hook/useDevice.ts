@@ -9,7 +9,7 @@ import { getStreamConstraint } from '@/lib/getStreamConstraint';
 import useCurrentDevice from './useCurrentDevice';
 import useCheckPermission from './useCheckPermission';
 
-const useDevice = () => {
+const useDevice = (isInitialGetStream = true) => {
   const {
     deviceEnable,
     audioInput,
@@ -37,7 +37,7 @@ const useDevice = () => {
 
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [streamStatus, setStreamStatus] = useState<StreamStatusType>(null);
-  const [isUpdateStream, setIsUpdateStream] = useState<boolean>(true);
+  const [isUpdateStream, setIsUpdateStream] = useState<boolean>(isInitialGetStream);
 
   const { updateDevice } = useCurrentDevice();
 
@@ -59,7 +59,7 @@ const useDevice = () => {
     setStreamStatus(null);
   }, [setDeviceEnable]);
 
-  const { updatePermission, addPermissionListener, checkPermissionQuery } = useCheckPermission();
+  const { isSupportedPermission, updatePermission, addPermissionListener } = useCheckPermission();
 
   const toggleAudioInput = async () => {
     if (stream) {
@@ -90,7 +90,7 @@ const useDevice = () => {
   };
 
   const getStream = useCallback(async () => {
-    const newPermission = await updatePermission(true);
+    const newPermission = await updatePermission();
     try {
       const newStream = await navigator.mediaDevices.getUserMedia(
         getStreamConstraint(newPermission, { audio: audioInput.id, video: videoInput.id }),
@@ -180,11 +180,10 @@ const useDevice = () => {
 
   useEffect(() => {
     const checkDevicePermission = async () => {
-      if (!stream) {
+      if (!stream || isSupportedPermission === null) {
         return;
       }
-      const isEnableCheckPermission = await checkPermissionQuery();
-      if (isEnableCheckPermission) {
+      if (isSupportedPermission !== false) {
         await addPermissionListener(() => {
           setIsUpdateStream(true);
           setStreamStatus(null);
@@ -212,7 +211,7 @@ const useDevice = () => {
         timerRef.current = null;
       }
     };
-  }, [stream, addPermissionListener, updatePermission, setDeviceEnable, handleUpdateStream, checkPermissionQuery]);
+  }, [stream, isSupportedPermission, addPermissionListener, updatePermission, setDeviceEnable, handleUpdateStream]);
 
   useEffect(() => {
     return () => {

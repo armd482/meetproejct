@@ -17,7 +17,7 @@ interface DeviceStoreType {
   audioInputList: MediaDeviceInfo[];
   audioOuputList: MediaDeviceInfo[];
   videoInputList: MediaDeviceInfo[];
-  setPermission: (callback: Record<'audio' | 'video', boolean> | PermissionCallback) => void;
+  setPermission: (callback: Record<'audio' | 'video', boolean> | null | PermissionCallback) => void;
   setAudioInput: (value: DeviceType) => void;
   setAudioOutput: (value: DeviceType) => void;
   setVideoInput: (value: DeviceType) => void;
@@ -36,7 +36,7 @@ export const useDeviceStore = create<DeviceStoreType>((set) => ({
   audioInputList: [],
   audioOuputList: [],
   videoInputList: [],
-  setPermission: (callback: Record<'audio' | 'video', boolean> | PermissionCallback) =>
+  setPermission: (callback: Record<'audio' | 'video', boolean> | null | PermissionCallback) =>
     set((state) => {
       if (typeof callback === 'function') {
         return { permission: callback(state.permission ?? { audio: false, video: false }) };

@@ -1,13 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Modal } from '@/component';
+import { Modal, InitialRequestModal, RequestModal } from '@/component';
 
 import { useDeviceStore } from '@/store/DeviceStore';
 import { useShallow } from 'zustand/react/shallow';
 import { StreamStatusType } from '@/type/streamType';
 
-import { InitialRequestModal, NotificationModal, RequestInfoModal, RequestModal } from './PermissionModal/index';
+import { NotificationModal, RequestInfoModal } from './PermissionModal/index';
 
 interface PermissionModalProps {
   isOpenModal: boolean;
