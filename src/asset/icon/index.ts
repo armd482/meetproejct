@@ -7,6 +7,7 @@ export { default as ChatOff } from './chatOff.svg';
 export { default as ChatOn } from './chatOn.svg';
 export { default as Check } from './check.svg';
 export { default as Chevron } from './chevron.svg';
+export { default as ChevronFill } from './chevronFill.svg';
 export { default as Clipboard } from './clipboard.svg';
 export { default as Declaration } from './declaration.svg';
 export { default as Delete } from './delete.svg';

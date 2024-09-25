@@ -40,7 +40,7 @@ function ModalContent({ status, onClose, onUpdateStream }: ModalContentProps) {
   }
 
   if (!isDenied) {
-    <RequestModal onClose={onClose} onRequstError={handleRequseError} onUpdateStream={onUpdateStream} />;
+    <RequestModal onSkipUpdateStream={onClose} onRequstError={handleRequseError} onUpdateStream={onUpdateStream} />;
   }
 
   return <RequestInfoModal onClose={onClose} />;

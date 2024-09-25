@@ -40,7 +40,7 @@ export default function ButtonTag({
     setIsDrag(false);
   };
   return (
-    <div className='relative size-fit' onMouseEnter={handleButtonMouseEnter} onMouseLeave={handleButtonMouseLeave}>
+    <div className='relative size-auto' onMouseEnter={handleButtonMouseEnter} onMouseLeave={handleButtonMouseLeave}>
       {children}
       {isDrag && (
         <div

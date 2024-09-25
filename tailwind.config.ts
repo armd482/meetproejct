@@ -5,7 +5,7 @@ const config: Config = {
   theme: {
     extend: {
       screens: {
-        sm: { max: '639px' },
+        sm: { max: '480px' },
         md: { max: '800px' },
         lg: { max: '1023px' },
         xl: { max: '1279px' },

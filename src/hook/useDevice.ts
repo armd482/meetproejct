@@ -9,7 +9,7 @@ import { getStreamConstraint } from '@/lib/getStreamConstraint';
 import useCurrentDevice from './useCurrentDevice';
 import useCheckPermission from './useCheckPermission';
 
-const useDevice = (isInitialGetStream = true) => {
+const useDevice = (isInitialUpdate = true) => {
   const {
     deviceEnable,
     audioInput,
@@ -37,7 +37,7 @@ const useDevice = (isInitialGetStream = true) => {
 
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [streamStatus, setStreamStatus] = useState<StreamStatusType>(null);
-  const [isUpdateStream, setIsUpdateStream] = useState<boolean>(isInitialGetStream);
+  const [isUpdateStream, setIsUpdateStream] = useState<boolean>(isInitialUpdate);
 
   const { updateDevice } = useCurrentDevice();
 
@@ -59,7 +59,14 @@ const useDevice = (isInitialGetStream = true) => {
     setStreamStatus(null);
   }, [setDeviceEnable]);
 
-  const { isSupportedPermission, updatePermission, addPermissionListener } = useCheckPermission();
+  const handleStreamClear = useCallback(() => {
+    if (stream) {
+      stream.getTracks().forEach((track) => track.stop());
+      setStream(null);
+    }
+  }, [stream]);
+
+  const { updatePermission, addPermissionListener, checkPermissionQuery } = useCheckPermission();
 
   const toggleAudioInput = async () => {
     if (stream) {
@@ -180,10 +187,11 @@ const useDevice = (isInitialGetStream = true) => {
 
   useEffect(() => {
     const checkDevicePermission = async () => {
-      if (!stream || isSupportedPermission === null) {
+      if (!stream) {
         return;
       }
-      if (isSupportedPermission !== false) {
+      const isEnableCheckPermission = await checkPermissionQuery();
+      if (isEnableCheckPermission) {
         await addPermissionListener(() => {
           setIsUpdateStream(true);
           setStreamStatus(null);
@@ -211,7 +219,7 @@ const useDevice = (isInitialGetStream = true) => {
         timerRef.current = null;
       }
     };
-  }, [stream, isSupportedPermission, addPermissionListener, updatePermission, setDeviceEnable, handleUpdateStream]);
+  }, [stream, addPermissionListener, updatePermission, setDeviceEnable, handleUpdateStream, checkPermissionQuery]);
 
   useEffect(() => {
     return () => {
@@ -230,6 +238,7 @@ const useDevice = (isInitialGetStream = true) => {
     toggleAudioInput,
     toggleVideoInput,
     handleUpdateStream,
+    handleStreamClear,
   };
 };
 

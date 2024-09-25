@@ -1,24 +1,18 @@
-/* eslint-disable import/no-cycle */
 import Image from 'next/image';
-
-import { ButtonTag } from '@/component';
-import * as Icon from '@/asset/icon';
+import { MouseEvent } from 'react';
 import { permission } from '@/asset/image';
 
 interface RequestModalProps {
   onUpdateStream?: () => void;
-  onClose?: () => void;
+  onSkipUpdateStream?: () => void;
   onRequstError?: () => void;
 }
 
-export default function RequestModal({ onClose, onRequstError, onUpdateStream }: RequestModalProps) {
+export default function RequestModal({ onSkipUpdateStream, onRequstError, onUpdateStream }: RequestModalProps) {
   const handleRequestPermissionButtonClick = async () => {
     try {
       if (onUpdateStream) {
         onUpdateStream();
-      }
-      if (onClose) {
-        onClose();
       }
     } catch {
       if (onRequstError) {
@@ -27,17 +21,15 @@ export default function RequestModal({ onClose, onRequstError, onUpdateStream }:
     }
   };
 
+  const handleWithoutRequestButtonClick = (e: MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    if (onSkipUpdateStream) {
+      onSkipUpdateStream();
+    }
+  };
+
   return (
     <div className='relative flex flex-col items-center justify-center rounded-[28px] bg-white px-8 pb-[40px] pt-[30px]'>
-      {onClose && (
-        <div className='absolute right-2 top-2 rounded-full hover:bg-[#F0F1F1] active:bg-[#DEDFDF]'>
-          <ButtonTag position='bottom' name='대화상자 닫기'>
-            <button type='button' onClick={onClose} className='flex  size-12 items-center justify-center'>
-              <Icon.Delete width={24} height={24} fill='#444746' />
-            </button>
-          </ButtonTag>
-        </div>
-      )}
       <Image src={permission} alt='permission' width={230} height={230} />
       <div className='px-10 pt-5 text-center font-googleSans text-[#444746]'>
         <p className='mb-4 text-2xl'>회의에서 참여자들이 나를 보고 듣도록 하시겠습니까?</p>
@@ -54,7 +46,7 @@ export default function RequestModal({ onClose, onRequstError, onUpdateStream }:
         <button
           type='button'
           className='w-[191px] rounded-full py-2 text-sm text-[#0B57D0] hover:bg-[#ECF2FC] active:bg-[#D5E2F8]'
-          onClick={onClose}
+          onClick={handleWithoutRequestButtonClick}
         >
           마이크 및 카메라 없이 계속
         </button>
