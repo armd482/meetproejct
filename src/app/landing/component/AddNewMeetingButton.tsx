@@ -55,7 +55,7 @@ export default function AddNewMeetingButton() {
         disabled={isClicked}
         className='flex h-12 shrink-0 items-center justify-center gap-2 rounded-md bg-[#1a73E8] px-[14px] text-base text-white hover:bg-[#1A6DDE] hover:shadow-md'
       >
-        <Icon.AddMeeting width={18} height={18} />새 회의
+        <Icon.AddMeeting width={18} height={18} fill='#ffffff' />새 회의
       </button>
       <Alert text='세션 생성에 실패하였습니다.' isOpen={isFailed} onCloseAlert={handleCloseAlert} />
     </>

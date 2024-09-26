@@ -124,8 +124,8 @@ export default function ControlBar({
       <OptionButton
         type='audio'
         onClickButton={handleButtonClick}
-        icon={<Icon.MicOn width={20} height={20} fill='#E3E3E3' />}
-        clickedIcon={<Icon.MicOff width={20} height={20} fill='#5F1312' />}
+        icon={<Icon.MicOn width={24} height={24} fill='#E3E3E3' />}
+        clickedIcon={<Icon.MicOff width={24} height={24} fill='#5F1312' />}
         name={{ chevron: '오디오 설정', icon: '마이크 끄기(ctrl + d)' }}
         status={streamStatus}
         stream={stream}
@@ -134,7 +134,7 @@ export default function ControlBar({
       <OptionButton
         type='video'
         onClickButton={handleButtonClick}
-        icon={<Icon.VideoOn width={26} height={26} fill='#E3E3E3' />}
+        icon={<Icon.VideoOn width={24} height={24} fill='#E3E3E3' />}
         clickedIcon={<Icon.VideoOff width={24} height={24} fill='#5F1312' />}
         name={{ chevron: '영상 설정', icon: '마이크 끄기(ctrl + d)' }}
         status={streamStatus}

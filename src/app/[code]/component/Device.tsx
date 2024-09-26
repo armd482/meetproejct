@@ -108,7 +108,7 @@ export default function Device() {
               {deviceEnable.audio && permission?.audio ? (
                 <Icon.MicOn width={24} height={24} fill='#ffffff' />
               ) : (
-                <Icon.MicOff width={28} height={28} fill='#ffffff' />
+                <Icon.MicOff width={24} height={24} fill='#ffffff' />
               )}
               {audioDisabled && streamStatus !== null && (
                 <div className='absolute right-0 top-0 size-3 rounded-full bg-white'>
