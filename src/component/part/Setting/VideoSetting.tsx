@@ -33,7 +33,6 @@ export default function VideoSetting({ stream, onUpdateStream }: VideoSettingPro
     if (stream && videoRef.current) {
       videoRef.current.srcObject = stream;
     }
-    console.log(stream?.getVideoTracks()[0]);
   }, [stream]);
 
   return (

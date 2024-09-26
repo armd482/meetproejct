@@ -165,10 +165,7 @@ export default function Setting({ isOpen, onClose }: SettingProps) {
     }
   }, [isOpen, isPending]);
 
-  console.log(stream?.getVideoTracks());
-
   useEffect(() => {
-    console.log(streamStatus);
     if (stream || streamStatus === 'rejected' || streamStatus === 'failed') {
       if (timerRef.current) {
         clearTimeout(timerRef.current);

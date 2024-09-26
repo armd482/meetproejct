@@ -16,6 +16,14 @@ const ICON_PROPS = {
   fill: '#5f6368',
 };
 
+const HELP_BUTTON = [
+  { name: '도움말', href: 'https://github.com/armd482/meetproejct' },
+  { name: '교육', href: 'https://github.com/armd482/meetproejct' },
+  { name: '서비스 약관', href: 'https://github.com/armd482/meetproejct' },
+  { name: '개인정보처리방침', href: 'https://github.com/armd482/meetproejct' },
+  { name: '약관 요약', href: 'https://github.com/armd482/meetproejct' },
+];
+
 export default function Header() {
   const { name, color, setName, setColor, setId } = useUserInfoStore(
     useShallow((state) => ({
@@ -30,6 +38,7 @@ export default function Header() {
   const [isClickedSetting, setIsClickedSetting] = useState(false);
   const [isClickedName, setIsClickedName] = useState(false);
   const [isClickedFeedback, setIsClickedFeedback] = useState(false);
+  const [isClickedHelp, setIsClickedHelp] = useState(false);
 
   const handleCloseInfo = () => {
     setIsClickedName(false);
@@ -41,7 +50,13 @@ export default function Header() {
     setId('');
     setIsClickedName(false);
   };
+
+  const handleHelpClose = () => {
+    setIsClickedHelp(false);
+  };
+
   const { targetRef } = useOutsideClick<HTMLDivElement>(handleCloseInfo);
+  const { targetRef: helpRef } = useOutsideClick<HTMLDivElement>(handleHelpClose);
 
   const handleSettingClick = () => {
     setIsClickedSetting((prev) => !prev);
@@ -59,10 +74,20 @@ export default function Header() {
     setIsClickedFeedback(false);
   };
 
+  const handleHelpClick = () => {
+    setIsClickedHelp((prev) => !prev);
+  };
+
+  const handleHelpButtonClick = (href: string) => {
+    window.open(href, '_blank');
+    setIsClickedHelp(false);
+  };
+
   const BUTTON_LIST = [
     {
       name: '지원',
       icon: <Icon.Help {...ICON_PROPS} />,
+      onClick: handleHelpClick,
     },
     {
       name: '문제 신고',
@@ -93,6 +118,26 @@ export default function Header() {
             {button.icon}
           </IconButton>
         ))}
+        {isClickedHelp && (
+          <div
+            ref={helpRef}
+            className={`absolute top-12 ${name && color ? 'right-[155px]' : 'right-[100px]'} w-[280px] py-2 rounded z-[5] bg-white`}
+            style={{
+              boxShadow: '0 3px 5px -1px rgba(0,0,0,.2),0 6px 10px 0 rgba(0,0,0,.14),0 1px 18px 0 rgba(0,0,0,.12)',
+            }}
+          >
+            {HELP_BUTTON.map((button) => (
+              <button
+                key={button.name}
+                type='button'
+                onClick={() => handleHelpButtonClick(button.href)}
+                className='flex items-center w-full h-12 px-4 text-left hover:bg-[#F5F5F5] active:bg-[#D7D7D7] text-black'
+              >
+                {button.name}
+              </button>
+            ))}
+          </div>
+        )}
         {name && color && (
           <div className='relative'>
             <button
