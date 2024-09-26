@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, ChangeEvent } from 'react';
 import ButtonTag from '@/component/ButtonTag';
-import { CaptureButton, StyleLink } from './index';
 import * as Icon from '@/asset/icon';
+import { CaptureButton, StyleLink } from './index';
 
 interface SuggestProps {
   onComplete: (value: boolean) => void;

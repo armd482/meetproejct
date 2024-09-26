@@ -1,8 +1,8 @@
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import * as Icon from '@/asset/icon';
 import ButtonTag from '@/component/ButtonTag';
-import { CaptureButton, StyleLink } from './index';
 import { useOutsideClick } from '@/hook';
+import { CaptureButton, StyleLink } from './index';
 
 interface ReportProps {
   onComplete: (value: boolean) => void;

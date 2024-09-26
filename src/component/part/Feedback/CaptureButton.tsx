@@ -46,6 +46,7 @@ export default function CaptureButton({ imgSrc, onImageChange, onVisible }: Capt
         onVisible(true);
       };
     } catch {
+      return;
     } finally {
       onVisible(true);
       setIsClicked(false);
@@ -64,13 +65,13 @@ export default function CaptureButton({ imgSrc, onImageChange, onVisible }: Capt
           <div className='overflow-hidden rounded border border-solid border-[#757575]'>
             <Image width={372} height={240} alt='capturedImage' src={imgSrc} />
           </div>
-          <div></div>
-          <div className='absolute top-6 right-0'>
+          <div />
+          <div className='absolute right-0 top-6'>
             <ButtonTag name='스크린샷 삭제' style={{ left: 'auto', right: '-45px' }} instant>
               <button
                 type='button'
                 onClick={handleRemoveButtonClick}
-                className='size-12 bg-white rounded-full flex items-center justify-center hover:bg-[#FCF7F6] active:bg-[#F5E5E4]'
+                className='flex size-12 items-center justify-center rounded-full bg-white hover:bg-[#FCF7F6] active:bg-[#F5E5E4]'
                 style={{ boxShadow: '0 1px 3px 0 rgba(48,48,48,0.302),0 4px 8px 3px rgba(48,48,48,0.149)' }}
               >
                 <Icon.Remove width={24} height={24} fill='#B3261E' />

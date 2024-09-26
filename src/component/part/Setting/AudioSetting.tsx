@@ -95,7 +95,7 @@ export default function AudioSetting({ stream, onUpdateStream }: AudioSettingPro
           {permission?.audio ? (
             <Visualizer stream={stream} />
           ) : (
-            <div className='h-14 text-sm text-[#202124] bg-[#F1F3F4] flex items-center px-[6px]'>마이크가 차단됨</div>
+            <div className='flex h-14 items-center bg-[#F1F3F4] px-[6px] text-sm text-[#202124]'>마이크가 차단됨</div>
           )}
         </div>
       </div>

@@ -121,7 +121,7 @@ export default function Header() {
         {isClickedHelp && (
           <div
             ref={helpRef}
-            className={`absolute top-12 ${name && color ? 'right-[155px]' : 'right-[100px]'} w-[280px] py-2 rounded z-[5] bg-white`}
+            className={`absolute top-12 ${name && color ? 'right-[155px]' : 'right-[100px]'} z-[5] w-[280px] rounded bg-white py-2`}
             style={{
               boxShadow: '0 3px 5px -1px rgba(0,0,0,.2),0 6px 10px 0 rgba(0,0,0,.14),0 1px 18px 0 rgba(0,0,0,.12)',
             }}
@@ -131,7 +131,7 @@ export default function Header() {
                 key={button.name}
                 type='button'
                 onClick={() => handleHelpButtonClick(button.href)}
-                className='flex items-center w-full h-12 px-4 text-left hover:bg-[#F5F5F5] active:bg-[#D7D7D7] text-black'
+                className='flex h-12 w-full items-center px-4 text-left text-black hover:bg-[#F5F5F5] active:bg-[#D7D7D7]'
               >
                 {button.name}
               </button>

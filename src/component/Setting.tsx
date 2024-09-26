@@ -1,7 +1,5 @@
 import useCheckPermission from '@/hook/useCheckPermission';
-import { useEffect, useState, useRef } from 'react';
-import { useDeviceStore } from '@/store/DeviceStore';
-import { useShallow } from 'zustand/react/shallow';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useDevice } from '@/hook';
 import * as Icon from '@/asset/icon';
 import Modal from './Modal';
@@ -128,7 +126,7 @@ export default function Setting({ isOpen, onClose }: SettingProps) {
   const { stream, streamStatus, handleUpdateStream, handleStreamClear } = useDevice(false);
   const { checkPermissionQuery } = useCheckPermission();
 
-  const updateStream = async () => {
+  const updateStream = useCallback(async () => {
     setIsTimeOut(false);
     if (timerRef.current) {
       clearTimeout(timerRef.current);
@@ -141,7 +139,7 @@ export default function Setting({ isOpen, onClose }: SettingProps) {
       setIsTimeOut(true);
       timerRef.current = null;
     }, 2000);
-  };
+  }, [handleUpdateStream]);
 
   useEffect(() => {
     const getPermission = async () => {
@@ -163,7 +161,7 @@ export default function Setting({ isOpen, onClose }: SettingProps) {
       setIsPending(true);
       getPermission();
     }
-  }, [isOpen, isPending]);
+  }, [isOpen, isPending, checkPermissionQuery, updateStream]);
 
   useEffect(() => {
     if (stream || streamStatus === 'rejected' || streamStatus === 'failed') {

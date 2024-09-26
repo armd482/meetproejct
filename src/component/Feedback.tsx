@@ -58,7 +58,7 @@ export default function Feedback({ isOpen, onClose }: FeedBackProps) {
         }}
       >
         <div
-          className='absolute right-0 top-0 h-full w-[412px] rounded-l-lg bg-white overflow-hidden'
+          className='absolute right-0 top-0 h-full w-[412px] overflow-hidden rounded-l-lg bg-white'
           style={{ boxShadow: '0 1px 3px 0 rgba(48,48,48,0.302),0 4px 8px 3px rgba(48,48,48,0.149)' }}
         >
           {!category ? (

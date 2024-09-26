@@ -55,11 +55,11 @@ export default function VideoSetting({ stream, onUpdateStream }: VideoSettingPro
             autoPlay
             muted
             ref={videoRef}
-            className='h-[58px] aspect-video object-cover'
+            className='aspect-video h-[58px] object-cover'
             style={{ transform: 'rotateY(180deg)' }}
           />
         ) : (
-          <div className='h-14 text-sm text-[#202124] bg-[#F1F3F4] flex items-center justify-center w-[160px]'>
+          <div className='flex h-14 w-[160px] items-center justify-center bg-[#F1F3F4] text-sm text-[#202124]'>
             카메라 차단됨
           </div>
         )}
