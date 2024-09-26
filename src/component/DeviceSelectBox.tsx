@@ -60,7 +60,7 @@ export default function DeviceSelectBox({
       <div className='relative w-full' ref={targetRef}>
         <button
           type='button'
-          className={`relative flex h-14 w-full min-w-16 items-center gap-2 truncate rounded-[4px] border border-solid ${disabled ? 'border-[#E7E8E8]' : 'border-[#80868B]'} pl-[10px] pr-[25px] ${!disabled && 'hover:bg-[#F6FAFE] active:border-[#1B77E4] active:bg-[#DBE9FB]'} `}
+          className={`relative flex h-14 w-full min-w-16 items-center gap-2 truncate rounded border border-solid ${disabled ? 'border-[#E7E8E8]' : 'border-[#80868B]'} pl-[10px] pr-[25px] ${!disabled && 'hover:bg-[#F6FAFE] active:border-[#1B77E4] active:bg-[#DBE9FB]'} `}
           onClick={handleSelectButtonClick}
           disabled={disabled}
         >
@@ -72,15 +72,15 @@ export default function DeviceSelectBox({
             {disabled ? '권한 필요' : currentValue.name}
           </p>
           <Icon.ChevronFill
-            width={10}
-            height={10}
+            width={18}
+            height={18}
             fill={disabled ? '#B5B6B7' : '#3C4043'}
-            className='absolute right-3 top-6'
+            className='absolute right-3 top-5'
           />
         </button>
         {isClicked && (
           <div
-            className='absolute left-0 top-full max-h-[376.2px] min-w-[260px] max-w-[498.4px] rounded-[4px] py-[6px] bg-white z-10'
+            className='absolute left-0 top-full z-10 max-h-[376.2px] min-w-[260px] max-w-[498.4px] rounded bg-white py-[6px]'
             style={{
               boxShadow: '0 3px 5px -1px rgba(0,0,0,.2),0 6px 10px 0 rgba(0,0,0,.14),0 1px 18px 0 rgba(0,0,0,.12)',
             }}

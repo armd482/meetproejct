@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { useOutsideClick } from '@/hook';
 import { useShallow } from 'zustand/react/shallow';
 import { Setting } from '@/component';
+import Feedback from '@/component/Feedback';
 import { CurrentDate, IconButton } from './part/Header';
 
 const ICON_PROPS = {
@@ -28,6 +29,7 @@ export default function Header() {
 
   const [isClickedSetting, setIsClickedSetting] = useState(false);
   const [isClickedName, setIsClickedName] = useState(false);
+  const [isClickedFeedback, setIsClickedFeedback] = useState(false);
 
   const handleCloseInfo = () => {
     setIsClickedName(false);
@@ -45,8 +47,16 @@ export default function Header() {
     setIsClickedSetting((prev) => !prev);
   };
 
-  const handleCloseSetting = () => {
+  const handleSettingClose = () => {
     setIsClickedSetting(false);
+  };
+
+  const handleFeedbackClick = () => {
+    setIsClickedFeedback(true);
+  };
+
+  const handleFeedbackClose = () => {
+    setIsClickedFeedback(false);
   };
 
   const BUTTON_LIST = [
@@ -56,7 +66,8 @@ export default function Header() {
     },
     {
       name: '문제 신고',
-      icon: <Icon.Declaration {...ICON_PROPS} />,
+      icon: <Icon.Feedback {...ICON_PROPS} />,
+      onClick: handleFeedbackClick,
     },
     {
       name: '설정',
@@ -117,7 +128,7 @@ export default function Header() {
                 <button
                   type='button'
                   onClick={handleLogout}
-                  className='mt-2 flex w-full items-center justify-center gap-3 rounded-full bg-[#F8FAFD] py-4 text-lg text-[#1F1F1F]'
+                  className='mt-2 flex w-full items-center justify-center gap-3 rounded-full bg-[#F8FAFD] py-4 text-lg text-custom-gray'
                 >
                   <Icon.Logout width={18} height={18} fill='#444746' />
                   로그아웃
@@ -127,7 +138,8 @@ export default function Header() {
           </div>
         )}
       </div>
-      <Setting isOpen={isClickedSetting} onClose={handleCloseSetting} />
+      <Setting isOpen={isClickedSetting} onClose={handleSettingClose} />
+      <Feedback isOpen={isClickedFeedback} onClose={handleFeedbackClose} />
     </div>
   );
 }

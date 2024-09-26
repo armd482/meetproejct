@@ -16,7 +16,7 @@ const config: Config = {
         '4.5xl': ['44px', '1'],
       },
       fontFamily: {
-        googleSans: ['Google Sans', 'Roboto', 'Arial', 'sans-serif'],
+        googleSans: ['Google Sans', 'Google Sans Text', 'Roboto', 'Arial', 'sans-serif'],
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
@@ -24,6 +24,7 @@ const config: Config = {
       },
       colors: {
         'black-87': 'rgba(0, 0, 0, 0.87)',
+        'custom-gray': '#1F1F1F',
       },
       backgroundColor: {
         'black-75': 'rgba(0, 0, 0, 0.75)',
@@ -46,6 +47,16 @@ const config: Config = {
             transform: 'scaleX(0)',
           },
         },
+
+        'slide-in-bottom': {
+          '0%': {
+            transform: 'scaleY(0)',
+          },
+          '100%': {
+            transform: 'scaleY(1)',
+          },
+        },
+
         'move-bottom-up': {
           '0%': {
             transform: 'translateY(100%)',
@@ -69,6 +80,7 @@ const config: Config = {
       animation: {
         'slide-in-left': 'slide-in-left 0.3s ease forwards',
         'slide-out-left': 'slide-out-left 0.3s ease forwards',
+        'slide-in-bottom': 'slide-in-bottom 0.3s ease forwards',
         'move-bottom-up': 'move-bottom-up 3s linear forwards',
       },
       transformOrigin: {

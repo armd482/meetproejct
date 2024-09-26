@@ -1,5 +1,6 @@
 export { default as clapEmoji } from './clapEmoji.png';
 export { default as curiousEmoji } from './curiousEmoji.png';
+export { default as feedbackHeader } from './feedbackHeader.png';
 export { default as heartEmoji } from './heartEmoji.png';
 export { default as laughterEmoji } from './laughterEmoji.png';
 export { default as partyPoperEmoji } from './partyPoperEmoji.png';

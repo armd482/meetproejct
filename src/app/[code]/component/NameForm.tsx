@@ -50,7 +50,7 @@ export default function NameForm() {
           value={name}
           onChange={handleInputChange}
           placeholder='이름'
-          className='h-14 w-[300px] rounded-[4px] border border-solid border-[#1F1F1F] px-4 text-base outline-none'
+          className='h-14 w-[300px] rounded border border-solid border-custom-gray px-4 text-base outline-none'
         />
         <p className='w-[300px] px-4 pt-1 text-right text-xs text-[#444746]'>{`${name.length} / ${MAX_SIZE}`}</p>
       </div>
