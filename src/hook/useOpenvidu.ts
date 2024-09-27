@@ -325,11 +325,16 @@ const useOpenvidu = (sessionId: string) => {
   }, []);
 
   useEffect(() => {
-    window.addEventListener('beforeunload', leaveSession);
-    return () => {
-      window.removeEventListener('beforeunload', leaveSession);
+    const cleanUpSession = () => {
+      const payload = JSON.stringify({ sessionId, userId: id });
+      navigator.sendBeacon(`/api/participant/delete`, payload);
+      leaveSession();
     };
-  }, [leaveSession]);
+    window.addEventListener('beforeunload', cleanUpSession);
+    return () => {
+      window.removeEventListener('beforeunload', cleanUpSession);
+    };
+  }, [leaveSession, id, sessionId]);
 
   useEffect(() => {
     const initialJoinSession = async () => {

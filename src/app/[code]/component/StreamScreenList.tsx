@@ -1,3 +1,5 @@
+'use client';
+
 import { Publisher, Subscriber } from 'openvidu-custom-armd482';
 import { useShallow } from 'zustand/react/shallow';
 

@@ -1,4 +1,4 @@
-'use clinet';
+'use client';
 
 import { useLayoutEffect, useState } from 'react';
 import { ParticipantDataType } from '@/type/participantType';

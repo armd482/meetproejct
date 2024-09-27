@@ -3,43 +3,38 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-import { getSessionId } from '@/lib/getRandomId';
-import { postSessionId, deleteSessionId } from '@/app/api/mongoAPI';
-import { postCreateSession } from '@/app/api/sessionAPI';
 import * as Icon from '@/asset/icon';
 import { Alert } from '@/component';
+import { useUserInfoStore } from '@/store/UserInfoStore';
+import { useShallow } from 'zustand/react/shallow';
+import { createSession } from '@/lib/createSession';
 
 export default function AddNewMeetingButton() {
   const router = useRouter();
+  const { name, color } = useUserInfoStore(
+    useShallow((state) => ({
+      name: state.name,
+      color: state.color,
+    })),
+  );
   const [isClicked, setIsClicked] = useState(false);
   const [isFailed, setIsFailed] = useState(false);
 
-  const responseSessionId = async (count: number) => {
-    if (count === 0) {
-      setIsFailed(true);
-      return null;
-    }
-    try {
-      const key = getSessionId();
-      await postSessionId(key);
-      return key;
-    } catch (error) {
-      return responseSessionId(count - 1);
-    }
-  };
-
   const handleButtonClick = async () => {
-    setIsClicked(true);
-    const key = await responseSessionId(3);
-    if (key) {
-      try {
-        await postCreateSession(key);
-        router.push(`/${key}`);
-      } catch {
-        await deleteSessionId(key);
-        setIsFailed(true);
-      }
+    if (!name || !color) {
+      router.push('/user');
+      return;
     }
+
+    setIsClicked(true);
+
+    const key = await createSession(3);
+
+    if (key) {
+      router.push(`/${key}`);
+      return;
+    }
+    setIsFailed(true);
     setIsClicked(false);
   };
 

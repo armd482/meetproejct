@@ -1,3 +1,5 @@
+'use client';
+
 import { useUserInfoStore } from '@/store/UserInfoStore';
 import { EmojiInfo } from '@/type/sessionType';
 import { memo, useEffect } from 'react';

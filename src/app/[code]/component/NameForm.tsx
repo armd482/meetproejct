@@ -7,10 +7,15 @@ import { ChangeEvent, FormEvent, useState } from 'react';
 import { getRandomHexColor } from '@/lib/getRandomColor';
 import { useUserInfoStore } from '@/store/UserInfoStore';
 import { useShallow } from 'zustand/react/shallow';
+import { createSession } from '@/lib/createSession';
+
+interface NameFormProps {
+  isHost: boolean;
+}
 
 const MAX_SIZE = 60;
 
-export default function NameForm() {
+export default function NameForm({ isHost }: NameFormProps) {
   const [name, setName] = useState('');
   const { setName: setUserName, setColor: setUserColor } = useUserInfoStore(
     useShallow((state) => ({
@@ -28,21 +33,52 @@ export default function NameForm() {
 
   const handleFromSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (name.length === 0) {
+    if (!name) {
       return;
     }
 
     const randomColor = getRandomHexColor();
 
-    const isValidSessionId = await postCheckSessionId(sessionId);
-    if (!isValidSessionId) {
-      alert('이미 닫힌 회의방입니다.');
-      router.push('/');
-      return;
+    if (isHost) {
+      const key = await createSession(3);
+      if (key) {
+        setUserName(name);
+        setUserColor(randomColor);
+        router.push(`${key}`);
+      }
     }
-    setUserName(name);
-    setUserColor(randomColor);
+
+    if (!isHost) {
+      const isValidSessionId = await postCheckSessionId(sessionId);
+      if (!isValidSessionId) {
+        alert('이미 닫힌 회의방입니다.');
+        router.push('/');
+        return;
+      }
+      setUserName(name);
+      setUserColor(randomColor);
+    }
   };
+
+  /* useEffect(() => {
+    console.log('호스트:', isHost);
+  }, [isHost]);
+
+  useEffect(() => {
+    const deleteSession = async (e) => {
+      console.log('pop');
+      setIsHost(false);
+      if (!isParticipate && isHost) {
+        navigator.sendBeacon(`/api/sessionId/delete?sessionId=${sessionId}`);
+        console.log('clear');
+      } 
+    };
+
+    window.addEventListener('popstate', deleteSession);
+    return () => {
+      window.removeEventListener('popstate', deleteSession);
+    };
+  }, [isParticipate, isHost, sessionId, setIsHost]); */
   return (
     <form className='flex flex-col items-center justify-center' onSubmit={handleFromSubmit}>
       <div className='pb-[5px] pt-5 font-googleSans'>
@@ -59,7 +95,7 @@ export default function NameForm() {
         className={`mt-4 h-14 w-60 rounded-full  ${name.length ? 'bg-[#0B57D0] text-white' : 'bg-[#E4E4E4] text-[#999999]'} text-center`}
         disabled={name.length === 0}
       >
-        참여 요청
+        {isHost ? '생성하기' : '참여하기'}
       </button>
     </form>
   );

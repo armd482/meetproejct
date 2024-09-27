@@ -2,7 +2,11 @@ import Link from 'next/link';
 import * as Icon from '@/asset/icon';
 import { Device, EntirePeople, NameForm } from './component';
 
-export default function Setting() {
+interface SettingProps {
+  isHost?: boolean;
+}
+
+export default function Setting({ isHost = false }: SettingProps) {
   return (
     <div className='flex h-screen w-screen flex-col bg-white'>
       <header className='relative p-4'>
@@ -16,8 +20,8 @@ export default function Setting() {
         <Device />
         <div className='m-4 flex w-[448px] flex-col items-center font-googleSans'>
           <p className='text-2xl'>이름이 무엇인가요?</p>
-          <NameForm />
-          <EntirePeople />
+          <NameForm isHost={isHost} />
+          {!isHost && <EntirePeople />}
         </div>
       </div>
       <footer className='flex items-center justify-center p-2 text-center text-xs text-[#5F6368]'>
