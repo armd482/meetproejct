@@ -6,8 +6,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { useDeviceStore } from '@/store/DeviceStore';
 import { StreamStatusType } from '@/type/streamType';
 import { getStreamConstraint } from '@/lib/getStreamConstraint';
-import useCurrentDevice from './useCurrentDevice';
-import useCheckPermission from './useCheckPermission';
+import { useCurrentDevice, useCheckPermission } from '@/hook';
 
 const useDevice = (isInitialUpdate = true) => {
   const {

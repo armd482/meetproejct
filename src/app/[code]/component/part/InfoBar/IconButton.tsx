@@ -23,6 +23,7 @@ export default function IconButton({ icon, clickedIcon, type, name, align = 'cen
     handlePanelType(type);
     handleOpenStatus(true);
   };
+
   return (
     <ButtonTag name={name} align={align}>
       <button

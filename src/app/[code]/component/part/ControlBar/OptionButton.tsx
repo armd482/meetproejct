@@ -4,7 +4,7 @@ import { ReactNode, useEffect, useState, MouseEvent, useCallback } from 'react';
 import * as Icon from '@/asset/icon';
 import { ButtonTag } from '@/component';
 import { StreamStatusType } from '@/type/streamType';
-import { useOutsideClick } from '@/hook';
+import { useOutsideClick, useShortcutKey } from '@/hook';
 import { useDeviceStore } from '@/store/DeviceStore';
 import { useShallow } from 'zustand/react/shallow';
 import DeviceList from './DeviceList';
@@ -16,10 +16,11 @@ interface OptionButtonProps {
   isVisibleOption?: boolean;
   clickedIcon: ReactNode;
   icon: ReactNode;
-  name: Record<'chevron' | 'icon', string>;
+  name: Record<'chevron' | 'iconOn' | 'iconOff', string>;
   stream?: MediaStream | null;
   status: StreamStatusType;
   changeDevice: (type: 'audio' | 'video', value: boolean | string) => Promise<MediaStream | undefined>;
+  shortcutKey?: string[];
 }
 
 export default function OptionButton({
@@ -33,6 +34,7 @@ export default function OptionButton({
   stream = null,
   status,
   changeDevice,
+  shortcutKey,
 }: OptionButtonProps) {
   const { deviceEnable, permission, audioInput, videoInput } = useDeviceStore(
     useShallow((state) => ({
@@ -45,7 +47,7 @@ export default function OptionButton({
 
   const [isPending, setIsPending] = useState(false);
   const [isClickedChevron, setIsClickedChevron] = useState(false);
-  const [currentHover, setCurrentHover] = useState<'chevron' | 'icon'>('icon');
+  const [currentHover, setCurrentHover] = useState<'chevron' | 'iconOn' | 'iconOff'>('chevron');
 
   const audioDisabled = !audioInput.id;
   const videoDisabled = !videoInput.id || status === 'rejected' || (permission && !permission.video);
@@ -76,13 +78,15 @@ export default function OptionButton({
   };
 
   const handleButtonMouseEnter = () => {
-    setCurrentHover('icon');
+    setCurrentHover(deviceEnable[type] ? 'iconOn' : 'iconOff');
   };
 
   const handleChevronMouseEnter = (e: MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     setCurrentHover('chevron');
   };
+
+  useShortcutKey(shortcutKey ?? [], handleButtonClick);
 
   useEffect(() => {
     if (!isVisibleOption) {

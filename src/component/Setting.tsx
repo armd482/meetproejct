@@ -1,6 +1,5 @@
-import useCheckPermission from '@/hook/useCheckPermission';
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { useDevice } from '@/hook';
+import { useDevice, useCheckPermission } from '@/hook';
 import * as Icon from '@/asset/icon';
 import Modal from './Modal';
 import RequestModal from './RequestModal';

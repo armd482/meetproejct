@@ -59,26 +59,6 @@ export default function NameForm({ isHost }: NameFormProps) {
       setUserColor(randomColor);
     }
   };
-
-  /* useEffect(() => {
-    console.log('호스트:', isHost);
-  }, [isHost]);
-
-  useEffect(() => {
-    const deleteSession = async (e) => {
-      console.log('pop');
-      setIsHost(false);
-      if (!isParticipate && isHost) {
-        navigator.sendBeacon(`/api/sessionId/delete?sessionId=${sessionId}`);
-        console.log('clear');
-      } 
-    };
-
-    window.addEventListener('popstate', deleteSession);
-    return () => {
-      window.removeEventListener('popstate', deleteSession);
-    };
-  }, [isParticipate, isHost, sessionId, setIsHost]); */
   return (
     <form className='flex flex-col items-center justify-center' onSubmit={handleFromSubmit}>
       <div className='pb-[5px] pt-5 font-googleSans'>

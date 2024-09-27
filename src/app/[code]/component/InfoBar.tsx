@@ -63,8 +63,8 @@ const BUTTON_LIST: ButtonType[] = [
 export default function InfoBar() {
   return (
     <div className='flex items-center justify-end'>
-      {BUTTON_LIST.map((button) => (
-        <IconButton key={button.type} {...button} />
+      {BUTTON_LIST.map((button, i) => (
+        <IconButton key={button.type} align={i === BUTTON_LIST.length - 1 ? 'right' : 'center'} {...button} />
       ))}
     </div>
   );

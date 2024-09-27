@@ -1,13 +1,13 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
+import { useShallow } from 'zustand/react/shallow';
+
 import * as Icon from '@/asset/icon';
 import { useUserInfoStore } from '@/store/UserInfoStore';
-import { useState } from 'react';
 import { useOutsideClick } from '@/hook';
-import { useShallow } from 'zustand/react/shallow';
-import { Setting } from '@/component';
-import Feedback from '@/component/Feedback';
+import { Feedback, Setting } from '@/component';
 import { CurrentDate, IconButton } from './part/Header';
 
 const ICON_PROPS = {
