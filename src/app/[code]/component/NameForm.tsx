@@ -1,13 +1,16 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
-import { postCheckSessionId } from '@/app/api/mongoAPI';
-
 import { ChangeEvent, FormEvent, useState } from 'react';
-import { getRandomHexColor } from '@/lib/getRandomColor';
-import { useUserInfoStore } from '@/store/UserInfoStore';
+import Image from 'next/image';
 import { useShallow } from 'zustand/react/shallow';
+
+import { postCheckSessionId } from '@/app/api/mongoAPI';
+import { getRandomHexColor } from '@/lib/getRandomColor';
 import { createSession } from '@/lib/createSession';
+import { useUserInfoStore } from '@/store/UserInfoStore';
+import * as image from '@/asset/image';
+import { Loading } from '@/component';
 
 interface NameFormProps {
   isHost: boolean;
@@ -16,6 +19,7 @@ interface NameFormProps {
 const MAX_SIZE = 60;
 
 export default function NameForm({ isHost }: NameFormProps) {
+  const [isPending, setIsPending] = useState(false);
   const [name, setName] = useState('');
   const { setName: setUserName, setColor: setUserColor } = useUserInfoStore(
     useShallow((state) => ({
@@ -36,6 +40,8 @@ export default function NameForm({ isHost }: NameFormProps) {
     if (!name) {
       return;
     }
+
+    setIsPending(true);
 
     const randomColor = getRandomHexColor();
 
@@ -77,6 +83,7 @@ export default function NameForm({ isHost }: NameFormProps) {
       >
         {isHost ? '생성하기' : '참여하기'}
       </button>
+      <Loading isPending={isPending} />
     </form>
   );
 }

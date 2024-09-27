@@ -18,6 +18,7 @@ import {
   StreamGridList,
   StreamScreenList,
 } from './component';
+import { Loading } from '@/component';
 
 export default function Meetting() {
   const pathname = usePathname();
@@ -146,6 +147,7 @@ export default function Meetting() {
           <InfoBar />
         </div>
       </div>
+      <Loading isPending={Boolean(stream === null)} />
     </div>
   );
 }

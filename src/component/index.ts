@@ -3,6 +3,7 @@ export { default as ButtonTag } from './ButtonTag';
 export { default as DeviceSelectBox } from './DeviceSelectBox';
 export { default as Feedback } from './Feedback';
 export { default as InitialRequestModal } from './InitialRequestModal';
+export { default as Loading } from './Loading';
 export { default as Modal } from './Modal';
 export { default as RequestModal } from './RequestModal';
 export { default as Setting } from './Setting';
