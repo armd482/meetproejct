@@ -12,8 +12,8 @@ export const postSessionId = async (sessionId: string) => {
 };
 
 export const deleteSessionId = async (sessionId: string) => {
-  const response = await fetch(`/api/sessionId?sessionId=${sessionId}`, {
-    method: 'DELETE',
+  const response = await fetch(`/api/sessionId/delete?sessionId=${sessionId}`, {
+    method: 'POST',
   });
   if (!response.ok) {
     const result = await response.json();
@@ -46,8 +46,8 @@ export const postParticipant = async (sessionId: string, userId: string, userNam
 };
 
 export const deleteParticipant = async (sessionId: string, userId: string) => {
-  const response = await fetch('/api/participant', {
-    method: 'DELETE',
+  const response = await fetch('/api/participant/delete', {
+    method: 'POST',
     body: JSON.stringify({ sessionId, userId }),
   });
   if (!response.ok) {

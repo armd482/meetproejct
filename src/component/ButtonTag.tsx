@@ -10,6 +10,7 @@ interface ButtonTagProps {
   gap?: number;
   style?: CSSProperties | null;
   align?: 'left' | 'center' | 'right';
+  instant?: boolean;
 }
 
 export default function ButtonTag({
@@ -19,6 +20,7 @@ export default function ButtonTag({
   gap = 4,
   style,
   align = 'center',
+  instant,
 }: ButtonTagProps) {
   const [isDrag, setIsDrag] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -26,6 +28,10 @@ export default function ButtonTag({
   const positionStyle = position === 'top' ? { top: `calc(-50% - ${gap}px)` } : { bottom: `calc(-50% - ${gap}px)` };
 
   const handleButtonMouseEnter = () => {
+    if (instant) {
+      setIsDrag(true);
+      return;
+    }
     timerRef.current = setTimeout(() => {
       setIsDrag(true);
       timerRef.current = null;
@@ -40,11 +46,11 @@ export default function ButtonTag({
     setIsDrag(false);
   };
   return (
-    <div className='relative size-fit' onMouseEnter={handleButtonMouseEnter} onMouseLeave={handleButtonMouseLeave}>
+    <div className='relative size-auto' onMouseEnter={handleButtonMouseEnter} onMouseLeave={handleButtonMouseLeave}>
       {children}
       {isDrag && (
         <div
-          className={`absolute flex h-6 w-max ${getAlignStyle(align)} items-center rounded-md bg-black-75 px-2 text-xs text-white`}
+          className={`absolute z-10 flex h-6 w-max ${getAlignStyle(align)} items-center rounded-md bg-black-75 px-2 text-xs text-white`}
           style={{ ...positionStyle, ...style }}
         >
           {name}

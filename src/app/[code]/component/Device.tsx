@@ -92,7 +92,7 @@ export default function Device() {
           style={{ transform: 'rotateY(180deg)' }}
         />
         <VideoNotification status={streamStatus} onClickButton={handleVideoButtonClick} />
-        {deviceEnable.audio && stream && (
+        {deviceEnable.audio && permission?.audio && (
           <div className='absolute bottom-4 left-4'>
             <Visualizer stream={stream} />
           </div>
@@ -103,12 +103,12 @@ export default function Device() {
             <button
               type='button'
               onClick={handleMicButton}
-              className={`relative flex items-center justify-center border border-solid ${deviceEnable.audio ? 'border-white' : 'border-[#EA4335] bg-[#EA4335]'} size-14 rounded-full`}
+              className={`relative flex items-center justify-center border border-solid ${deviceEnable.audio && permission?.audio ? 'border-white' : 'border-[#EA4335] bg-[#EA4335]'} size-14 rounded-full`}
             >
-              {deviceEnable.audio ? (
+              {deviceEnable.audio && permission?.audio ? (
                 <Icon.MicOn width={24} height={24} fill='#ffffff' />
               ) : (
-                <Icon.MicOff width={28} height={28} fill='#ffffff' />
+                <Icon.MicOff width={24} height={24} fill='#ffffff' />
               )}
               {audioDisabled && streamStatus !== null && (
                 <div className='absolute right-0 top-0 size-3 rounded-full bg-white'>
@@ -122,9 +122,9 @@ export default function Device() {
             <button
               type='button'
               onClick={handleVideoButton}
-              className={`relative flex items-center justify-center border border-solid ${deviceEnable.video ? 'border-white' : 'border-[#EA4335] bg-[#EA4335]'} size-14 rounded-full`}
+              className={`relative flex items-center justify-center border border-solid ${deviceEnable.video && permission?.video ? 'border-white' : 'border-[#EA4335] bg-[#EA4335]'} size-14 rounded-full`}
             >
-              {deviceEnable.video ? (
+              {deviceEnable.video && permission?.video ? (
                 <Icon.VideoOn width={24} height={24} fill='#ffffff' />
               ) : (
                 <Icon.VideoOff width={24} height={24} fill='#ffffff' />

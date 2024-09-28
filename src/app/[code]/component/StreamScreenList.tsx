@@ -1,4 +1,6 @@
-import { Publisher, Subscriber } from 'openvidu-custom-armd482';
+'use client';
+
+import { Publisher, Subscriber } from 'openvidu-browser';
 import { useShallow } from 'zustand/react/shallow';
 
 import { useDeviceStore } from '@/store/DeviceStore';
@@ -9,10 +11,11 @@ import { VideoStream, OtherAudioStream } from './part/Stream';
 interface StreamScreenListProps {
   screenPublisher: [string, Publisher | Subscriber];
   participants: Record<string, UserInfo>;
-  publisher: Publisher | null;
-  subscribers: [string, Subscriber][];
+  publisher: Publisher | null | undefined;
+  subscribers: [string, Subscriber | null][];
   emojiList: EmojiInfo[];
   handsUpList: Record<string, boolean>;
+  stream: MediaStream | null | undefined;
 }
 
 export default function StreamScreenList({
@@ -22,6 +25,7 @@ export default function StreamScreenList({
   subscribers,
   emojiList,
   handsUpList,
+  stream,
 }: StreamScreenListProps) {
   const { id, name, color } = useUserInfoStore(
     useShallow((state) => ({
@@ -31,9 +35,11 @@ export default function StreamScreenList({
     })),
   );
 
-  const { deviceEnable } = useDeviceStore(
+  const { deviceEnable, audioInput, videoInput } = useDeviceStore(
     useShallow((state) => ({
       deviceEnable: state.deviceEnable,
+      audioInput: state.audioInput,
+      videoInput: state.videoInput,
     })),
   );
 
@@ -52,7 +58,20 @@ export default function StreamScreenList({
         />
       </div>
       <div className='grid h-full grid-rows-4 gap-4' style={{ width: 'min(25%, 208px)' }}>
-        {publisher && <VideoStream user={{ id, name, color, ...deviceEnable }} subscriber={publisher} muted />}
+        {publisher !== undefined && (
+          <VideoStream
+            user={{
+              id,
+              name,
+              color,
+              audio: Boolean(deviceEnable.audio && audioInput.id),
+              video: Boolean(deviceEnable.video && videoInput.id),
+            }}
+            subscriber={publisher}
+            muted
+            stream={stream}
+          />
+        )}
         {currentSubscribers.map((entity) => (
           <VideoStream
             key={entity[0]}

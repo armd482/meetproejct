@@ -15,7 +15,7 @@ const useCheckPermission = () => {
   const checkPermissionQuery = useCallback(async () => {
     if (!navigator.permissions) {
       setIsSupportedPermission(false);
-      return false;
+      return null;
     }
 
     try {
@@ -26,8 +26,10 @@ const useCheckPermission = () => {
         name: 'microphone' as PermissionName,
       });
 
-      if (videoPermission.state === 'denied' || audioPermission.state === 'denied') {
-        throw new Error('Permission.query 미지원 브라우저');
+      setIsSupportedPermission(true);
+
+      if (audioPermission.state === 'prompt' || videoPermission.state === 'prompt') {
+        return false;
       }
 
       const newPermission = {
@@ -39,7 +41,7 @@ const useCheckPermission = () => {
       return newPermission;
     } catch {
       setIsSupportedPermission(false);
-      return false;
+      return null;
     }
   }, [setPermission]);
 
@@ -82,56 +84,50 @@ const useCheckPermission = () => {
     [setDeviceEnable, setPermission],
   );
 
-  const updatePermission = useCallback(
-    async (isInitial?: boolean) => {
-      if (isSupportedPermission !== false && !isInitial) {
-        const newPermission = await checkPermissionQuery();
-        if (newPermission) {
-          setIsSupportedPermission(true);
-        }
-        if (typeof newPermission !== 'boolean') {
-          return newPermission;
-        }
+  const updatePermission = useCallback(async () => {
+    if (isSupportedPermission === null || isSupportedPermission === true) {
+      const newPermission = await checkPermissionQuery();
+      if (newPermission) {
+        return newPermission;
       }
+    }
 
-      let isFailed = false;
+    let isFailed = false;
 
-      const ATVT = await checkPermission(true, true);
+    const ATVT = await checkPermission(true, true);
 
-      if (ATVT) {
-        if (ATVT !== 'failed') {
-          setPermission({ audio: true, video: true });
-          return { audio: true, video: true, isFailed };
-        }
-        isFailed = true;
+    if (ATVT) {
+      if (ATVT !== 'failed') {
+        setPermission({ audio: true, video: true });
+        return { audio: true, video: true, isFailed };
       }
+      isFailed = true;
+    }
 
-      const ATVF = await checkPermission(true, false);
+    const ATVF = await checkPermission(true, false);
 
-      if (ATVF) {
-        if (ATVF !== 'failed') {
-          setPermission({ audio: true, video: false });
-          return { audio: true, video: false, isFailed };
-        }
-        isFailed = true;
+    if (ATVF) {
+      if (ATVF !== 'failed') {
+        setPermission({ audio: true, video: false });
+        return { audio: true, video: false, isFailed };
       }
+      isFailed = true;
+    }
 
-      const AFVT = await checkPermission(false, true);
+    const AFVT = await checkPermission(false, true);
 
-      if (AFVT) {
-        if (AFVT !== 'failed') {
-          setPermission({ audio: false, video: true });
-          return { audio: false, video: true, isFailed };
-        }
-        isFailed = true;
+    if (AFVT) {
+      if (AFVT !== 'failed') {
+        setPermission({ audio: false, video: true });
+        return { audio: false, video: true, isFailed };
       }
-      setPermission({ audio: false, video: false });
-      setDeviceEnable({ audio: false, video: false });
+      isFailed = true;
+    }
+    setPermission({ audio: false, video: false });
+    setDeviceEnable({ audio: false, video: false });
 
-      return { audio: false, video: false, isFailed };
-    },
-    [isSupportedPermission, checkPermissionQuery, checkPermission, setPermission, setDeviceEnable],
-  );
+    return { audio: false, video: false, isFailed };
+  }, [isSupportedPermission, checkPermissionQuery, checkPermission, setPermission, setDeviceEnable]);
 
   return {
     isSupportedPermission,

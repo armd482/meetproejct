@@ -6,7 +6,7 @@ interface UserListCardProps {
   color: string;
   host?: boolean;
   isMicOn: boolean;
-  stream: MediaStream;
+  stream: MediaStream | null;
 }
 
 export default function UserListCard({ name, color, host, isMicOn, stream }: UserListCardProps) {

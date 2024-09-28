@@ -2,13 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import * as Icon from '@/asset/icon';
-import { ButtonTag } from '@/component';
+import { ButtonTag, Feedback, Setting } from '@/component';
+import { useOutsideClick } from '@/hook';
 import MenuCard from './MenuCard';
 
 export default function MenuButton() {
   const [isClickedButton, setIsClickedButton] = useState(false);
 
-  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isClickedFeedback, setIsClickedFeedback] = useState(false);
+  const [isClickedSetting, setIsClickedSetting] = useState(false);
 
   const checkFullscreen = () => {
     return document.fullscreenElement !== null;
@@ -58,8 +61,30 @@ export default function MenuButton() {
     setIsClickedButton((prev) => !prev);
   };
 
+  const handleFeebackButtonClick = () => {
+    setIsClickedFeedback(true);
+    setIsClickedButton(false);
+  };
+
+  const handleSettingButtonClick = () => {
+    setIsClickedSetting(true);
+    setIsClickedButton(false);
+  };
+
+  const handleFeedbackClose = () => {
+    setIsClickedFeedback(false);
+  };
+
+  const handleSettingClose = () => {
+    setIsClickedSetting(false);
+  };
+
+  const { targetRef } = useOutsideClick<HTMLDivElement>(() => {
+    setIsClickedButton(false);
+  });
+
   return (
-    <div className='relative'>
+    <div className='relative' ref={targetRef}>
       <ButtonTag name='옵션 더보기'>
         <button
           type='button'
@@ -70,7 +95,7 @@ export default function MenuButton() {
         </button>
       </ButtonTag>
       {isClickedButton && (
-        <div className='absolute -top-4 left-0 w-[324px] -translate-y-full rounded-xl bg-[#1E1F20] py-2'>
+        <div className='absolute -top-4 left-0 w-[324px] -translate-y-full rounded-xl bg-[#1E1F20] py-2 md:left-auto md:right-0'>
           <MenuCard
             icon={
               isFullscreen ? (
@@ -82,8 +107,21 @@ export default function MenuButton() {
             onClick={toggleFullscreen}
             name={isFullscreen ? '전체화면 종료' : '전체화면'}
           />
+          <hr className='my-2 w-full border-t border-[#444746]' />
+          <MenuCard
+            icon={<Icon.Feedback width={24} height={24} fill='#C4C7C5' />}
+            onClick={handleFeebackButtonClick}
+            name='문제 신고'
+          />
+          <MenuCard
+            icon={<Icon.Setting width={24} height={24} fill='#C4C7C5' />}
+            onClick={handleSettingButtonClick}
+            name='설정'
+          />
         </div>
       )}
+      <Feedback isOpen={isClickedFeedback} onClose={handleFeedbackClose} />
+      <Setting isOpen={isClickedSetting} onClose={handleSettingClose} />
     </div>
   );
 }

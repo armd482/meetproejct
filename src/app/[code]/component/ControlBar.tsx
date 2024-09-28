@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode, useState } from 'react';
+import { ReactNode, useCallback, useState } from 'react';
 import * as Icon from '@/asset/icon';
 import { ToggleType } from '@/type/toggleType';
 import { useDeviceStore } from '@/store/DeviceStore';
@@ -11,7 +11,7 @@ import { ControlButton, MenuButton, OptionButton, CallEndButton } from './part/C
 import { PermissionModal } from './part/Device';
 
 interface ControlBarProps {
-  stream: MediaStream | null;
+  stream: MediaStream | null | undefined;
   streamStatus: StreamStatusType;
   changeDevice: (type: 'audio' | 'video', value: boolean | string) => Promise<MediaStream | undefined>;
   handleUpdateStream: () => void;
@@ -28,6 +28,7 @@ interface ControlButtonType {
   clickedIcon: ReactNode;
   disabledIcon?: ReactNode;
   onClick?: (value: boolean | 'disable') => void;
+  shortcutKey?: string[];
 }
 
 const CONTROL_BUTTON_OFF_PROPS = { width: 24, height: 24, fill: '#06306D' };
@@ -90,6 +91,7 @@ export default function ControlBar({
       icon: <Icon.HandOff {...CONTROL_BUTTON_OFF_PROPS} />,
       clickedIcon: <Icon.HandOn {...CONTROL_BUTTON_ON_PROPS} />,
       onClick: handleHandsUpButtonClick,
+      shortcutKey: ['Control', 'Alt', 'h'],
     },
   ];
   const [isOpenModal, setIsOpenModal] = useState(false);
@@ -109,36 +111,41 @@ export default function ControlBar({
     setIsOpenAlert(false);
   };
 
-  const handleButtonClick = (type: 'audio' | 'video') => {
-    if (type === 'audio' && permission && permission.audio) {
-      return;
-    }
-    if (type === 'video' && permission && permission.video) {
-      return;
-    }
-    setIsOpenModal(true);
-  };
+  const handleButtonClick = useCallback(
+    (type: 'audio' | 'video') => {
+      if (type === 'audio' && permission && permission.audio) {
+        return;
+      }
+      if (type === 'video' && permission && permission.video) {
+        return;
+      }
+      setIsOpenModal(true);
+    },
+    [permission],
+  );
 
   return (
-    <div className='z-30 flex h-12 items-center gap-2 bg-[#212121]'>
+    <div className='z-30 flex h-12 shrink-0 items-center gap-2 bg-[#212121]'>
       <OptionButton
         type='audio'
         onClickButton={handleButtonClick}
-        icon={<Icon.MicOn width={20} height={20} fill='#E3E3E3' />}
-        clickedIcon={<Icon.MicOff width={20} height={20} fill='#5F1312' />}
-        name={{ chevron: '오디오 설정', icon: '마이크 끄기(ctrl + d)' }}
+        icon={<Icon.MicOn width={24} height={24} fill='#E3E3E3' />}
+        clickedIcon={<Icon.MicOff width={24} height={24} fill='#5F1312' />}
+        name={{ chevron: '오디오 설정', iconOn: '마이크 끄기(ctrl + d)', iconOff: '마이크 켜기(ctrl + d)' }}
         status={streamStatus}
         stream={stream}
         changeDevice={changeDevice}
+        shortcutKey={['Control', 'd']}
       />
       <OptionButton
         type='video'
         onClickButton={handleButtonClick}
-        icon={<Icon.VideoOn width={26} height={26} fill='#E3E3E3' />}
+        icon={<Icon.VideoOn width={24} height={24} fill='#E3E3E3' />}
         clickedIcon={<Icon.VideoOff width={24} height={24} fill='#5F1312' />}
-        name={{ chevron: '영상 설정', icon: '마이크 끄기(ctrl + d)' }}
+        name={{ chevron: '영상 설정', iconOn: '비디오 끄기(ctrl + e)', iconOff: '비디오 켜기(ctrl + e)' }}
         status={streamStatus}
         changeDevice={changeDevice}
+        shortcutKey={['Control', 'e']}
       />
       {CONTROL_BUTTON.map((button) => (
         <ControlButton key={button.type} {...button} />

@@ -1,7 +1,7 @@
 import { RefObject } from 'react';
 
 export const setTrackChage = async (
-  stream: MediaStream | null,
+  stream: MediaStream | null | undefined,
   mediaRef: RefObject<HTMLVideoElement | HTMLAudioElement>,
   device: MediaDeviceInfo,
   type: 'audioInput' | 'videoInput' | 'audioOutput',

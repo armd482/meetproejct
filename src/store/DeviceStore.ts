@@ -1,9 +1,9 @@
 import { create } from 'zustand';
+import { DeviceType } from '@/type/streamType';
 
 type PermissionType = Record<'audio' | 'video', boolean>;
 type PermissionCallback = (value: PermissionType) => PermissionType;
 
-type DeviceType = Record<'id' | 'name', string>;
 type DeviceCallback = (deviceEnable: Record<'video' | 'audio', boolean>) => Record<'video' | 'audio', boolean>;
 
 type DeviceEnable = Record<'video' | 'audio', boolean>;
@@ -17,7 +17,7 @@ interface DeviceStoreType {
   audioInputList: MediaDeviceInfo[];
   audioOuputList: MediaDeviceInfo[];
   videoInputList: MediaDeviceInfo[];
-  setPermission: (callback: Record<'audio' | 'video', boolean> | PermissionCallback) => void;
+  setPermission: (callback: Record<'audio' | 'video', boolean> | null | PermissionCallback) => void;
   setAudioInput: (value: DeviceType) => void;
   setAudioOutput: (value: DeviceType) => void;
   setVideoInput: (value: DeviceType) => void;
@@ -36,7 +36,7 @@ export const useDeviceStore = create<DeviceStoreType>((set) => ({
   audioInputList: [],
   audioOuputList: [],
   videoInputList: [],
-  setPermission: (callback: Record<'audio' | 'video', boolean> | PermissionCallback) =>
+  setPermission: (callback: Record<'audio' | 'video', boolean> | null | PermissionCallback) =>
     set((state) => {
       if (typeof callback === 'function') {
         return { permission: callback(state.permission ?? { audio: false, video: false }) };

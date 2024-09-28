@@ -1,9 +1,10 @@
 'use client';
 
-import { ReactNode, useContext } from 'react';
+import { ReactNode, useCallback, useContext } from 'react';
 import { ButtonTag } from '@/component';
 import { ToggleContext } from '@/context/ToggleContext';
 import { ToggleType } from '@/type/toggleType';
+import { useShortcutKey } from '@/hook';
 
 interface ControlButtonProps {
   icon: ReactNode;
@@ -12,20 +13,31 @@ interface ControlButtonProps {
   name: string;
   type: ToggleType;
   onClick?: (value: boolean | 'disable') => void;
+  shortcutKey?: string[];
 }
 
-export default function ControlButton({ icon, clickedIcon, disabledIcon, name, type, onClick }: ControlButtonProps) {
+export default function ControlButton({
+  icon,
+  clickedIcon,
+  disabledIcon,
+  name,
+  type,
+  onClick,
+  shortcutKey,
+}: ControlButtonProps) {
   const { toggleStatus, handleToggleStatus } = useContext(ToggleContext);
   const isClickedButton = toggleStatus[type];
 
-  const handleButtonClick = () => {
+  const handleButtonClick = useCallback(() => {
     if (onClick) {
       onClick(typeof isClickedButton === 'boolean' ? !isClickedButton : 'disable');
     }
     if (isClickedButton !== 'disable') {
       handleToggleStatus(type);
     }
-  };
+  }, [type, isClickedButton, handleToggleStatus, onClick]);
+
+  useShortcutKey(shortcutKey ?? [], handleButtonClick);
 
   return (
     <ButtonTag name={name}>

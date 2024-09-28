@@ -1,16 +1,23 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
-import { postCheckSessionId } from '@/app/api/mongoAPI';
-
 import { ChangeEvent, FormEvent, useState } from 'react';
-import { getRandomHexColor } from '@/lib/getRandomColor';
-import { useUserInfoStore } from '@/store/UserInfoStore';
 import { useShallow } from 'zustand/react/shallow';
+
+import { postCheckSessionId } from '@/app/api/mongoAPI';
+import { getRandomHexColor } from '@/lib/getRandomColor';
+import { createSession } from '@/lib/createSession';
+import { useUserInfoStore } from '@/store/UserInfoStore';
+import { Loading } from '@/component';
+
+interface NameFormProps {
+  isHost: boolean;
+}
 
 const MAX_SIZE = 60;
 
-export default function NameForm() {
+export default function NameForm({ isHost }: NameFormProps) {
+  const [isPending, setIsPending] = useState(false);
   const [name, setName] = useState('');
   const { setName: setUserName, setColor: setUserColor } = useUserInfoStore(
     useShallow((state) => ({
@@ -28,20 +35,33 @@ export default function NameForm() {
 
   const handleFromSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (name.length === 0) {
+    if (!name) {
       return;
     }
+
+    setIsPending(true);
 
     const randomColor = getRandomHexColor();
 
-    const isValidSessionId = await postCheckSessionId(sessionId);
-    if (!isValidSessionId) {
-      alert('이미 닫힌 회의방입니다.');
-      router.push('/');
-      return;
+    if (isHost) {
+      const key = await createSession(3);
+      if (key) {
+        setUserName(name);
+        setUserColor(randomColor);
+        router.push(`${key}`);
+      }
     }
-    setUserName(name);
-    setUserColor(randomColor);
+
+    if (!isHost) {
+      const isValidSessionId = await postCheckSessionId(sessionId);
+      if (!isValidSessionId) {
+        alert('이미 닫힌 회의방입니다.');
+        router.push('/');
+        return;
+      }
+      setUserName(name);
+      setUserColor(randomColor);
+    }
   };
   return (
     <form className='flex flex-col items-center justify-center' onSubmit={handleFromSubmit}>
@@ -50,7 +70,7 @@ export default function NameForm() {
           value={name}
           onChange={handleInputChange}
           placeholder='이름'
-          className='h-14 w-[300px] rounded-[4px] border border-solid border-[#1F1F1F] px-4 text-base outline-none'
+          className='h-14 w-[300px] rounded border border-solid border-custom-gray px-4 text-base outline-none'
         />
         <p className='w-[300px] px-4 pt-1 text-right text-xs text-[#444746]'>{`${name.length} / ${MAX_SIZE}`}</p>
       </div>
@@ -59,8 +79,9 @@ export default function NameForm() {
         className={`mt-4 h-14 w-60 rounded-full  ${name.length ? 'bg-[#0B57D0] text-white' : 'bg-[#E4E4E4] text-[#999999]'} text-center`}
         disabled={name.length === 0}
       >
-        참여 요청
+        {isHost ? '생성하기' : '참여하기'}
       </button>
+      <Loading isPending={isPending} />
     </form>
   );
 }

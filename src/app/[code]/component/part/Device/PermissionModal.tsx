@@ -1,13 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Modal } from '@/component';
+import { Modal, InitialRequestModal, RequestModal } from '@/component';
 
 import { useDeviceStore } from '@/store/DeviceStore';
 import { useShallow } from 'zustand/react/shallow';
 import { StreamStatusType } from '@/type/streamType';
 
-import { InitialRequestModal, NotificationModal, RequestInfoModal, RequestModal } from './PermissionModal/index';
+import { NotificationModal, RequestInfoModal } from './PermissionModal/index';
 
 interface PermissionModalProps {
   isOpenModal: boolean;
@@ -40,7 +40,7 @@ function ModalContent({ status, onClose, onUpdateStream }: ModalContentProps) {
   }
 
   if (!isDenied) {
-    <RequestModal onClose={onClose} onRequstError={handleRequseError} onUpdateStream={onUpdateStream} />;
+    <RequestModal onSkipUpdateStream={onClose} onRequstError={handleRequseError} onUpdateStream={onUpdateStream} />;
   }
 
   return <RequestInfoModal onClose={onClose} />;

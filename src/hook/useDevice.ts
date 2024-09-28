@@ -6,10 +6,9 @@ import { useShallow } from 'zustand/react/shallow';
 import { useDeviceStore } from '@/store/DeviceStore';
 import { StreamStatusType } from '@/type/streamType';
 import { getStreamConstraint } from '@/lib/getStreamConstraint';
-import useCurrentDevice from './useCurrentDevice';
-import useCheckPermission from './useCheckPermission';
+import { useCurrentDevice, useCheckPermission } from '@/hook';
 
-const useDevice = () => {
+const useDevice = (isInitialUpdate = true) => {
   const {
     deviceEnable,
     audioInput,
@@ -35,9 +34,9 @@ const useDevice = () => {
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const [stream, setStream] = useState<MediaStream | null>(null);
+  const [stream, setStream] = useState<MediaStream | null | undefined>(undefined);
   const [streamStatus, setStreamStatus] = useState<StreamStatusType>(null);
-  const [isUpdateStream, setIsUpdateStream] = useState<boolean>(true);
+  const [isUpdateStream, setIsUpdateStream] = useState<boolean>(isInitialUpdate);
 
   const { updateDevice } = useCurrentDevice();
 
@@ -58,6 +57,13 @@ const useDevice = () => {
     setIsUpdateStream(true);
     setStreamStatus(null);
   }, [setDeviceEnable]);
+
+  const handleStreamClear = useCallback(() => {
+    if (stream) {
+      stream.getTracks().forEach((track) => track.stop());
+      setStream(null);
+    }
+  }, [stream]);
 
   const { updatePermission, addPermissionListener, checkPermissionQuery } = useCheckPermission();
 
@@ -90,7 +96,7 @@ const useDevice = () => {
   };
 
   const getStream = useCallback(async () => {
-    const newPermission = await updatePermission(true);
+    const newPermission = await updatePermission();
     try {
       const newStream = await navigator.mediaDevices.getUserMedia(
         getStreamConstraint(newPermission, { audio: audioInput.id, video: videoInput.id }),
@@ -231,6 +237,7 @@ const useDevice = () => {
     toggleAudioInput,
     toggleVideoInput,
     handleUpdateStream,
+    handleStreamClear,
   };
 };
 
