@@ -11,5 +11,5 @@ export interface UserListType {
   color: string;
   isMicOn: boolean;
   isVideoOn: boolean;
-  stream: MediaStream;
+  stream: MediaStream | null;
 }

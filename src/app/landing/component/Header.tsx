@@ -108,16 +108,20 @@ export default function Header() {
         className='absolute left-5 top-1/2 flex h-10 -translate-y-1/2 items-center gap-2 whitespace-nowrap'
       >
         <Icon.Logo width={36} height={36} />
-        <p className='text-1.5xl font-semibold text-gray-600'>Project</p>
-        <p className='text-1.5xl font-medium text-gray-600'>Meet</p>
+        <p className='text-1.5xl font-semibold text-gray-600 sm:hidden'>Project</p>
+        <p className='text-1.5xl font-medium text-gray-600 sm:hidden'>Meet</p>
       </Link>
       <div className='absolute right-5 top-1/2 z-10 flex -translate-y-1/2 items-center whitespace-nowrap bg-white'>
-        <CurrentDate />
+        <div className='sm:hidden'>
+          <CurrentDate />
+        </div>
+
         {BUTTON_LIST.map((button) => (
           <IconButton key={button.name} name={button.name} onClick={button.onClick}>
             {button.icon}
           </IconButton>
         ))}
+
         {isClickedHelp && (
           <div
             ref={helpRef}

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Image, { StaticImageData } from 'next/image';
-import { Publisher, Subscriber } from 'openvidu-custom-armd482';
+import { Publisher, Subscriber } from 'openvidu-browser';
 import { Visualizer } from '@/component';
 import * as Icon from '@/asset/icon';
 import * as ImageSrc from '@/asset/image';
@@ -17,10 +17,11 @@ interface UserInfo extends Record<'id' | 'name' | 'color', string> {
 
 interface VideoStreamProps {
   user: UserInfo;
-  subscriber: Subscriber | Publisher;
+  subscriber: Subscriber | Publisher | null;
   muted?: boolean;
   emojiList?: EmojiInfo[];
   handsUpList?: Record<string, boolean>;
+  stream?: MediaStream | null | undefined;
 }
 
 const EMOJI_IMAGE: Record<EmojiType, StaticImageData> = {
@@ -35,11 +36,18 @@ const EMOJI_IMAGE: Record<EmojiType, StaticImageData> = {
   thumbUp: ImageSrc.thumbUpEmoji,
 };
 
-export default function VideoStream({ user, subscriber, muted = false, emojiList, handsUpList }: VideoStreamProps) {
+export default function VideoStream({
+  user,
+  subscriber,
+  muted = false,
+  emojiList,
+  handsUpList,
+  stream,
+}: VideoStreamProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [emojiIcon, setEmojiIcon] = useState<EmojiInfo | null>(null);
   const audioOutput = useDeviceStore((state) => state.audioOutput);
-  const isScreen = subscriber.stream.typeOfVideo === 'SCREEN';
+  const isScreen = subscriber?.stream.typeOfVideo === 'SCREEN';
 
   useEffect(() => {
     if (subscriber && videoRef.current) {
@@ -59,7 +67,7 @@ export default function VideoStream({ user, subscriber, muted = false, emojiList
     setEmojiIcon(emojiList.findLast((emoji) => emoji.userId === user.id) ?? null);
   }, [emojiList, user.id]);
 
-  const stream = subscriber.stream.getMediaStream();
+  const mediaStream = stream ?? subscriber?.stream.getMediaStream();
   return (
     <div className='relative flex size-full items-center'>
       <div className=' relative flex size-full items-center justify-center overflow-hidden rounded-lg bg-[#3C4043]'>
@@ -80,8 +88,8 @@ export default function VideoStream({ user, subscriber, muted = false, emojiList
           </div>
         )}
         <div className='absolute right-2 top-2 z-30'>
-          {user.audio ? (
-            <Visualizer stream={stream} />
+          {mediaStream && user.audio ? (
+            <Visualizer stream={mediaStream} />
           ) : (
             <div className='flex size-[26px] items-center justify-center rounded-full bg-[#34373A]'>
               <Icon.MicOff width={18} height={18} fill='#ffffff' />

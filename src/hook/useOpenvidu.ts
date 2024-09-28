@@ -4,12 +4,11 @@ import {
   OpenVidu,
   Session as OVSession,
   Publisher,
-  PublisherProperties,
   SignalEvent,
   StreamEvent,
   StreamPropertyChangedEvent,
   Subscriber,
-} from 'openvidu-custom-armd482';
+} from 'openvidu-browser';
 import { postToken } from '@/app/api/sessionAPI';
 import { deleteSessionId, deleteParticipant, postParticipant } from '@/app/api/mongoAPI';
 import { useDeviceStore } from '@/store/DeviceStore';
@@ -30,9 +29,11 @@ const useOpenvidu = (sessionId: string) => {
   const isOnlyRef = useRef<boolean | null>(null);
   const [isInitial, setIsInitial] = useState(true);
 
+  const isStreamUpdate = useRef<boolean>(true);
+
   const [session, setSession] = useState<OVSession | null>(null);
-  const [publisher, setPublisher] = useState<Publisher | null>(null);
-  const [subscribers, setSubscribers] = useState<[string, Subscriber][]>([]);
+  const [publisher, setPublisher] = useState<Publisher | null | undefined>(undefined);
+  const [subscribers, setSubscribers] = useState<[string, Subscriber | null][]>([]);
   const [participants, setParticipants] = useState<Record<string, UserInfo>>({});
   const [OV, setOV] = useState<OpenVidu | null>(null);
   const [chatList, setChatList] = useState<ChatInfo[]>([]);
@@ -68,11 +69,19 @@ const useOpenvidu = (sessionId: string) => {
 
   const leaveSession = useCallback(async () => {
     if (session) {
+      if (publisher === null) {
+        session.signal({
+          type: 'leave',
+          data: JSON.stringify({ userId: session.connection.connectionId }),
+        });
+        session.disconnect();
+      }
+
       session.connection.stream
         ?.getMediaStream()
         ?.getTracks()
         .forEach((track) => track.stop());
-      session.disconnect();
+      await session.disconnect();
     }
 
     if (screenSession) {
@@ -113,15 +122,7 @@ const useOpenvidu = (sessionId: string) => {
       const publishConstraint = {
         audioSource: permission && permission.audio ? (audioInput.id ? audioInput.id : true) : false,
         videoSource: permission && permission.video ? (videoInput.id ? videoInput.id : true) : false,
-        publishAudio: true,
-        publishVideo: true,
-        filter: {
-          type: 'GStreamerFilter',
-          options: {
-            command: 'videoflip method=vertical-flip',
-          },
-        },
-      } as unknown as PublisherProperties;
+      };
 
       const newPublisher = newOV.initPublisher(undefined, publishConstraint);
       await newSession.publish(newPublisher);
@@ -138,15 +139,32 @@ const useOpenvidu = (sessionId: string) => {
       setOV(newOV);
       const newSession = newOV.initSession();
       await newSession.connect(token, { clientData: { name, color } });
+      const {
+        connection: { connectionId },
+      } = newSession;
+      setId(connectionId);
       setSession(newSession);
-      publishVideo(newOV, newSession);
+      if (stream) {
+        await publishVideo(newOV, newSession);
+      } else {
+        setPublisher(null);
+        await newSession.signal({
+          type: 'participate',
+          data: JSON.stringify({
+            userName: name,
+            color,
+            userId: newSession.connection.connectionId,
+          }),
+        });
+      }
+
       setSubscribers(() => {
-        const data: [string, Subscriber][] = [];
+        const data: [string, Subscriber | null][] = [];
         newSession.remoteConnections.forEach((entry) => {
-          if (!entry.stream || entry.stream.typeOfVideo === 'SCREEN') {
+          if (entry.stream && entry.stream.typeOfVideo === 'SCREEN') {
             return;
           }
-          data.push([entry.connectionId, newSession.subscribe(entry.stream, undefined)]);
+          data.push([entry.connectionId, entry.stream ? newSession.subscribe(entry.stream, undefined) : null]);
         });
         return data;
       });
@@ -160,9 +178,9 @@ const useOpenvidu = (sessionId: string) => {
       setParticipants(() => {
         const totalParticipants = {};
         newSession.remoteConnections.forEach((entry) => {
-          const { connectionId, data } = entry;
+          const { data } = entry;
           Object.assign(totalParticipants, {
-            [connectionId]: {
+            [entry.connectionId]: {
               name: JSON.parse(data).clientData.name,
               color: JSON.parse(data).clientData.color,
               audio: entry.stream?.audioActive,
@@ -173,17 +191,13 @@ const useOpenvidu = (sessionId: string) => {
         return totalParticipants;
       });
 
-      const {
-        connection: { connectionId },
-      } = newSession;
-      setId(connectionId);
       await postParticipant(sessionId, connectionId, name, color);
     } catch {
       alert('이미 닫힌 회의실입니다');
       leaveSession();
       router.push('/landing');
     }
-  }, [name, sessionId, color, router, leaveSession, setId, publishVideo]);
+  }, [name, sessionId, color, router, leaveSession, setId, publishVideo, stream]);
 
   const changeDevice = useCallback(
     async (type: 'audio' | 'video', value: boolean | string) => {
@@ -338,31 +352,44 @@ const useOpenvidu = (sessionId: string) => {
 
   useEffect(() => {
     const initialJoinSession = async () => {
-      if (isInitial && stream) {
-        setIsInitial(false);
-        await joinSession();
+      if (stream === undefined || !isInitial) {
+        return;
       }
+      setIsInitial(false);
+      await joinSession();
     };
 
     initialJoinSession();
   }, [joinSession, isInitial, permission, stream]);
 
   useEffect(() => {
-    const updateTrack = async () => {
-      if (publisher && stream) {
-        const audioTrack = stream.getAudioTracks()[0];
-        const videoTrack = stream.getVideoTracks()[0];
+    isStreamUpdate.current = true;
+  }, [stream]);
 
-        if (audioTrack && publisher) {
-          await publisher.replaceTrack(audioTrack);
-        }
-        if (videoTrack && publisher) {
-          await publisher.replaceTrack(videoTrack);
-        }
+  useEffect(() => {
+    const updateTrack = async () => {
+      if (!publisher || !stream || !session || !OV) {
+        return;
       }
+
+      const audioTrack = stream.getAudioTracks()[0];
+      const videoTrack = stream.getVideoTracks()[0];
+
+      await session.unpublish(publisher);
+      const newPublisher = OV.initPublisher(undefined, {
+        audioSource: !!audioTrack,
+        videoSource: !!videoTrack,
+        publishAudio: !!audioTrack,
+        publishVideo: !!videoTrack,
+      });
+      await session.publish(newPublisher);
+      setPublisher(newPublisher);
     };
-    updateTrack();
-  }, [stream, publisher]);
+    if (isStreamUpdate.current) {
+      isStreamUpdate.current = false;
+      updateTrack();
+    }
+  }, [session, publisher, stream, OV]);
 
   useEffect(() => {
     isOnlyRef.current = subscribers.length === 0;
@@ -519,6 +546,7 @@ const useOpenvidu = (sessionId: string) => {
         return;
       }
       const handsUpStatus = JSON.parse(data) as { userId: string; value: boolean };
+
       setHandsUpList((prev) => {
         if (handsUpStatus.value) {
           return { ...prev, [handsUpStatus.userId]: handsUpStatus.value };
@@ -534,8 +562,52 @@ const useOpenvidu = (sessionId: string) => {
       if (!data) {
         return;
       }
+
       const updateData = JSON.parse(data) as { id: string };
       setHandsUpList((prev) => ({ ...prev, [updateData.id]: true }));
+    };
+
+    const handleParticipate = (e: SignalEvent) => {
+      const { data } = e;
+      if (!data) {
+        return;
+      }
+
+      const responseData = JSON.parse(data) as { userName: string; color: string; userId: string };
+      const { userId, userName, color: userColor } = responseData;
+
+      if (userId === id) {
+        return;
+      }
+
+      if (isRaiseHand) {
+        session.signal({
+          type: 'raiseHandUpdate',
+          data: JSON.stringify({ id }),
+        });
+      }
+
+      setParticipants((prev) => ({
+        ...prev,
+        [userId]: { name: userName, color: userColor, audio: false, video: false },
+      }));
+      setSubscribers((prev) => [...prev.filter((subscriber) => subscriber[0] !== userId), [userId, null]]);
+    };
+
+    const handleLeave = (e: SignalEvent) => {
+      const { data } = e;
+      if (!data) {
+        return;
+      }
+
+      const { userId } = JSON.parse(data) as { userId: string };
+
+      setSubscribers((prev) => prev.filter((subscriber) => subscriber[0] !== userId));
+      setParticipants((prev) => {
+        const newParticipants = { ...prev };
+        delete newParticipants[userId];
+        return newParticipants;
+      });
     };
 
     session.on('streamCreated', handleCreateStream);
@@ -545,6 +617,8 @@ const useOpenvidu = (sessionId: string) => {
     session.on('signal:emoji', handleEmojiRecive);
     session.on('signal:handsUp', handleHandsUpRecive);
     session.on('signal:raiseHandUpdate', handleHandsUpUpdateRecive);
+    session.on('signal:participate', handleParticipate);
+    session.on('signal:leave', handleLeave);
 
     return () => {
       session.off('streamCreated', handleCreateStream);
@@ -554,8 +628,10 @@ const useOpenvidu = (sessionId: string) => {
       session.off('signal:emoji', handleEmojiRecive);
       session.off('signal:handsUp', handleHandsUpRecive);
       session.off('signal:raiseHandUpdate', handleHandsUpUpdateRecive);
+      session.off('signal:participate', handleParticipate);
+      session.off('signal:leave', handleLeave);
     };
-  }, [session, id, screenPublisher, isRaiseHand]);
+  }, [session, id, screenPublisher, isRaiseHand, color, name, publisher]);
 
   return {
     publisher,

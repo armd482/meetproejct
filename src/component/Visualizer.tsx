@@ -1,7 +1,7 @@
 import { useVolume } from '@/hook';
 
 interface VisualizerProps {
-  stream: MediaStream | null;
+  stream: MediaStream | null | undefined;
 }
 
 export default function Visualizer({ stream }: VisualizerProps) {

@@ -1,9 +1,10 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 
 import * as Icon from '@/asset/icon';
 import { PanelType } from '@/type/panelType';
+import { useOutsideClick } from '@/hook';
 import { IconButton } from './part/InfoBar';
 
 interface ButtonType {
@@ -61,11 +62,40 @@ const BUTTON_LIST: ButtonType[] = [
 ];
 
 export default function InfoBar() {
+  const [isClicked, setIsClicked] = useState(false);
+  const { targetRef } = useOutsideClick<HTMLDivElement>(() => setIsClicked(false));
+  const handleClickButton = () => {
+    setIsClicked((prev) => !prev);
+  };
   return (
-    <div className='flex items-center justify-end'>
-      {BUTTON_LIST.map((button, i) => (
-        <IconButton key={button.type} align={i === BUTTON_LIST.length - 1 ? 'right' : 'center'} {...button} />
-      ))}
-    </div>
+    <>
+      <div className='flex items-center justify-end md:hidden'>
+        {BUTTON_LIST.map((button, i) => (
+          <IconButton key={button.type} align={i === BUTTON_LIST.length - 1 ? 'right' : 'center'} {...button} />
+        ))}
+      </div>
+      <div className='relative right-4 hidden size-12 justify-self-end md:block' ref={targetRef}>
+        <button
+          type='button'
+          onClick={handleClickButton}
+          className='flex size-12 items-center justify-center rounded-full hover:bg-[#2F3033] active:bg-[#272F3F] '
+        >
+          <Icon.Chevron width={16} height={16} fill='#E3E3E3' className={`${!isClicked && 'rotate-180'}`} />
+        </button>
+        {isClicked && (
+          <div
+            className='absolute -right-6 top-0 z-40 rounded-lg bg-[#202124] p-2'
+            style={{
+              transform: 'translateY(calc(-100% - 20px))',
+              boxShadow: '0 2px 2px 0 rgba(0,0,0,.14),0 3px 1px -2px rgba(0,0,0,.12),0 1px 5px 0 rgba(0,0,0,.2)',
+            }}
+          >
+            {BUTTON_LIST.map((button, i) => (
+              <IconButton key={button.type} align={i === BUTTON_LIST.length - 1 ? 'right' : 'center'} {...button} />
+            ))}
+          </div>
+        )}
+      </div>
+    </>
   );
 }

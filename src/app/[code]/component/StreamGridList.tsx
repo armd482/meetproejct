@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Publisher, Subscriber } from 'openvidu-custom-armd482';
+import { Publisher, Subscriber } from 'openvidu-browser';
 import { useShallow } from 'zustand/react/shallow';
 
 import { useUserInfoStore } from '@/store/UserInfoStore';
@@ -10,11 +10,12 @@ import { UserInfo, EmojiInfo } from '@/type/sessionType';
 import { VideoStream, OtherAudioStream } from './part/Stream';
 
 interface StreamGridListProps {
-  subscribers: [string, Subscriber][];
-  publisher: Publisher | null;
+  subscribers: [string, Subscriber | null][];
+  publisher: Publisher | null | undefined;
   participants: Record<string, UserInfo>;
   emojiList: EmojiInfo[];
   handsUpList: Record<string, boolean>;
+  stream: MediaStream | null | undefined;
 }
 
 export default function StreamGridList({
@@ -23,8 +24,9 @@ export default function StreamGridList({
   participants,
   emojiList,
   handsUpList,
+  stream,
 }: StreamGridListProps) {
-  const [maxRow, setMaxRow] = useState(Math.floor((window.innerWidth - 400) / 166));
+  const [maxRow, setMaxRow] = useState(Math.min(Math.floor((window.innerWidth - 400) / 166), 1));
 
   const { id, name, color } = useUserInfoStore(
     useShallow((state) => ({
@@ -34,9 +36,11 @@ export default function StreamGridList({
     })),
   );
 
-  const { deviceEnable } = useDeviceStore(
+  const { deviceEnable, audioInput, videoInput } = useDeviceStore(
     useShallow((state) => ({
       deviceEnable: state.deviceEnable,
+      audioInput: state.audioInput,
+      videoInput: state.videoInput,
     })),
   );
 
@@ -65,13 +69,20 @@ export default function StreamGridList({
         gridTemplateColumns: `repeat(${currentPageSubscribers.length === 0 ? '1' : Math.min(rowNum, Math.ceil(Math.sqrt(1 + 4 * currentPageSubscribers.length) / 2))}, 1fr)`,
       }}
     >
-      {publisher && (
+      {publisher !== undefined && (
         <VideoStream
-          user={{ id, name, color, ...deviceEnable }}
+          user={{
+            id,
+            name,
+            color,
+            audio: Boolean(deviceEnable.audio && audioInput.id),
+            video: Boolean(deviceEnable.video && videoInput.id),
+          }}
           subscriber={publisher}
           muted
           emojiList={emojiList}
           handsUpList={handsUpList}
+          stream={stream}
         />
       )}
       {currentPageSubscribers.map((entity) => (
@@ -83,7 +94,7 @@ export default function StreamGridList({
           handsUpList={handsUpList}
         />
       ))}
-      {subscribers.length >= maxNum - 1 &&
+      {otherSubscriber.length >= 1 &&
         (otherSubscriber.length === 1 ? (
           <VideoStream
             user={{ id: otherSubscriber[0][0], ...participants[otherSubscriber[0][0]] }}

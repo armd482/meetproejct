@@ -8,6 +8,7 @@ import { useDeviceStore } from '@/store/DeviceStore';
 import { useUserInfoStore } from '@/store/UserInfoStore';
 import { ToggleContext } from '@/context/ToggleContext';
 import { useOpenvidu } from '@/hook';
+import { Loading } from '@/component';
 import {
   ControlBar,
   EmojiAnimation,
@@ -18,13 +19,13 @@ import {
   StreamGridList,
   StreamScreenList,
 } from './component';
-import { Loading } from '@/component';
 
 export default function Meetting() {
   const pathname = usePathname();
-  const { deviceEnable } = useDeviceStore(
+  const { deviceEnable, permission } = useDeviceStore(
     useShallow((state) => ({
       deviceEnable: state.deviceEnable,
+      permission: state.permission,
     })),
   );
 
@@ -71,7 +72,7 @@ export default function Meetting() {
       color: userColor,
       isMicOn: audio,
       isVideoOn: video,
-      stream: entity[1].stream.getMediaStream(),
+      stream: entity[1]?.stream.getMediaStream() ?? null,
     };
   });
 
@@ -95,6 +96,7 @@ export default function Meetting() {
               publisher={publisher}
               emojiList={emojiList}
               handsUpList={handsUpList}
+              stream={stream}
             />
           ) : (
             <StreamGridList
@@ -103,6 +105,7 @@ export default function Meetting() {
               participants={participants}
               emojiList={emojiList}
               handsUpList={handsUpList}
+              stream={stream}
             />
           )}
           {emojiList.map((emoji) => (
@@ -147,7 +150,7 @@ export default function Meetting() {
           <InfoBar />
         </div>
       </div>
-      <Loading isPending={Boolean(stream === null)} />
+      <Loading isPending={Boolean(stream === null && !permission)} />
     </div>
   );
 }

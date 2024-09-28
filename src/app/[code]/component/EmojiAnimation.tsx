@@ -28,9 +28,8 @@ const EMOJI_IMAGE: Record<EmojiType, StaticImageData> = {
 };
 
 function EmojiIcon({ emoji, maxWidth, deleteEmoji }: EmojiAnimationProps) {
-  const { name, id } = useUserInfoStore(
+  const { id } = useUserInfoStore(
     useShallow((state) => ({
-      name: state.name,
       id: state.id,
     })),
   );
@@ -48,7 +47,7 @@ function EmojiIcon({ emoji, maxWidth, deleteEmoji }: EmojiAnimationProps) {
       <div
         className={`max-w-28 truncate rounded-full px-2 text-sm ${emoji.userId === id ? 'bg-[#8AB4F8] text-[#48525F]' : 'bg-[#202124] text-white'} `}
       >
-        {id === emoji.userId ? '나' : name}
+        {id === emoji.userId ? '나' : emoji.userName}
       </div>
     </div>
   );

@@ -2,14 +2,12 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import { ChangeEvent, FormEvent, useState } from 'react';
-import Image from 'next/image';
 import { useShallow } from 'zustand/react/shallow';
 
 import { postCheckSessionId } from '@/app/api/mongoAPI';
 import { getRandomHexColor } from '@/lib/getRandomColor';
 import { createSession } from '@/lib/createSession';
 import { useUserInfoStore } from '@/store/UserInfoStore';
-import * as image from '@/asset/image';
 import { Loading } from '@/component';
 
 interface NameFormProps {

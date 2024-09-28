@@ -4,10 +4,13 @@ import { ChangeEvent, FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import * as Icon from '@/asset/icon';
 import { checkKey } from '@/lib/checkKey';
+import { Alert, Loading } from '@/component';
 
 export default function ParticipateMeetingForm() {
   const router = useRouter();
   const [value, setValue] = useState<string>('');
+  const [isPending, setIsPending] = useState<boolean>(false);
+  const [isFailed, setIsFailed] = useState<boolean>(false);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
@@ -18,10 +21,18 @@ export default function ParticipateMeetingForm() {
     if (!value) {
       return;
     }
+    setIsPending(true);
     const result = await checkKey(value);
     if (result) {
       router.push(`/${result}`);
+      return;
     }
+    setIsPending(false);
+    setIsFailed(true);
+  };
+
+  const handleAlertClose = () => {
+    setIsFailed(false);
   };
 
   return (
@@ -40,6 +51,8 @@ export default function ParticipateMeetingForm() {
       >
         참여
       </button>
+      <Loading isPending={isPending} />
+      <Alert isOpen={isFailed} onCloseAlert={handleAlertClose} text='존재하지 않는 세션입니다.' />
     </form>
   );
 }

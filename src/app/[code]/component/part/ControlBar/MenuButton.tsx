@@ -95,7 +95,7 @@ export default function MenuButton() {
         </button>
       </ButtonTag>
       {isClickedButton && (
-        <div className='absolute -top-4 left-0 w-[324px] -translate-y-full rounded-xl bg-[#1E1F20] py-2'>
+        <div className='absolute -top-4 left-0 w-[324px] -translate-y-full rounded-xl bg-[#1E1F20] py-2 md:left-auto md:right-0'>
           <MenuCard
             icon={
               isFullscreen ? (

@@ -1,8 +1,8 @@
-import { Subscriber } from 'openvidu-custom-armd482';
+import { Subscriber } from 'openvidu-browser';
 import { useEffect, useRef } from 'react';
 
 interface OtherAudioStreamProps {
-  otherSubscriber: [string, Subscriber][];
+  otherSubscriber: [string, Subscriber | null][];
   color: string;
   name: string;
 }
@@ -26,7 +26,7 @@ export default function OtherAudioStream({ otherSubscriber, color, name }: Other
     const currentSources = new Set<MediaStreamAudioSourceNode>();
 
     otherSubscriber.forEach((entity) => {
-      const mediaStream = entity[1].stream.getMediaStream();
+      const mediaStream = entity[1]?.stream.getMediaStream();
       if (mediaStream) {
         const audioTrack = mediaStream.getAudioTracks();
         if (audioTrack.length > 0 && audioContextRef.current && destinationRef.current) {

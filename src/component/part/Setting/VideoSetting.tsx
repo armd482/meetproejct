@@ -5,7 +5,7 @@ import { useShallow } from 'zustand/react/shallow';
 import * as Icon from '@/asset/icon';
 
 interface VideoSettingProps {
-  stream: MediaStream | null;
+  stream: MediaStream | null | undefined;
   onUpdateStream: () => void;
 }
 

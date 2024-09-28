@@ -34,7 +34,7 @@ const useDevice = (isInitialUpdate = true) => {
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const [stream, setStream] = useState<MediaStream | null>(null);
+  const [stream, setStream] = useState<MediaStream | null | undefined>(undefined);
   const [streamStatus, setStreamStatus] = useState<StreamStatusType>(null);
   const [isUpdateStream, setIsUpdateStream] = useState<boolean>(isInitialUpdate);
 

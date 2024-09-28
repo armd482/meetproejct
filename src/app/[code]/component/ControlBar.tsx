@@ -11,7 +11,7 @@ import { ControlButton, MenuButton, OptionButton, CallEndButton } from './part/C
 import { PermissionModal } from './part/Device';
 
 interface ControlBarProps {
-  stream: MediaStream | null;
+  stream: MediaStream | null | undefined;
   streamStatus: StreamStatusType;
   changeDevice: (type: 'audio' | 'video', value: boolean | string) => Promise<MediaStream | undefined>;
   handleUpdateStream: () => void;
@@ -125,7 +125,7 @@ export default function ControlBar({
   );
 
   return (
-    <div className='z-30 flex h-12 items-center gap-2 bg-[#212121]'>
+    <div className='z-30 flex h-12 shrink-0 items-center gap-2 bg-[#212121]'>
       <OptionButton
         type='audio'
         onClickButton={handleButtonClick}

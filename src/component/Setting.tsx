@@ -12,13 +12,13 @@ interface SettingProps {
 }
 
 interface SettingModalProps {
-  stream: MediaStream | null;
+  stream: MediaStream | null | undefined;
   onClose: () => void;
   onUpdateStream: () => void;
 }
 
 interface SettingContentProps {
-  stream: MediaStream | null;
+  stream: MediaStream | null | undefined;
   category: Category;
   onUpdateStream: () => void;
 }

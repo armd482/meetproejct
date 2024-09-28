@@ -92,7 +92,7 @@ export default function Device() {
           style={{ transform: 'rotateY(180deg)' }}
         />
         <VideoNotification status={streamStatus} onClickButton={handleVideoButtonClick} />
-        {deviceEnable.audio && stream && (
+        {deviceEnable.audio && permission?.audio && (
           <div className='absolute bottom-4 left-4'>
             <Visualizer stream={stream} />
           </div>

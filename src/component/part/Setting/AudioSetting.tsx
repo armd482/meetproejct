@@ -5,7 +5,7 @@ import { DeviceSelectBox, Visualizer } from '@/component';
 import * as Icon from '@/asset/icon';
 
 interface AudioSettingProps {
-  stream: MediaStream | null;
+  stream: MediaStream | null | undefined;
   onUpdateStream: () => void;
 }
 
