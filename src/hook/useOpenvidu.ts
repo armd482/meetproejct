@@ -144,19 +144,6 @@ const useOpenvidu = (sessionId: string) => {
       } = newSession;
       setId(connectionId);
       setSession(newSession);
-      if (stream) {
-        await publishVideo(newOV, newSession);
-      } else {
-        setPublisher(null);
-        await newSession.signal({
-          type: 'participate',
-          data: JSON.stringify({
-            userName: name,
-            color,
-            userId: newSession.connection.connectionId,
-          }),
-        });
-      }
 
       setSubscribers(() => {
         const data: [string, Subscriber | null][] = [];
@@ -190,6 +177,20 @@ const useOpenvidu = (sessionId: string) => {
         });
         return totalParticipants;
       });
+
+      if (stream) {
+        await publishVideo(newOV, newSession);
+      } else {
+        setPublisher(null);
+        await newSession.signal({
+          type: 'participate',
+          data: JSON.stringify({
+            userName: name,
+            color,
+            userId: newSession.connection.connectionId,
+          }),
+        });
+      }
 
       await postParticipant(sessionId, connectionId, name, color);
     } catch {
