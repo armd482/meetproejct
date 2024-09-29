@@ -135,7 +135,7 @@ export default function Header() {
                 key={button.name}
                 type='button'
                 onClick={() => handleHelpButtonClick(button.href)}
-                className='flex h-12 w-full items-center px-4 text-left text-black hover:bg-[#F5F5F5] active:bg-[#D7D7D7]'
+                className='flex h-12 w-full items-center justify-center px-4 text-black hover:bg-[#F5F5F5] active:bg-[#D7D7D7]'
               >
                 {button.name}
               </button>
