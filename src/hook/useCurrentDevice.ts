@@ -24,13 +24,13 @@ const useCurrentDevice = () => {
 
       const deviceInfo = await getCurrentDeviceInfo(stream);
 
-      setVideoInput(deviceInfo.currentVideoInput);
+      setVideoInput(deviceInfo.currentVideoInput ?? deviceInfo.currentVideoInputList[0]);
       setVideoInputList(deviceInfo.currentVideoInputList);
 
-      setAudioInput(deviceInfo.currentAudioInput);
+      setAudioInput(deviceInfo.currentAudioInput ?? deviceInfo.currentAudioInputList[0]);
       setAudioInputList(deviceInfo.currentAudioInputList);
 
-      setAudioOutput(deviceInfo.currentAudioOutput);
+      setAudioOutput(deviceInfo.currentAudioOutput ?? deviceInfo.currentAudioOutputList[0]);
       setAudioOutputList(deviceInfo.currentAudioOutputList);
     },
     [setAudioInput, setAudioOutput, setVideoInput, setAudioInputList, setAudioOutputList, setVideoInputList],
