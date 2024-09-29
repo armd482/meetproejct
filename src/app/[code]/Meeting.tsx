@@ -135,7 +135,7 @@ export default function Meetting() {
       </div>
       <div ref={barRef} className='relative w-full shrink-0 bg-[#202124] font-googleSans text-base text-white'>
         <Toggle onClickEmojiButton={sendEmoji} />
-        <div className='relative grid shrink-0 grid-cols-[1fr_auto_1fr] items-center bg-[#212121] p-4'>
+        <div className='relative flex shrink-0 justify-between bg-[#212121] p-4'>
           <MeetInfoBar />
           <ControlBar
             changeDevice={changeDevice}

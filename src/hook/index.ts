@@ -1,4 +1,3 @@
-export { default as useCheckChrome } from './useCheckChrome';
 export { default as useCheckPermission } from './useCheckPermission';
 export { default as useCurrentDate } from './useCurrentDate';
 export { default as useCurrentDevice } from './useCurrentDevice';

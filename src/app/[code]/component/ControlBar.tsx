@@ -7,6 +7,7 @@ import { useDeviceStore } from '@/store/DeviceStore';
 import { useShallow } from 'zustand/react/shallow';
 import { Alert } from '@/component';
 import { StreamStatusType } from '@/type/streamType';
+import { checkBrowser } from '@/lib/checkBrowser';
 import { ControlButton, MenuButton, OptionButton, CallEndButton } from './part/ControlBar';
 import { PermissionModal } from './part/Device';
 
@@ -29,6 +30,7 @@ interface ControlButtonType {
   disabledIcon?: ReactNode;
   onClick?: (value: boolean | 'disable') => void;
   shortcutKey?: string[];
+  hidden?: boolean;
 }
 
 const CONTROL_BUTTON_OFF_PROPS = { width: 24, height: 24, fill: '#06306D' };
@@ -64,6 +66,8 @@ export default function ControlBar({
     handleHandsUp(value);
   };
 
+  const isSupportScreenShareBrowser = checkBrowser();
+
   const CONTROL_BUTTON: ControlButtonType[] = [
     /* {
       name: '자막 사용(c)',
@@ -84,6 +88,7 @@ export default function ControlBar({
       clickedIcon: <Icon.ScreenShare {...CONTROL_BUTTON_ON_PROPS} />,
       disabledIcon: <Icon.ScreenShare {...{ ...CONTROL_BUTTON_OFF_PROPS, fill: '#AFB5C4' }} />,
       onClick: handleScreenShareButtonClick,
+      hidden: !isSupportScreenShareBrowser,
     },
     {
       name: '손들기(ctrl + alt + h)',
@@ -125,7 +130,7 @@ export default function ControlBar({
   );
 
   return (
-    <div className='z-30 flex h-12 shrink-0 items-center gap-2 bg-[#212121]'>
+    <div className='absolute left-1/2 top-1/2 z-30 flex h-12 shrink-0 -translate-x-1/2 -translate-y-1/2 items-center gap-2 bg-[#212121] sm-md:relative sm-md:left-auto sm-md:top-auto sm-md:translate-x-0 sm-md:translate-y-0'>
       <OptionButton
         type='audio'
         onClickButton={handleButtonClick}

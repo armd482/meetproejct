@@ -6,6 +6,7 @@ const config: Config = {
     extend: {
       screens: {
         sm: { max: '480px' },
+        'sm-md': { max: '600px' },
         md: { max: '800px' },
         lg: { max: '1023px' },
         xl: { max: '1279px' },

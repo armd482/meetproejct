@@ -43,7 +43,7 @@ export default function DeviceList({ type, stream = null, status, changeDevice }
   }, [stream]);
 
   return (
-    <div className='absolute top-0 z-50 flex -translate-y-full items-center gap-[10px] rounded-[36px] bg-[#2C2C2C] p-[10px] duration-500'>
+    <div className='absolute top-0 z-50 flex -translate-y-full items-center gap-[10px] rounded-[36px] bg-[#2C2C2C] p-[10px] duration-500 md:hidden'>
       {type === 'audio' ? (
         <>
           <DeviceButton
