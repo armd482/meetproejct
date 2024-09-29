@@ -9,7 +9,7 @@ export default function MeetInfoBar() {
   const date = useCurrentDate();
 
   return (
-    <div className='flex flex-1 items-center gap-3 truncate'>
+    <div className='flex flex-1 items-center gap-3 truncate sm-md:hidden'>
       <p>{formatTime(date)}</p>
       <div className='h-4 border-r border-solid border-white' />
       <p className='truncate'>{code}</p>

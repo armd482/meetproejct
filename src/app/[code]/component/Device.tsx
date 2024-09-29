@@ -78,7 +78,7 @@ export default function Device() {
   };
 
   return (
-    <div className='w-full max-w-[764px] p-4 pr-2 lg:h-[284px] lg:w-[480px] lg:pr-4'>
+    <div className='w-full max-w-[764px] p-4 pr-2 lg:h-[284px] lg:pr-4'>
       <div
         className='relative aspect-video size-full overflow-hidden rounded-lg'
         style={{

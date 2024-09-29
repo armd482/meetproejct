@@ -18,7 +18,7 @@ export default function Setting({ isHost = false }: SettingProps) {
       </header>
       <div className='flex flex-1 items-center justify-center lg:flex-col'>
         <Device />
-        <div className='m-4 flex w-[448px] flex-col items-center font-googleSans'>
+        <div className='flex w-full max-w-[448px] flex-col items-center p-4 font-googleSans'>
           <p className='text-2xl'>이름이 무엇인가요?</p>
           <NameForm isHost={isHost} />
           {!isHost && <EntirePeople />}
