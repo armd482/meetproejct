@@ -50,12 +50,17 @@ export default function VideoStream({
   const isScreen = subscriber?.stream.typeOfVideo === 'SCREEN';
 
   useEffect(() => {
-    if (subscriber && videoRef.current) {
-      subscriber.addVideoElement(videoRef.current);
+    if (!subscriber || !videoRef.current) {
+      return;
+    }
+
+    subscriber.addVideoElement(videoRef.current);
+    if (videoRef.current.setSinkId) {
       videoRef.current.setSinkId(audioOutput.id);
-      if (isScreen) {
-        videoRef.current.style.setProperty('transform', 'rotateY(0deg)');
-      }
+    }
+
+    if (isScreen) {
+      videoRef.current.style.setProperty('transform', 'rotateY(0deg)');
     }
   }, [subscriber, audioOutput, isScreen]);
 

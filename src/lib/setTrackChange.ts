@@ -7,7 +7,7 @@ export const setTrackChage = async (
   type: 'audioInput' | 'videoInput' | 'audioOutput',
 ) => {
   if (type === 'audioOutput') {
-    if (mediaRef.current) {
+    if (mediaRef.current && mediaRef.current.setSinkId) {
       mediaRef.current.setSinkId(device.deviceId);
     }
     return;

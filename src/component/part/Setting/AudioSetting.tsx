@@ -47,7 +47,10 @@ export default function AudioSetting({ stream, onUpdateStream }: AudioSettingPro
     setIsPlay(false);
     if (audioRef.current) {
       audioRef.current.pause();
-      audioRef.current.setSinkId(newValue.deviceId);
+      if (audioRef.current.setSinkId) {
+        audioRef.current.setSinkId(newValue.deviceId);
+        audioRef.current.setSinkId(newValue.deviceId);
+      }
     }
   };
 
