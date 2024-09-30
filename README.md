@@ -1,7 +1,7 @@
 # Meet Project
 
 <p align="center">
-  <img src='https://github.com/user-attachments/assets/3fb00868-65d8-492e-8213-1451b50d8639' width="750" height="120"/>
+  <img src='https://github.com/user-attachments/assets/7166b841-24e8-456c-8222-698226b00ed0'/>
 </p>
 
 #### 개발 기간: 2024.08.26~2024.09.20 </br>
