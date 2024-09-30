@@ -8,7 +8,7 @@
 #### URL: https://www.meetproject.shop
 
 ## 프로젝트 소개
-이 프로젝트는 Google Meet를 참고한 클론 코딩 프로젝트입니다.<br>
+이 프로젝트는 Google Meet의 기능/레이아웃을 참고한 클론 코딩 프로젝트입니다.<br>
 
 - openvidu를 이용한 session 생성 및 참가를 관리합니다. EC2를 통해 배포하였습니다
 - mongoDB를 이용한 sessionId와 참가자 정보를 관리합니다.
