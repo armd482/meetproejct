@@ -1,5 +1,7 @@
 'use client';
 
+/* eslint-disable */
+
 import { useDevice } from '@/hook';
 import { useDeviceStore } from '@/store/DeviceStore';
 import { useShallow } from 'zustand/react/shallow';
