@@ -4,10 +4,11 @@
 
 import { useDevice } from '@/hook';
 import { useDeviceStore } from '@/store/DeviceStore';
+import { useEffect } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
 export default function Page() {
-  const { stream } = useDevice();
+  const { stream, handleStreamClear } = useDevice();
   const { audioInput, audioOutput, videoInput, audioInputList, audioOutputList, videoInputList } = useDeviceStore(
     useShallow((state) => ({
       audioInput: state.audioInput,
@@ -18,6 +19,14 @@ export default function Page() {
       videoInputList: state.videoInputList,
     })),
   );
+
+  useEffect(() => {
+    return () => {
+      if (stream) {
+        handleStreamClear();
+      }
+    };
+  }, [stream, handleStreamClear]);
   return (
     <div>
       <div>
