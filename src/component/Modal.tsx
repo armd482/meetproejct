@@ -30,6 +30,12 @@ export default function Modal({ isOpen, onCloseModal, children }: ModalProps) {
     return null;
   }
 
+  if (isOpen) {
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.body.style.overflow = 'auto';
+  }
+
   return (
     <ModalPortal>
       <div

@@ -1,4 +1,4 @@
-import React, { useState, MouseEvent, useEffect, ReactNode } from 'react';
+import React, { useState, MouseEvent, ReactNode } from 'react';
 import * as Icon from '@/asset/icon';
 import { DeviceType } from '@/type/streamType';
 import { useOutsideClick } from '@/hook';
@@ -9,16 +9,16 @@ interface DeviceSelectBoxProps {
   deviceList: MediaDeviceInfo[];
   onChange: (id: string) => void;
   DeviceIcon: React.FC<React.SVGProps<SVGSVGElement>>;
-  disabled?: boolean;
+  disabled?: boolean | '권한' | '시스템';
 }
 
 interface BoxWrapperProps {
   children: ReactNode;
-  disabled: boolean;
+  disabled: boolean | '권한' | '시스템';
 }
 
 function BoxWrapper({ children, disabled }: BoxWrapperProps) {
-  return disabled ? (
+  return disabled === '권한' ? (
     <ButtonTag name='권한 필요' position='bottom'>
       {children}
     </ButtonTag>
@@ -49,27 +49,31 @@ export default function DeviceSelectBox({
     setIsClicked(false);
   };
 
-  useEffect(() => {
-    if (disabled) {
-      setIsClicked(false);
+  const getLabel = () => {
+    if (disabled === false) {
+      return currentValue.name;
     }
-  }, [disabled]);
+
+    if (disabled === '권한') {
+      return '권한 필요';
+    }
+    return '시스템 오디오';
+  };
+
+  const currentLabel = getLabel();
 
   return (
     <BoxWrapper disabled={disabled}>
-      <div className='relative w-full' ref={targetRef}>
+      <div className='relative  sm:w-deviceSelectBox-sm sm-md:w-deviceSelectBox-sm-md' ref={targetRef}>
         <button
           type='button'
           className={`relative flex h-14 w-full min-w-16 items-center gap-2 truncate rounded border border-solid ${disabled ? 'border-[#E7E8E8]' : 'border-[#80868B]'} pl-[10px] pr-[25px] ${!disabled && 'hover:bg-[#F6FAFE] active:border-[#1B77E4] active:bg-[#DBE9FB]'} `}
           onClick={handleSelectButtonClick}
-          disabled={disabled}
+          disabled={Boolean(disabled)}
         >
           <DeviceIcon width={16} height={16} fill={disabled ? '#B5B6B7' : '#3C4043'} />
-          <p
-            className={`w-full truncate text-left ${disabled ? 'text-[#B5B6B7]' : 'text-[#3C4043]'}`}
-            style={{ maxWidth: 'calc(100vw - 512px)' }}
-          >
-            {disabled ? '권한 필요' : currentValue.name}
+          <p className={`w-full truncate text-left ${disabled ? 'text-[#B5B6B7]' : 'text-[#3C4043]'}`}>
+            {currentLabel}
           </p>
           <Icon.ChevronFill
             width={18}

@@ -106,7 +106,7 @@ function SettingModal({ stream, onUpdateStream, onClose }: SettingModalProps) {
       >
         <Icon.Delete width={24} height={24} fill='#5F6368' />
       </button>
-      <div className='m-6 w-[496px] pt-[60px]'>
+      <div className='m-6 pt-[60px] md:w-settingContent-md'>
         <SettingContent stream={stream} category={category} onUpdateStream={onUpdateStream} />
       </div>
     </div>

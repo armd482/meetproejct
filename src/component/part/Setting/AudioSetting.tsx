@@ -91,7 +91,7 @@ export default function AudioSetting({ stream, onUpdateStream }: AudioSettingPro
             deviceList={audioInputList}
             onChange={(id: string) => handleAudioChange(id, 'input')}
             DeviceIcon={Icon.MicOn}
-            disabled={!(permission && permission.audio)}
+            disabled={permission?.audio ? false : '권한'}
           />
         </div>
         <div className='ml-6 flex w-40 items-center justify-center pt-7'>
@@ -112,7 +112,7 @@ export default function AudioSetting({ stream, onUpdateStream }: AudioSettingPro
             deviceList={audioOuputList}
             onChange={(id: string) => handleAudioChange(id, 'output')}
             DeviceIcon={Icon.Sound}
-            disabled={!(permission && permission.audio)}
+            disabled={permission?.audio ? (audioOuputList.length === 0 ? '시스템' : false) : '권한'}
           />
         </div>
         <div className='ml-6 flex w-40 items-center justify-center pt-7'>
