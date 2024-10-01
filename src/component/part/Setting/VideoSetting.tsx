@@ -46,7 +46,7 @@ export default function VideoSetting({ stream, onUpdateStream }: VideoSettingPro
           deviceList={videoInputList}
           onChange={handleVideoChange}
           DeviceIcon={Icon.VideoOn}
-          disabled={!(permission && permission.video)}
+          disabled={permission?.video ? false : '권한'}
         />
       </div>
       <div className='ml-6 flex w-40 items-center justify-center pt-7'>

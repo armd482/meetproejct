@@ -30,6 +30,11 @@ const config: Config = {
       backgroundColor: {
         'black-75': 'rgba(0, 0, 0, 0.75)',
       },
+      width: {
+        'settingContent-md': 'calc(100vw - 112px)',
+        'deviceSelectBox-sm': 'calc(100vw - 160px) !important',
+        'deviceSelectBox-sm-md': 'calc(100vw - 320px)',
+      },
       keyframes: {
         'slide-in-left': {
           '0%': {
