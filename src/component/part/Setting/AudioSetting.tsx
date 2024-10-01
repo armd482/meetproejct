@@ -94,7 +94,7 @@ export default function AudioSetting({ stream, onUpdateStream }: AudioSettingPro
             disabled={permission?.audio ? false : '권한'}
           />
         </div>
-        <div className='ml-6 flex w-40 items-center justify-center pt-7'>
+        <div className='ml-6 flex w-40 items-center justify-center pt-7 sm:ml-0 sm:w-full'>
           {permission?.audio ? (
             <Visualizer stream={stream} />
           ) : (
