@@ -8,7 +8,7 @@ import { postCheckSessionId } from '@/app/api/mongoAPI';
 import { getRandomHexColor } from '@/lib/getRandomColor';
 import { createSession } from '@/lib/createSession';
 import { useUserInfoStore } from '@/store/UserInfoStore';
-import { Loading } from '@/component';
+import { Alert, Loading } from '@/component';
 
 interface NameFormProps {
   isHost: boolean;
@@ -19,6 +19,7 @@ const MAX_SIZE = 60;
 export default function NameForm({ isHost }: NameFormProps) {
   const [isPending, setIsPending] = useState(false);
   const [name, setName] = useState('');
+  const [isFailed, setIsFailed] = useState(false);
   const { setName: setUserName, setColor: setUserColor } = useUserInfoStore(
     useShallow((state) => ({
       setName: state.setName,
@@ -49,6 +50,10 @@ export default function NameForm({ isHost }: NameFormProps) {
         setUserName(name);
         setUserColor(randomColor);
         router.push(`${key}`);
+      } else {
+        setIsPending(false);
+        setIsFailed(true);
+        return;
       }
     }
 
@@ -62,6 +67,10 @@ export default function NameForm({ isHost }: NameFormProps) {
       setUserName(name);
       setUserColor(randomColor);
     }
+  };
+
+  const handleAlertClose = () => {
+    setIsFailed(false);
   };
   return (
     <form className='flex w-full max-w-[300px] flex-col items-center justify-center' onSubmit={handleFromSubmit}>
@@ -82,6 +91,7 @@ export default function NameForm({ isHost }: NameFormProps) {
         {isHost ? '생성하기' : '참여하기'}
       </button>
       <Loading isPending={isPending} />
+      <Alert isOpen={isFailed} onCloseAlert={handleAlertClose} text='세션 생성에 실패하였습니다' />
     </form>
   );
 }
