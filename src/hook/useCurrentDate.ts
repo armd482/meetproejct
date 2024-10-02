@@ -3,12 +3,13 @@
 import { useState, useEffect, useRef } from 'react';
 
 const useCurrentDate = () => {
-  const [time, setTime] = useState(() => new Date());
+  const [time, setTime] = useState<Date | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    const currnetSecond = new Date().getTime();
+    const currenTime = new Date();
+    setTime(currenTime);
 
     const updateTime = () => {
       setTime(new Date());
@@ -19,7 +20,7 @@ const useCurrentDate = () => {
         updateTime();
         intervalRef.current = setInterval(updateTime, 60000);
       },
-      60000 - (currnetSecond % 60000),
+      60000 - (currenTime.getTime() % 60000),
     );
 
     return () => {

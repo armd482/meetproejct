@@ -2,7 +2,10 @@ const formatNumber = (number: number) => {
   return number.toString().padStart(2, '0');
 };
 
-export const formatTime = (date: Date | string) => {
+export const formatTime = (date: Date | string | null) => {
+  if (date === null) {
+    return '오전 12:00';
+  }
   const newDate = new Date(date);
 
   if (!newDate.getTime()) {
@@ -16,7 +19,10 @@ export const formatTime = (date: Date | string) => {
   return `${period} ${hour12}:${minute}`;
 };
 
-export const formatDate = (date: Date | string) => {
+export const formatDate = (date: Date | string | null) => {
+  if (!date) {
+    return '01월 01일 (월)';
+  }
   const newDate = new Date(date);
   if (!newDate.getTime()) {
     return '날짜 오류';
