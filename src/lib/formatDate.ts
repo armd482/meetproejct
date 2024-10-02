@@ -4,6 +4,10 @@ const formatNumber = (number: number) => {
 
 export const formatTime = (date: Date | string) => {
   const newDate = new Date(date);
+
+  if (!newDate.getTime()) {
+    return '시간 오류';
+  }
   const hour = newDate.getHours();
   const period = hour < 12 ? '오전' : '오후';
   const hour12 = formatNumber(hour % 12 || 12);
@@ -14,6 +18,9 @@ export const formatTime = (date: Date | string) => {
 
 export const formatDate = (date: Date | string) => {
   const newDate = new Date(date);
+  if (!newDate.getTime()) {
+    return '날짜 오류';
+  }
   const WEEK = ['일', '월', '화', '수', '목', '금', '토'];
   const month = formatNumber(newDate.getMonth() + 1);
   const day = formatNumber(newDate.getDate());
